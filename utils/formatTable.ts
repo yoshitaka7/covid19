@@ -5,7 +5,7 @@ const headers = [
   { text: '国籍', value: '国籍' },
   { text: '居住地', value: '居住地' },
   { text: '年代・性別', value: '年代・性別' },
-  { text: '備考', value: '備考' },
+  { text: '備考', value: '備考' }
 ]
 
 type DataType = {
@@ -41,7 +41,7 @@ export default (data: DataType[]) => {
       国籍: d['国籍'] ?? '不明',
       居住地: d['住居地'] ?? '不明',
       '年代・性別': d['年代・性別'] ?? '不明',
-      備考: d['備考'] ?? '不明',
+      備考: d['備考'] ?? '不明'
     }
     tableDate.datasets.push(TableRow)
   })
