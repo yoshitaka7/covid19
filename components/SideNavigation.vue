@@ -145,7 +145,7 @@ export default {
         },
         {
           title: this.$t('Message from Governor Omura'),
-          link: 'https://www.pref.aichi.jp/chiji/index.html'
+          link: 'https://www.pref.aichi.jp/chiji/message/index00.html'
         },
         {
           title: this.$t('About us'),
