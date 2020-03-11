@@ -94,14 +94,10 @@
         >GitHub リポジトリ</a
       >をご確認ください。
     </TextCard>
-
-    <!--
-    <TextCard title="お問い合わせ先（県のHPサイトポリシーについて）">
-      愛知県情報政策課インターネット運用グループ<br />
-      電話
-      <a href="tel:052-954-6114">052-954-6114</a>
+    <TextCard title="お問い合わせ先">
+      Code for Nagoya<br />
+      <a href="mailto:info@code4.nagoya">info@code4.nagoya</a>
     </TextCard>
-    -->
   </div>
 </template>
 
