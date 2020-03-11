@@ -40,21 +40,21 @@
       <div class="SideNavigation-Footer">
         <div class="SideNavigation-SocialLinkContainer">
           <a
-            href="https://line.me/R/ti/p/%40822sysfc"
+            href="http://line.naver.jp/ti/p/%40aichipref"
             target="_blank"
             rel="noopener"
           >
             <img src="/line.png" alt="LINE" />
           </a>
           <a
-            href="https://twitter.com/tokyo_bousai"
+            href="https://twitter.com/pref_aichi"
             target="_blank"
             rel="noopener"
           >
             <img src="/twitter.png" alt="Twitter" />
           </a>
           <a
-            href="https://www.facebook.com/tochokoho"
+            href="https://www.facebook.com/aichikoho"
             target="_blank"
             rel="noopener"
           >
@@ -81,7 +81,6 @@
     "Aichi Prefecture Government": "愛知県",
     "Tokyo COVID-19 Task Force": "新型コロナウイルス感染症対策本部",
     "The latest updates": "県内の最新感染動向",
-    "If you have any symptoms": "新型コロナウイルス感染症が心配なときに",
     "for Families with children": "お子様をお持ちの皆様へ",
     "for Citizens": "県民の皆様へ",
     "for Enterprises and Employees": "企業の皆様・はたらく皆様へ",
@@ -89,7 +88,8 @@
     "Cancelled public events": "愛知労働局主催等 中止又は延期するイベント等",
     "Government official website": "愛知県公式ホームページ",
     "Message from Governor Omura": "知事からのメッセージ",
-    "About us": "当サイトについて"
+    "About us": "当サイトについて",
+    "Other local Government": "他自治体の対策サイト"
   }
 }
 </i18n>
@@ -113,12 +113,7 @@ export default {
         {
           icon: 'mdi-chart-timeline-variant',
           title: this.$t('The latest updates'),
-          link: '/'
-        },
-        {
-          icon: 'covid',
-          title: this.$t('If you have any symptoms'),
-          link: '/flow',
+          link: '/',
           divider: true
         },
         {
@@ -150,7 +145,7 @@ export default {
         },
         {
           title: this.$t('Message from Governor Omura'),
-          link: 'https://www.pref.aichi.jp/chiji/index.html'
+          link: 'https://www.pref.aichi.jp/chiji/message/index00.html'
         },
         {
           title: this.$t('About us'),
@@ -159,6 +154,11 @@ export default {
         {
           title: this.$t('Government official website'),
           link: 'https://www.pref.aichi.jp/',
+          divider: true
+        },
+        {
+          title: this.$t('Other local Government'),
+          link: '/government',
           divider: true
         }
       ]

@@ -6,12 +6,6 @@
       :date="headerItem.date"
     />
     <whats-new class="mb-4" :items="newsItems" />
-    <static-info
-      class="mb-4"
-      :url="'/flow'"
-      :text="'自分や家族の症状に不安や心配があればまずは電話相談をどうぞ'"
-      :btn-text="'相談の手順を見る'"
-    />
     <v-row class="DataBlock">
       <!--
       <v-col cols="12" md="6" class="DataCard">
@@ -33,10 +27,11 @@
           :date="Data.patients.date"
           :unit="'人'"
           :url="
-            'https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d0000000068'
+            'https://www.pref.aichi.jp/soshiki/kenkotaisaku/novel-coronavirus.html'
           "
         />
       </v-col>
+
       <v-col cols="12" md="6" class="DataCard">
         <data-table
           :title="'陽性患者の属性'"
@@ -46,7 +41,7 @@
           :date="Data.patients.date"
           :info="sumInfoOfPatients"
           :url="
-            'https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d0000000068'
+            'https://www.pref.aichi.jp/soshiki/kenkotaisaku/novel-coronavirus.html'
           "
         />
       </v-col>
@@ -106,7 +101,7 @@ import TimeBarChart from '@/components/TimeBarChart.vue'
 // import MetroBarChart from '@/components/MetroBarChart.vue'
 // import TimeStackedBarChart from '@/components/TimeStackedBarChart.vue'
 import WhatsNew from '@/components/WhatsNew.vue'
-import StaticInfo from '@/components/StaticInfo.vue'
+// import StaticInfo from '@/components/StaticInfo.vue'
 import Data from '@/data/data.json'
 import MetroData from '@/data/metro.json'
 import DataTable from '@/components/DataTable.vue'
@@ -124,7 +119,7 @@ export default {
     //    MetroBarChart,
     //    TimeStackedBarChart,
     WhatsNew,
-    StaticInfo,
+    //    StaticInfo,
     DataTable
     //    SvgCard,
     //    ConfirmedCasesTable
@@ -135,31 +130,31 @@ export default {
     // 感染者数
     const patientsTable = formatTable(Data.patients.data)
     // 退院者グラフ
-    const dischargesGraph = formatGraph(Data.discharges_summary.data)
+    // const dischargesGraph = formatGraph(Data.discharges_summary.data)
 
     // 相談件数
-    const contactsGraph = formatGraph(Data.contacts.data)
+    // const contactsGraph = formatGraph(Data.contacts.data)
     // 帰国者・接触者電話相談センター相談件数
-    const querentsGraph = formatGraph(Data.querents.data)
+    // const querentsGraph = formatGraph(Data.querents.data)
     // 名古屋市営地下鉄の利用者数の推移
-    const metroGraph = MetroData
+    // const metroGraph = MetroData
     // 検査実施日別状況
-    const inspectionsGraph = [
-      Data.inspections_summary.data['県内'],
-      Data.inspections_summary.data['その他']
-    ]
+    // const inspectionsGraph = [
+    //   Data.inspections_summary.data['県内'],
+    //   Data.inspections_summary.data['その他']
+    // ]
     const inspectionsItems = [
       '県内発生（疑い例・接触者調査）',
       'その他（チャーター便・クルーズ便）'
     ]
-    const inspectionsLabels = Data.inspections_summary.labels
+    // const inspectionsLabels = Data.inspections_summary.labels
     // 死亡者数
     // #MEMO: 今後使う可能性あるので一時コメントアウト
     // const fatalitiesTable = formatTable(
     //   Data.patients.data.filter(patient => patient['備考'] === '死亡')
     // )
     // 検査陽性者の状況
-    const confirmedCases = formatConfirmedCases(Data.main_summary)
+    // const confirmedCases = formatConfirmedCases(Data.main_summary)
 
     const sumInfoOfPatients = {
       lText: patientsGraph[
@@ -173,14 +168,14 @@ export default {
       Data,
       patientsTable,
       patientsGraph,
-      dischargesGraph,
-      contactsGraph,
-      querentsGraph,
-      metroGraph,
-      inspectionsGraph,
-      inspectionsItems,
-      inspectionsLabels,
-      confirmedCases,
+      // dischargesGraph,
+      // contactsGraph,
+      // querentsGraph,
+      // metroGraph,
+      // inspectionsGraph,
+      // inspectionsItems,
+      // inspectionsLabels,
+      // confirmedCases,
       sumInfoOfPatients,
       headerItem: {
         icon: 'mdi-chart-timeline-variant',
