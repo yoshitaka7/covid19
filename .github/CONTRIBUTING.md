@@ -32,9 +32,7 @@
 Issue に、掲載名、リンク先（あれば）、役割をコメントください（準備中）。
 
 ## 開発に関する情報
-* 開発サイト https://dev-covid19-aichi.netlify.com/
-* ステージングサイト https://stg-covid19-aichi.netlify.com/
-* 本番サイト https://covid19-aichi.netlify.com/
-* [デザイン](https://www.figma.com/file/V7vt80p2gauhdgTZeVNbgj/UI%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3?node-id=121%3A156)
+* 開発サイト https://dev-covid19-tokyo.netlify.com/
+* 本番サイト https://stopcovid19.code4.nagoya/
 
 本 ドキュメント の更新も大歓迎です！
