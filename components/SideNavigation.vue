@@ -258,6 +258,7 @@ export default {
 .open {
   @include lessThan($small) {
     position: fixed;
+    overflow: auto;
     top: 0;
     bottom: 0;
     left: 0;
