@@ -10,6 +10,7 @@
       title="神奈川県"
       link="https://www.pref.kanagawa.jp/osirase/1369/"
     />
+    <TextCard title="岐阜県" link="https://covid19-gifu.netlify.com/" />
   </div>
 </template>
 
