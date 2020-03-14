@@ -18,6 +18,13 @@ export default {
     return {
       items: [
         {
+          title:
+            '新型コロナウイルス感染症の影響を受けている中小企業者に対する金融支援（危機関連保証及びセーフティネット保証5号業種追加指定）について',
+          link: 'https://www.pref.aichi.jp/soshiki/kinyu/kinyu0313.html',
+          body:
+            '新型コロナウイルス感染症の発生に起因して事業活動に影響を受けている中小企業者への資金繰り支援措置として、この度、国は全国的な信用収縮に対応するため、2020年3月13日（金曜日）から、危機関連保証を発動することとなりました。'
+        },
+        {
           title: '新型コロナウイルス感染症対策緊急つなぎ資金',
           link: 'https://www.pref.aichi.jp/soshiki/kinyu/kinyu0304.html',
           body:
