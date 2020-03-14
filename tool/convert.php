@@ -86,7 +86,7 @@ function readPatients() : array
 {
   $excelDir = __DIR__.'/downloads/patients.xlsx';
   $sheetName = 'Table 1';
-  $data = xlsxToArray($excelDir, $sheetName, 'A3:H100', 'A2:H2');
+  $data = xlsxToArray($excelDir, $sheetName, 'A3:H200', 'A2:H2');
   return [
     'date' => xlsxToArray($excelDir, $sheetName, 'G1')[0][0], // データ更新日
     'data' => $data->filter(function ($row) {
