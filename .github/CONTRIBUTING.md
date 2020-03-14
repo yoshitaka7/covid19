@@ -32,7 +32,7 @@
 Issue に、掲載名、リンク先（あれば）、役割をコメントください（準備中）。
 
 ## 開発に関する情報
-* 開発サイト https://dev-covid19-tokyo.netlify.com/
+* 開発サイト https://dev-covid19-aichi.netlify.com/
 * 本番サイト https://stopcovid19.code4.nagoya/
 
 本 ドキュメント の更新も大歓迎です！

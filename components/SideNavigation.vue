@@ -60,6 +60,13 @@
           >
             <img src="/facebook.png" alt="Facebook" />
           </a>
+          <a
+            href="https://github.com/code4nagoya/covid19"
+            target="_blank"
+            rel="noopener"
+          >
+            <img src="/github.png" alt="GitHub" />
+          </a>
         </div>
         <!-- <small class="SideNavigation-Copyright" lang="en">
           Copyright &copy; 2020 Tokyo Metropolitan Government. All Rights
@@ -258,6 +265,7 @@ export default {
 .open {
   @include lessThan($small) {
     position: fixed;
+    overflow: auto;
     top: 0;
     bottom: 0;
     left: 0;
