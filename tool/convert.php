@@ -31,8 +31,8 @@ function formatDate(string $date) :string
     $date = formatSerialDate($match[1]);
   }
 
-  if (preg_match('#(\d+/\d+/\d+) (\d+:\d+:\d+)#', $date, $matches)) {
-    $carbon = Carbon::parse($matches[1].' '.$matches[2]);
+  if (preg_match('#(\d+/\d+/\d+)#', $date, $matches)) {
+    $carbon = Carbon::parse($matches[1]);
     return $carbon->format('Y/m/d H:i');
   } else {
     throw new Exception('Can not parse date:'.$date);
@@ -55,7 +55,9 @@ function formatSerialDate(string $serialDate) :string
 function xlsxToArray(string $path, string $sheet_name, string $range, $header_range = null)
 {
   $reader = new PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+
   $spreadsheet = $reader->load($path);
+
   $sheet = $spreadsheet->getSheetByName($sheet_name);
   $data =  new Collection($sheet->rangeToArray($range));
   $data = $data->map(function ($row) {
@@ -84,7 +86,7 @@ function readPatients() : array
 {
   $excelDir = __DIR__.'/downloads/patients.xlsx';
   $sheetName = 'Table 1';
-  $data = xlsxToArray($excelDir, $sheetName, 'A3:H100', 'A2:H2');
+  $data = xlsxToArray($excelDir, $sheetName, 'A3:H200', 'A2:H2');
   return [
     'date' => xlsxToArray($excelDir, $sheetName, 'G1')[0][0], // データ更新日
     'data' => $data->filter(function ($row) {
@@ -135,6 +137,9 @@ $lastUpdate = '';
 
 $lastTime = 0;
 foreach ($data as $key => &$arr) {
+    if ($arr['date'] == null) {
+      continue;
+    }
     $arr['date'] = formatDate($arr['date']);
     $timestamp = Carbon::parse()->format('YmdHis');
     if ($lastTime <= $timestamp) {
