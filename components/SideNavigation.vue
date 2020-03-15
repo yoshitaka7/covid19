@@ -165,7 +165,8 @@ export default {
         },
         {
           title: this.$t('Other local Government'),
-          link: 'https://github.com/tokyo-metropolitan-gov/covid19/blob/development/forkedSites.md#readme'
+          link:
+            'https://github.com/tokyo-metropolitan-gov/covid19/blob/development/forkedSites.md#readme'
         }
       ]
     },
