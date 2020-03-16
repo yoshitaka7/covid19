@@ -88,7 +88,7 @@ function readPatients() : array
   $sheetName = 'Table 1';
   $data = xlsxToArray($excelDir, $sheetName, 'A3:H200', 'A2:H2');
   return [
-    'date' => xlsxToArray($excelDir, $sheetName, 'G1')[0][0], // データ更新日
+    'date' => xlsxToArray($excelDir, $sheetName, 'H1')[0][0], // データ更新日
     'data' => $data->filter(function ($row) {
       return $row['発表日'];
     })->map(function ($row) {
