@@ -88,7 +88,7 @@ function readPatients() : array
   $sheetName = 'Table 1';
   $data = xlsxToArray($excelDir, $sheetName, 'A3:H200', 'A2:H2');
   return [
-    'date' => xlsxToArray($excelDir, $sheetName, 'G1')[0][0], // データ更新日
+    'date' => xlsxToArray($excelDir, $sheetName, 'H1')[0][0], // データ更新日
     'data' => $data->filter(function ($row) {
       return $row['発表日'];
     })->map(function ($row) {
@@ -144,7 +144,7 @@ foreach ($data as $key => &$arr) {
     $timestamp = Carbon::parse()->format('YmdHis');
     if ($lastTime <= $timestamp) {
       $lastTime = $timestamp;
-      $lastUpdate = Carbon::parse($arr['date'])->addDay()->format('Y/m/d 8:00');
+      $lastUpdate = Carbon::parse($arr['date'])->addDay()->format('Y/m/d 22:00');
     }
 }
 $data['lastUpdate'] = $lastUpdate;

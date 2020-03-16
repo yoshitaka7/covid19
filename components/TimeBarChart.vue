@@ -214,6 +214,7 @@ export default {
               },
               type: 'time',
               time: {
+                parser: 'M/D',
                 unit: 'month'
               }
             }
