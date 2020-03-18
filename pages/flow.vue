@@ -73,10 +73,33 @@
           <div class="mx-2 mb-5">
             <img
               src="/flow/sp/sp_flow_04@2x.png"
-              alt="不安に思う方／微熱・軽い咳・感染の不安／経済産業省 遠隔健康相談事業"
+              alt="不安に思う方／微熱・軽い咳・感染の不安"
             />
           </div>
           <div>
+            <h4 class="SodanHeader">
+              愛知県－LINE公式アカウント
+            </h4>
+
+            <div
+              class="SodanHeader"
+              style="margin-top: 10px; margin-bottom: 10px; "
+            >
+              <div>
+                <a
+                  class="Link"
+                  href="https://www.pref.aichi.jp/site/covid19-aichi/line-1.html"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  新型コロナ対策パーソナルサポート
+                  <v-icon size="16">
+                    mdi-open-in-new
+                  </v-icon>
+                </a>
+              </div>
+            </div>
+
             <h4 class="SodanHeader">
               経済産業省 遠隔健康相談事業
             </h4>
@@ -131,11 +154,21 @@
             新型コロナ受診相談窓口
           </h3>
           <p class="SodanHeader">
-            帰国者・接触者電話相談センター
+            愛知県保健医療局<br />健康医務部健康対策課<br />感染症グループ
+          </p>
+          <p
+            style="display: flex; justify-content: center; align-items: center;"
+          >
+            <a
+              style="font-size: 8.3333333333vw; font-weight: bold; text-align: center; text-decoration: none;"
+              href="tel:0529546272"
+            >
+              052-954-6272
+            </a>
           </p>
           <div class="SodanHeader">
             <div class="SodanChip">
-              24時間対応※
+              24時間対応
             </div>
           </div>
           <dl>
@@ -143,11 +176,11 @@
               <dd>
                 <a
                   class="Link"
-                  href="https://www.pref.aichi.jp/soshiki/kenkotaisaku/novel-coronavirus.html#kikokusha"
+                  href="https://www.pref.aichi.jp/site/covid19-aichi/soudan.html#soudan"
                   target="_blank"
                   rel="noopener"
                 >
-                  お住まいの地域の保健所・保健センターへ
+                  または、<br />お住まいの地域の保健所・保健センターへ
                   <v-icon size="16">
                     mdi-open-in-new
                   </v-icon>
@@ -156,7 +189,7 @@
             </div>
             <div>
               <dd>
-                ※地域により受付時間が異なります
+                (地域により受付時間が異なります)
               </dd>
             </div>
           </dl>
