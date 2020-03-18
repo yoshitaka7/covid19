@@ -1267,7 +1267,7 @@
       <g transform="translate(0 0)">
         <g transform="translate(19 5)">
           <a
-            xlink:href="https://www.pref.aichi.jp/soshiki/kenkotaisaku/novel-coronavirus.html#kikokusha"
+            xlink:href="https://www.pref.aichi.jp/site/covid19-aichi/soudan.html#soudan"
             target="_blank"
             rel="noopener"
           >
