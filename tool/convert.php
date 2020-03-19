@@ -149,4 +149,40 @@ foreach ($data as $key => &$arr) {
 }
 $data['lastUpdate'] = $lastUpdate;
 
+$data['main_summary'] = [
+  'attr' => '検査実施人数',
+  'value' => xlsxToArray(__DIR__.'/downloads/summary.xlsx', '検査実施サマリ', 'A2')[0][0],
+  'children' => [
+    [
+      'attr' => '陽性患者数',
+      'value' => $better_patients_summary['data']['感染者数']->sum(),
+      'children' => [
+        [
+          'attr' => '入院中',
+          'value' => $better_patients_summary['data']['感染者数']->sum() - $better_patients_summary['data']['退院者数']->sum() - $better_patients_summary['data']['死亡者数']->sum(),
+          'children' => [
+            [
+              'attr' => '軽症・中等症',
+              'value' => $better_patients_summary['data']['軽症']->sum() + $better_patients_summary['data']['中等症']->sum()
+            ],
+            [
+              'attr' => '重症',
+              'value' => $better_patients_summary['data']['重症']->sum()
+            ]
+          ]
+        ],
+        [
+          'attr' => '退院',
+          'value' => $better_patients_summary['data']['退院者数']->sum()
+        ],
+        [
+          'attr' => '死亡',
+          'value' => $better_patients_summary['data']['死亡者数']->sum()
+        ]
+
+      ]
+    ]
+  ]
+];
+
 file_put_contents(__DIR__.'/../data/data.json', json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
