@@ -134,9 +134,12 @@
         }
 
         .ac,
-        .am,
         .u {
           font-size: 42px;
+        }
+
+        .am {
+          font-size: 38px;
         }
 
         .ae,
@@ -1220,7 +1223,7 @@
           </g>
         </g>
       </g>
-      <text class="am" transform="translate(333 816)">
+      <text class="am" transform="translate(333 826)">
         <tspan x="-322.663" y="0">新型コロナ受診相談窓口</tspan>
         <tspan class="ad" xml:space="preserve" y="0">による相談結果</tspan>
       </text>

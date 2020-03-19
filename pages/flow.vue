@@ -254,7 +254,7 @@
         </div>
       </div>
       <a
-        href="https://www.pref.aichi.jp//soshiki/kenkotaisaku/novel-coronavirus.html"
+        href="https://www.pref.aichi.jp/site/covid19-aichi/"
         target="_blank"
         rel="noopener"
         class="Flow-Card-Button"
