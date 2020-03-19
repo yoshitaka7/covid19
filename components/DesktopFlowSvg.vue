@@ -134,9 +134,12 @@
         }
 
         .ac,
-        .am,
         .u {
           font-size: 42px;
+        }
+
+        .am {
+          font-size: 38px;
         }
 
         .ae,
@@ -232,9 +235,9 @@
       <filter
         id="a"
         filterUnits="userSpaceOnUse"
-        height="195"
-        width="254"
-        x="498"
+        height="286"
+        width="454"
+        x="298"
         y="515"
       >
         <feOffset input="SourceAlpha" />
@@ -246,8 +249,8 @@
       <filter
         id="c"
         filterUnits="userSpaceOnUse"
-        height="196"
-        width="493"
+        height="286"
+        width="293"
         x="0"
         y="514"
       >
@@ -344,44 +347,154 @@
     </defs>
     <g transform="translate(3 3)">
       <g class="ba" transform="matrix(1, 0, 0, 1, -3, -3)">
-        <g class="a" transform="translate(501 518)">
-          <rect class="ap" height="189" rx="4" width="248" />
+        <g class="a" transform="translate(301 518)">
+          <!-- <rect class="ap" height="189" rx="4" width="248" /> -->
           <rect
             class="d"
-            height="187.5"
+            height="267.5"
             rx="3.25"
-            width="246.5"
+            width="446.5"
             x="0.75"
             y="0.75"
           />
         </g>
       </g>
-      <text class="b" transform="translate(622 555)">
-        <tspan x="-55" y="0">新型コロナ</tspan>
-        <tspan x="-76.67" y="25">コールセンター</tspan>
+
+      <text transform="translate(422 550)">
+        <a
+          xlink:href="https://www.pref.aichi.jp/site/covid19-aichi/soudan-korona.html"
+          target="_blank"
+          rel="noopener"
+        >
+          <tspan class="b" x="-50" y="0">愛知県精神保健福祉センター</tspan>
+        </a>
+
+        <a
+          xlink:href="https://www.pref.aichi.jp/site/covid19-aichi/soudan-korona.html"
+          target="_blank"
+          rel="noopener"
+        >
+          <tspan
+            style="font-weight: bold; font-size: 24px;"
+            class="c"
+            x="-15"
+            y="30"
+          >
+            052-962-5377
+          </tspan>
+        </a>
+
+        <a
+          xlink:href="https://www.pref.aichi.jp/site/covid19-aichi/line-1.html"
+          target="_blank"
+          rel="noopener"
+        >
+          <tspan class="b" x="-55" y="85">愛知県－LINE公式アカウント</tspan>
+        </a>
+
+        <a
+          xlink:href="https://www.pref.aichi.jp/site/covid19-aichi/line-1.html"
+          target="_blank"
+          rel="noopener"
+        >
+          <tspan class="c" x="-35" y="110">
+            新型コロナ対策パーソナルサポート
+          </tspan>
+        </a>
+
+        <a
+          xlink:href="https://www.meti.go.jp/press/2019/03/20200311004/20200311004.html"
+          target="_blank"
+          rel="noopener"
+        >
+          <tspan class="b" x="-55" y="160">経済産業省 遠隔健康相談事業</tspan>
+        </a>
+
+        <tspan class="c" x="-70" y="185">
+          3月31日まで、無料で医師に遠隔相談できます
+        </tspan>
+
+        <a
+          xlink:href="https://medpeer.co.jp/press/7471.html"
+          target="_blank"
+          rel="noopener"
+        >
+          <tspan x="-20" y="210">first call</tspan>
+        </a>
+
+        <a
+          xlink:href="https://linecorp.com/ja/pr/news/ja/2020/3119"
+          target="_blank"
+          rel="noopener"
+        >
+          <tspan x="90" y="210">LINEヘルスケア</tspan>
+        </a>
       </text>
-      <text class="c" transform="translate(622 614)">
-        <tspan x="-75.392" y="0">午前9時から午後9時</tspan>
-        <tspan x="-56" y="20">（土日祝含む）</tspan>
-      </text>
+
+      <g transform="translate(660 535)">
+        <path class="d" d="M0,0H19V19H0Z" />
+        <path
+          class="ao"
+          d="M15.667,15.667H4.583V4.583h5.542V3H4.583A1.583,1.583,0,0,0,3,4.583V15.667A1.583,1.583,0,0,0,4.583,17.25H15.667a1.588,1.588,0,0,0,1.583-1.583V10.125H15.667ZM11.708,3V4.583H14.55L6.768,12.365l1.116,1.116L15.667,5.7V8.542H17.25V3Z"
+          transform="translate(-0.625 -0.625)"
+        />
+      </g>
+
+      <g transform="translate(660 620)">
+        <path class="d" d="M0,0H19V19H0Z" />
+        <path
+          class="ao"
+          d="M15.667,15.667H4.583V4.583h5.542V3H4.583A1.583,1.583,0,0,0,3,4.583V15.667A1.583,1.583,0,0,0,4.583,17.25H15.667a1.588,1.588,0,0,0,1.583-1.583V10.125H15.667ZM11.708,3V4.583H14.55L6.768,12.365l1.116,1.116L15.667,5.7V8.542H17.25V3Z"
+          transform="translate(-0.625 -0.625)"
+        />
+      </g>
+
+      <g transform="translate(660 695)">
+        <path class="d" d="M0,0H19V19H0Z" />
+        <path
+          class="ao"
+          d="M15.667,15.667H4.583V4.583h5.542V3H4.583A1.583,1.583,0,0,0,3,4.583V15.667A1.583,1.583,0,0,0,4.583,17.25H15.667a1.588,1.588,0,0,0,1.583-1.583V10.125H15.667ZM11.708,3V4.583H14.55L6.768,12.365l1.116,1.116L15.667,5.7V8.542H17.25V3Z"
+          transform="translate(-0.625 -0.625)"
+        />
+      </g>
+
+      <g transform="translate(460 745)">
+        <path class="d" d="M0,0H19V19H0Z" />
+        <path
+          class="ao"
+          d="M15.667,15.667H4.583V4.583h5.542V3H4.583A1.583,1.583,0,0,0,3,4.583V15.667A1.583,1.583,0,0,0,4.583,17.25H15.667a1.588,1.588,0,0,0,1.583-1.583V10.125H15.667ZM11.708,3V4.583H14.55L6.768,12.365l1.116,1.116L15.667,5.7V8.542H17.25V3Z"
+          transform="translate(-0.625 -0.625)"
+        />
+      </g>
+
+      <g transform="translate(625 745)">
+        <path class="d" d="M0,0H19V19H0Z" />
+        <path
+          class="ao"
+          d="M15.667,15.667H4.583V4.583h5.542V3H4.583A1.583,1.583,0,0,0,3,4.583V15.667A1.583,1.583,0,0,0,4.583,17.25H15.667a1.588,1.588,0,0,0,1.583-1.583V10.125H15.667ZM11.708,3V4.583H14.55L6.768,12.365l1.116,1.116L15.667,5.7V8.542H17.25V3Z"
+          transform="translate(-0.625 -0.625)"
+        />
+      </g>
+
       <g class="az" transform="matrix(1, 0, 0, 1, -3, -3)">
         <g class="a" transform="translate(3 517)">
-          <rect class="ap" height="190" rx="4" width="487" />
+          <!-- <rect class="ap" height="190" rx="4" width="287" /> -->
           <rect
             class="d"
-            height="188.5"
+            height="268.5"
             rx="3.25"
-            width="485.5"
+            width="285.5"
             x="0.75"
             y="0.75"
           />
         </g>
       </g>
-      <g transform="translate(28 3)">
-        <text class="c" transform="translate(66 641)">
+      <g transform="translate(28 43)">
+        <text class="c" transform="translate(66 621)">
           <tspan x="0" y="0">不安に思う方</tspan>
+          <tspan x="-65" y="25">（微熱・軽い咳・感染の不安）</tspan>
         </text>
-        <g transform="translate(91 570)">
+        <g transform="translate(91 550)">
           <path class="d" d="M0,0H45.36V45.36H0Z" />
           <path
             class="e"
@@ -403,7 +516,7 @@
           <tspan x="-50" y="27">必要な場合</tspan>
         </text>
       </g>
-      <g transform="translate(-4.559 251.625)">
+      <!-- <g transform="translate(-4.559 251.625)">
         <g class="g" transform="translate(289.559 275.375)">
           <path
             class="ap"
@@ -477,7 +590,7 @@
             d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2ZM10,17,5,12l1.41-1.41L10,14.17l7.59-7.59L19,8Z"
           />
         </g>
-      </g>
+      </g> -->
       <g transform="translate(730 587)">
         <g class="k">
           <circle class="ap" cx="23" cy="23" r="23" />
@@ -492,7 +605,7 @@
           />
         </g>
       </g>
-      <g transform="translate(470 587)">
+      <g transform="translate(270 587)">
         <g class="k">
           <circle class="ap" cx="23" cy="23" r="23" />
           <circle class="d" cx="23" cy="23" r="22" />
@@ -533,15 +646,22 @@
         transform="translate(761)"
         width="279"
       />
+
       <text class="n" transform="translate(901 60)">
-        <tspan x="-65" y="0">新型コロナ</tspan>
-        <tspan x="-78" y="29">受診相談窓口</tspan>
+        <tspan x="-70" y="0">新型コロナ</tspan>
+        <tspan x="-85" y="30">受診相談窓口</tspan>
       </text>
-      <text class="c" transform="translate(901 128)">
-        <tspan x="-56" y="0">帰国者・接触者</tspan>
-        <tspan x="-64" y="18">電話相談センター</tspan>
+      <text class="c" transform="translate(901 130)">
+        <tspan x="-65" y="0">愛知県保健医療局</tspan>
+        <tspan x="-80" y="18">健康医務部健康対策課</tspan>
+        <tspan x="-55" y="36">感染症グループ</tspan>
+
+        <tspan x="-100" y="75" style="font-size: 27px; font-weight: bold;">
+          052-954-6272
+        </tspan>
       </text>
-      <g transform="translate(-53 -101)">
+
+      <g transform="translate(-53 -51)">
         <rect
           class="i"
           height="42"
@@ -553,21 +673,21 @@
           <tspan x="-48.816" y="0">24時間対応</tspan>
         </text>
       </g>
-      <g transform="translate(-45 -100)">
+      <!-- <g transform="translate(-45 -100)">
         <text class="p" transform="translate(946 469)">
           <tspan x="-54" y="0">平日土日祝</tspan>
           <tspan class="q">
-            <tspan x="-91.392" y="23">午前9時から午後5時</tspan>
+            <tspan x="-91.392" y="23">午前9時から午後fffaa5時</tspan>
           </tspan>
         </text>
-      </g>
-      <line class="r" transform="translate(783.5 225.5)" x2="236" />
-      <line class="r" transform="translate(783.5 338.5)" x2="236" />
-      <g transform="translate(-64 -102)">
+      </g> -->
+      <!-- <line class="r" transform="translate(783.5 225.5)" x2="236" /> -->
+      <!-- <line class="r" transform="translate(783.5 338.5)" x2="236" /> -->
+      <!-- <g transform="translate(-64 -102)">
         <text class="p" transform="translate(965 363)">
-          <tspan x="-54" y="0">平日（日中）</tspan>
+          <tspan x="-54" y="0">平日土日祝</tspan>
         </text>
-      </g>
+      </g> -->
       <g class="ay" transform="matrix(1, 0, 0, 1, -3, -3)">
         <g class="g" transform="translate(3 3)">
           <path
@@ -1043,15 +1163,15 @@
         </g>
       </g>
       <g transform="translate(0 -7)">
-        <text class="ac" transform="translate(137 1160)">
+        <text class="ac" transform="translate(137 1190)">
           <tspan x="-89.817" y="0">PCR検査</tspan>
         </text>
-        <g transform="translate(-101 1091)">
+        <!-- <g transform="translate(-101 1091)">
           <text class="b" transform="translate(238 106)">
             <tspan x="-77" y="0">東京都健康安全</tspan>
             <tspan x="-77" y="25">研究センター等</tspan>
           </text>
-        </g>
+        </g> -->
       </g>
       <g transform="translate(-264 1017)">
         <g transform="translate(559 167)">
@@ -1103,7 +1223,7 @@
           </g>
         </g>
       </g>
-      <text class="am" transform="translate(333 816)">
+      <text class="am" transform="translate(333 826)">
         <tspan x="-322.663" y="0">新型コロナ受診相談窓口</tspan>
         <tspan class="ad" xml:space="preserve" y="0">による相談結果</tspan>
       </text>
@@ -1163,7 +1283,7 @@
           />
         </g>
       </g>
-      <g transform="translate(0 7)">
+      <!-- <g transform="translate(0 7)">
         <text class="an" transform="translate(913 456)">
           <tspan x="-84.051" y="0">052-954-6272</tspan>
         </text>
@@ -1175,20 +1295,29 @@
             transform="translate(0.25 0.25)"
           />
         </g>
-      </g>
-      <g transform="translate(0 -19)">
+      </g> -->
+      <g transform="translate(0 0)">
         <g transform="translate(19 5)">
           <a
-            xlink:href="https://www.fukushihoken.metro.tokyo.lg.jp/iryo/kansen/coronasodan.html"
+            xlink:href="https://www.pref.aichi.jp/site/covid19-aichi/soudan.html#soudan"
             target="_blank"
             rel="noopener"
           >
-            <text class="c" transform="translate(803 311)" style="">
-              <tspan x="0" y="0">各保健所の電話番号は</tspan>
-              <tspan x="0" y="22">福祉保健局HPへ</tspan>
+            <text class="c" transform="translate(783 300)" style="">
+              <tspan x="0" y="0">または</tspan>
+              <tspan x="0" y="32">お住まいの地域の</tspan>
+              <tspan x="0" y="54">保健所・保健センターへ</tspan>
+              <tspan x="0" y="76">お電話ください※</tspan>
             </text>
           </a>
-          <g transform="translate(927 318)">
+
+          <text class="c" transform="translate(803 410)" style="">
+            <tspan x="-20" y="0">※</tspan>
+            <tspan x="0" y="0">地域により受付時間が</tspan>
+            <tspan x="0" y="22">異なります</tspan>
+          </text>
+
+          <g transform="translate(910 360)">
             <path class="d" d="M0,0H19V19H0Z" />
             <path
               class="ao"
@@ -1198,7 +1327,7 @@
           </g>
         </g>
       </g>
-      <text class="an" transform="translate(633 679)">
+      <!-- <text class="an" transform="translate(633 679)">
         <tspan x="-79.555" y="0">0570-550571</tspan>
       </text>
       <g transform="translate(520 656)">
@@ -1208,7 +1337,7 @@
           d="M6.922,11.439a16.411,16.411,0,0,0,7.139,7.139L16.444,16.2a1.077,1.077,0,0,1,1.1-.26,12.358,12.358,0,0,0,3.867.617A1.087,1.087,0,0,1,22.5,17.636v3.781A1.087,1.087,0,0,1,21.417,22.5,18.415,18.415,0,0,1,3,4.083,1.087,1.087,0,0,1,4.083,3H7.875A1.087,1.087,0,0,1,8.958,4.083a12.307,12.307,0,0,0,.617,3.867A1.087,1.087,0,0,1,9.3,9.056Z"
           transform="translate(0.25 0.25)"
         />
-      </g>
+      </g> -->
     </g>
   </svg>
 </template>
