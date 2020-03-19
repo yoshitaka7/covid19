@@ -13,7 +13,6 @@
       :btn-text="'相談の手順を見る'"
     /> -->
     <v-row class="DataBlock">
-      <!--
       <v-col cols="12" md="6" class="DataCard">
         <svg-card
           title="検査陽性者の状況"
@@ -23,7 +22,7 @@
           <confirmed-cases-table v-bind="confirmedCases" />
         </svg-card>
       </v-col>
-      -->
+
       <v-col cols="12" md="6" class="DataCard">
         <time-bar-chart
           title="陽性患者数"
@@ -113,10 +112,10 @@ import Data from '@/data/data.json'
 import DataTable from '@/components/DataTable.vue'
 import formatGraph from '@/utils/formatGraph'
 import formatTable from '@/utils/formatTable'
-// import formatConfirmedCases from '@/utils/formatConfirmedCases'
+import formatConfirmedCases from '@/utils/formatConfirmedCases'
 import News from '@/data/news.json'
-// import SvgCard from '@/components/SvgCard.vue'
-// import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
+import SvgCard from '@/components/SvgCard.vue'
+import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 
 export default {
   components: {
@@ -125,10 +124,10 @@ export default {
     //    MetroBarChart,
     //    TimeStackedBarChart,
     WhatsNew,
-    // StaticInfo,
-    DataTable
-    //    SvgCard,
-    //    ConfirmedCasesTable
+    //    StaticInfo,
+    DataTable,
+    SvgCard,
+    ConfirmedCasesTable
   },
   data() {
     // 感染者数グラフ
@@ -150,8 +149,8 @@ export default {
     //   Data.inspections_summary.data['その他']
     // ]
     // const inspectionsItems = [
-    //   '県内発生（疑い例・接触者調査）',
-    //   'その他（チャーター便・クルーズ便）'
+    //  '県内発生（疑い例・接触者調査）',
+    //  'その他（チャーター便・クルーズ便）'
     // ]
     // const inspectionsLabels = Data.inspections_summary.labels
     // 死亡者数
@@ -160,7 +159,7 @@ export default {
     //   Data.patients.data.filter(patient => patient['備考'] === '死亡')
     // )
     // 検査陽性者の状況
-    // const confirmedCases = formatConfirmedCases(Data.main_summary)
+    const confirmedCases = formatConfirmedCases(Data.main_summary)
 
     const sumInfoOfPatients = {
       lText: patientsGraph[
@@ -181,7 +180,7 @@ export default {
       // inspectionsGraph,
       // inspectionsItems,
       // inspectionsLabels,
-      // confirmedCases,
+      confirmedCases,
       sumInfoOfPatients,
       headerItem: {
         icon: 'mdi-chart-timeline-variant',
