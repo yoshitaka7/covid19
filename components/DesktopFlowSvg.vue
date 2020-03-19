@@ -617,7 +617,7 @@
 
       <text class="n" transform="translate(901 60)">
         <tspan x="-70" y="0">新型コロナ</tspan>
-        <tspan x="-85" y="30">受信相談窓口</tspan>
+        <tspan x="-85" y="30">受診相談窓口</tspan>
       </text>
       <text class="c" transform="translate(901 130)">
         <tspan x="-65" y="0">愛知県保健医療局</tspan>
