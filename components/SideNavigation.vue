@@ -139,7 +139,7 @@ export default {
           icon: 'mdi-account-multiple',
           title: this.$t('for Citizens'),
           link:
-            'https://www.pref.aichi.jp/soshiki/kenkotaisaku/novel-coronavirus.html'
+            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
         },
         {
           icon: 'mdi-domain',
