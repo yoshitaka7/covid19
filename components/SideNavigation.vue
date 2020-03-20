@@ -121,7 +121,8 @@ export default {
         {
           icon: 'mdi-chart-timeline-variant',
           title: this.$t('The latest updates'),
-          link: '/'
+          link: '/',
+          divider: true
         },
         // {
         //   icon: 'covid',
