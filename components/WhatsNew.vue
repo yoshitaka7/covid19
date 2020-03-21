@@ -10,7 +10,6 @@
         mdi-information
       </v-icon>
       <time
-        v-if="date"
         class="WhatsNew-list-item-anchor-time px-2"
         :datetime="formattedDate(date)"
       >
@@ -96,7 +95,7 @@ export default {
       }
 
       &-time {
-        flex: 0 0 90px;
+        flex: 0 0 auto;
         @include lessThan($medium) {
           flex: 0 0 100%;
         }
