@@ -193,9 +193,9 @@ export default {
         date: Data.lastUpdate
       },
       newsItem: {
-        date: "",
-        url: "https://www.pref.aichi.jp/site/covid19-aichi/",
-        text: "愛知県発表の新型コロナウイルス感染症に関する情報はこちら"
+        date: '2020/03/11',
+        url: 'https://www.pref.aichi.jp/site/covid19-aichi/',
+        text: '愛知県発表の新型コロナウイルス感染症に関する情報はこちら'
       }
       // metroGraphOption: {
       //   responsive: true,
