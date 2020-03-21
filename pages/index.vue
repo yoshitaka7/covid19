@@ -5,7 +5,12 @@
       :title="headerItem.title"
       :date="headerItem.date"
     />
-    <whats-new class="mb-4" :items="newsItems" />
+    <whats-new
+      class="mb-4"
+      :text="newsItem.text"
+      :date="newsItem.date"
+      :url="newsItem.url"
+    />
     <!-- <static-info
       class="mb-4"
       :url="'/flow'"
@@ -187,7 +192,11 @@ export default {
         title: '愛知県内の最新感染動向',
         date: Data.lastUpdate
       },
-      newsItems: News.newsItems
+      newsItem: {
+        date: "",
+        url: "https://www.pref.aichi.jp/site/covid19-aichi/",
+        text: "愛知県発表の新型コロナウイルス感染症に関する情報はこちら"
+      }
       // metroGraphOption: {
       //   responsive: true,
       //   legend: {
