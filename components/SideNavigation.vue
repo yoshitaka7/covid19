@@ -110,12 +110,12 @@ export default {
           link: '/',
           divider: true
         },
-        // {
-        //   icon: 'covid',
-        //   title: this.$t('If you have any symptoms'),
-        //   link: '/flow',
-        //   divider: true
-        // },
+        {
+          icon: 'covid',
+          title: this.$t('If you have any symptoms'),
+          link: '/flow',
+          divider: true
+        },
         {
           icon: 'parent',
           title: this.$t('for Families with children'),
