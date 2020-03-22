@@ -54,6 +54,19 @@
             <img src="/github.png" alt="GitHub" />
           </a>
         </div>
+        <div class="SideNavigation-SponsorLinkContainer">
+          {{ $t('Powered by:') }}<br />
+          <a href="https://www.sakura.ad.jp/" target="_blank" rel="noopener">
+            <span class="image-title">{{ $t('SAKURA internet Inc.') }}</span>
+            <img
+              class="sakura-internet-logo"
+              src="/sakura-internet.svg"
+              width="172px"
+              height="46.5px"
+              :alt="$t('SAKURA internet Inc.')"
+            />
+          </a>
+        </div>
         <!-- <small class="SideNavigation-Copyright" lang="en">
           Copyright &copy; 2020 Tokyo Metropolitan Government. All Rights
           Reserved.
@@ -83,7 +96,8 @@
     "Government official website": "愛知県公式ホームページ",
     "Message from Governor Omura": "知事からのメッセージ",
     "About us": "当サイトについて",
-    "Other local Government": "他自治体の対策サイト"
+    "Other local Government": "他自治体の対策サイト",
+    "SAKURA internet Inc.": "さくらインターネット"
   }
 }
 </i18n>
@@ -244,6 +258,53 @@ export default {
       &:first-of-type {
         margin-right: 10px;
       }
+    }
+  }
+  &-SponsorLinkContainer {
+    overflow: visible;
+    padding-top: 0.8rem;
+    white-space: normal;
+    font-size: 0.82rem;
+    color: $gray-1;
+    & a {
+      color: #333;
+      text-decoration: none;
+    }
+    & a:hover {
+      opacity: 0.6;
+    }
+    & img {
+      padding-bottom: 0.9rem;
+    }
+    & img.justdouit-logo {
+      margin: 0 0 0 -3px;
+      width: 132px;
+    }
+    & img.sakura-internet-logo {
+      margin: -6px 0 0 -14px;
+      width: 176px;
+    }
+    & .image-title {
+      display: inline-block;
+      width: 0;
+      height: 1.5rem;
+      overflow: hidden;
+    }
+    & .no-image-title {
+      display: inline-block;
+      line-height: 1.8rem;
+      color: #444;
+      font-size: 1.5rem;
+      font-weight: 400;
+    }
+    & .cc-by-logo {
+      width: auto;
+      height: 1.8rem;
+      vertical-align: text-top;
+    }
+    & a.license {
+      display: inline-block;
+      margin: -0.7rem 0 0.2rem 0;
     }
   }
   &-Copyright {
