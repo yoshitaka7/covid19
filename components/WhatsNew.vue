@@ -1,38 +1,31 @@
 <template>
   <div class="WhatsNew">
-    <h2 class="WhatsNew-heading">
-      <v-icon size="24" class="WhatsNew-heading-icon">
+    <a
+      class="WhatsNew-list-item-anchor"
+      :href="url"
+      target="_blank"
+      rel="noopener"
+    >
+      <v-icon size="18" class="WhatsNew-heading-icon">
         mdi-information
       </v-icon>
-      最新のお知らせ
-    </h2>
-    <ul class="WhatsNew-list">
-      <li v-for="(item, i) in items" :key="i" class="WhatsNew-list-item">
-        <a
-          class="WhatsNew-list-item-anchor"
-          :href="item.url"
-          target="_blank"
-          rel="noopener"
+      <time
+        class="WhatsNew-list-item-anchor-time px-2"
+        :datetime="formattedDate(date)"
+      >
+        {{ date }}
+      </time>
+      <span class="WhatsNew-list-item-anchor-link">
+        {{ text }}
+        <v-icon
+          v-if="!isInternalLink(url)"
+          class="WhatsNew-item-ExternalLinkIcon"
+          size="12"
         >
-          <time
-            class="WhatsNew-list-item-anchor-time px-2"
-            :datetime="formattedDate(item.date)"
-          >
-            {{ item.date }}
-          </time>
-          <span class="WhatsNew-list-item-anchor-link">
-            {{ item.text }}
-            <v-icon
-              v-if="!isInternalLink(item.url)"
-              class="WhatsNew-item-ExternalLinkIcon"
-              size="12"
-            >
-              mdi-open-in-new
-            </v-icon>
-          </span>
-        </a>
-      </li>
-    </ul>
+          mdi-open-in-new
+        </v-icon>
+      </span>
+    </a>
   </div>
 </template>
 
@@ -41,8 +34,16 @@ import { convertDateToISO8601Format } from '@/utils/formatDate'
 
 export default {
   props: {
-    items: {
-      type: Array,
+    text: {
+      type: String,
+      required: true
+    },
+    date: {
+      type: String,
+      required: true
+    },
+    url: {
+      type: String,
       required: true
     }
   },
@@ -73,7 +74,8 @@ export default {
   margin-left: 12px;
 
   &-icon {
-    margin: 3px;
+    margin: 0 3px;
+    color: $gray-2 !important;
   }
 }
 
@@ -93,7 +95,7 @@ export default {
       }
 
       &-time {
-        flex: 0 0 90px;
+        flex: 0 0 auto;
         @include lessThan($medium) {
           flex: 0 0 100%;
         }
