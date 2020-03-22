@@ -97,6 +97,7 @@
     "Message from Governor Omura": "知事からのメッセージ",
     "About us": "当サイトについて",
     "Other local Government": "他自治体の対策サイト",
+    "Powered by:": "Powered by:",
     "SAKURA internet Inc.": "さくらインターネット"
   }
 }
