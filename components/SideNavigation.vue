@@ -277,10 +277,6 @@ export default {
     & img {
       padding-bottom: 0.9rem;
     }
-    & img.justdouit-logo {
-      margin: 0 0 0 -3px;
-      width: 132px;
-    }
     & img.sakura-internet-logo {
       margin: -6px 0 0 -14px;
       width: 176px;
@@ -297,15 +293,6 @@ export default {
       color: #444;
       font-size: 1.5rem;
       font-weight: 400;
-    }
-    & .cc-by-logo {
-      width: auto;
-      height: 1.8rem;
-      vertical-align: text-top;
-    }
-    & a.license {
-      display: inline-block;
-      margin: -0.7rem 0 0.2rem 0;
     }
   }
   &-Copyright {
