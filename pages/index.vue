@@ -11,6 +11,11 @@
       :date="newsItem.date"
       :url="newsItem.url"
     />
+    <whats-new
+      class="mb-4"
+      text="当サイトは有志が作成したものです。お問い合わせは愛知県ではなく、当サイトまで運営まで。"
+      url="/about"
+    />
     <!-- <static-info
       class="mb-4"
       :url="'/flow'"
