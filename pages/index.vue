@@ -71,7 +71,9 @@
           :chart-data="inspectionsGraph"
           :date="DataInspections.inspections_summary.date"
           :unit="'件'"
-          :remarks="'※3/1は1/30からの合算値、3/8は3/2からの合算値'"
+          :remarks="
+            '※3/1は1/30からの合算値、3/8は3/2からの合算値、3/15は3/9からの合算値'
+          "
           :url="
             'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
           "
