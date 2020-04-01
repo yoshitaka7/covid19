@@ -19,7 +19,7 @@
           <a href="https://www.netlify.com/" target="_blank" rel="noopener">Netlify</a>
         </li>
         <li>
-          <a href="https://github.com/code4nagoya" target="_blank" rel="noopener">Code for Nagoya</a>
+          <a href="https://www.code4.nagoya/" target="_blank" rel="noopener">Code for Nagoya</a>
         </li>
       </ul>
     </Text-card>    
