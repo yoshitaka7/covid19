@@ -22,6 +22,8 @@
           <a href="https://www.code4.nagoya/" target="_blank" rel="noopener">Code for Nagoya</a>
         </li>
       </ul>
+      <br />
+      サーバー提供等で各種団体に協力をいただいて運営しています。協力を検討いただける自治体・企業の担当者はページ末尾のお問い合わせ先にご連絡ください。
     </Text-card>    
     <TextCard title="ブラウザ環境について">
       当サイトは以下の環境でご覧いただくことを推奨いたします。<br />
