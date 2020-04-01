@@ -94,6 +94,8 @@
     "Official statements from Task Force": "愛知県新型コロナウイルス感染症対策本部会議報",
     "Cancelled public events": "愛知労働局主催等 中止又は延期するイベント等",
     "Government official website": "愛知県公式ホームページ",
+    "Government official LINE": "愛知県-新型コロナ対策パーソナルサポート(LINE)",
+    "Government official Twitter": "愛知県庁公式Twitter",
     "Message from Governor Omura": "知事からのメッセージ",
     "About us": "当サイトについて",
     "Other local Government": "他自治体の対策サイト",
@@ -168,13 +170,20 @@ export default {
         },
         {
           title: this.$t('Government official website'),
-          link: 'https://www.pref.aichi.jp/',
+          link: 'https://www.pref.aichi.jp/'
+        },
+        {
+          title: this.$t('Government official LINE'),
+          link: 'https://liny.link/r/1653954481-KA3xJl9g?lp=8Zhyvz'
+        },
+        {
+          title: this.$t('Government official Twitter'),
+          link: 'https://twitter.com/pref_aichi',
           divider: true
         },
         {
           title: this.$t('Other local Government'),
-          link:
-            'https://github.com/tokyo-metropolitan-gov/covid19/blob/development/FORKED_SITES.md#readme'
+          link: 'https://stopcovid19.code4japan.org/'
         }
       ]
     },
