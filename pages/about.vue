@@ -14,17 +14,17 @@
       <ul class="About-Cooperating-Organizations">
         <li>
           <a href="https://www.sakura.ad.jp/" target="_blank" rel="noopener">
-          さくらインターネット株式会社
+            さくらインターネット株式会社
           </a>
         </li>
         <li>
           <a href="https://www.netlify.com/" target="_blank" rel="noopener">
-          Netlify
+            Netlify
           </a>
         </li>
         <li>
           <a href="https://www.code4.nagoya/" target="_blank" rel="noopener">
-          Code for Nagoya
+            Code for Nagoya
           </a>
         </li>
       </ul>
