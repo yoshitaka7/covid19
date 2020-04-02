@@ -13,36 +13,24 @@
     <Text-card title="協力団体">
       <ul class="About-Cooperating-Organizations">
         <li>
-          <a
-            href="https://www.sakura.ad.jp/"
-            target="_blank" 
-            rel="noopener"
-          >
-            さくらインターネット株式会社
+          <a href="https://www.sakura.ad.jp/" target="_blank" rel="noopener">
+          さくらインターネット株式会社
           </a>
         </li>
         <li>
-          <a
-            href="https://www.netlify.com/"
-            target="_blank"
-            rel="noopener"
-          >
-            Netlify
+          <a href="https://www.netlify.com/" target="_blank" rel="noopener">
+          Netlify
           </a>
         </li>
         <li>
-          <a
-            href="https://www.code4.nagoya/"
-            target="_blank"
-            rel="noopener"
-          >
-            Code for Nagoya
+          <a href="https://www.code4.nagoya/" target="_blank" rel="noopener">
+          Code for Nagoya
           </a>
         </li>
       </ul>
       <br />
       サーバー提供等で各種団体に協力をいただいて運営しています。協力を検討いただける自治体・企業の担当者はページ末尾のお問い合わせ先にご連絡ください。
-    </Text-card>    
+    </Text-card>
     <TextCard title="ブラウザ環境について">
       当サイトは以下の環境でご覧いただくことを推奨いたします。<br />
       <ul class="About-Browser-List">
