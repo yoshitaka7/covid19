@@ -360,7 +360,8 @@
         </g>
       </g>
 
-      <text transform="translate(422 550)">
+      <!-- <text transform="translate(422 550)"> -->
+      <text transform="translate(422 600)">
         <a
           xlink:href="https://www.pref.aichi.jp/site/covid19-aichi/soudan-korona.html"
           target="_blank"
@@ -402,7 +403,7 @@
           </tspan>
         </a>
 
-        <a
+        <!-- <a
           xlink:href="https://www.meti.go.jp/press/2019/03/20200311004/20200311004.html"
           target="_blank"
           rel="noopener"
@@ -428,10 +429,11 @@
           rel="noopener"
         >
           <tspan x="90" y="210">LINEヘルスケア</tspan>
-        </a>
+        </a> -->
       </text>
 
-      <g transform="translate(660 535)">
+      <!-- <g transform="translate(660 535)"> -->
+      <g transform="translate(660 585)">
         <path class="d" d="M0,0H19V19H0Z" />
         <path
           class="ao"
@@ -440,7 +442,8 @@
         />
       </g>
 
-      <g transform="translate(660 620)">
+      <!--  <g transform="translate(660 620)"> -->
+      <g transform="translate(660 670)">
         <path class="d" d="M0,0H19V19H0Z" />
         <path
           class="ao"
@@ -449,7 +452,7 @@
         />
       </g>
 
-      <g transform="translate(660 695)">
+      <!-- <g transform="translate(660 695)">
         <path class="d" d="M0,0H19V19H0Z" />
         <path
           class="ao"
@@ -474,7 +477,7 @@
           d="M15.667,15.667H4.583V4.583h5.542V3H4.583A1.583,1.583,0,0,0,3,4.583V15.667A1.583,1.583,0,0,0,4.583,17.25H15.667a1.588,1.588,0,0,0,1.583-1.583V10.125H15.667ZM11.708,3V4.583H14.55L6.768,12.365l1.116,1.116L15.667,5.7V8.542H17.25V3Z"
           transform="translate(-0.625 -0.625)"
         />
-      </g>
+      </g>  -->
 
       <g class="az" transform="matrix(1, 0, 0, 1, -3, -3)">
         <g class="a" transform="translate(3 517)">
