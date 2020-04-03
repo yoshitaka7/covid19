@@ -10,6 +10,27 @@
       <br />
       愛知県による公式情報と客観的な数値をわかりやすく伝えることで、愛知県にお住まいの方や、愛知県内に拠点を持つ企業の方、愛知県を訪れる方が、現状を把握して適切な対策を取れるようにすることを目的としています。
     </TextCard>
+    <Text-card title="協力団体">
+      <ul class="About-Cooperating-Organizations">
+        <li>
+          <a href="https://www.sakura.ad.jp/" target="_blank" rel="noopener">
+            さくらインターネット株式会社
+          </a>
+        </li>
+        <li>
+          <a href="https://www.netlify.com/" target="_blank" rel="noopener">
+            Netlify
+          </a>
+        </li>
+        <li>
+          <a href="https://www.code4.nagoya/" target="_blank" rel="noopener">
+            Code for Nagoya
+          </a>
+        </li>
+      </ul>
+      <br />
+      サーバー提供等で各種団体に協力をいただいて運営しています。協力を検討いただける自治体・企業の担当者はページ末尾のお問い合わせ先にご連絡ください。
+    </Text-card>
     <TextCard title="ブラウザ環境について">
       当サイトは以下の環境でご覧いただくことを推奨いたします。<br />
       <ul class="About-Browser-List">
