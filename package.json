@@ -43,8 +43,7 @@
     "vue-chartjs": "^3.5.0",
     "vue-property-decorator": "^8.4.0",
     "vue-scrollto": "^2.17.1",
-    "vue-spinner": "^1.0.3",
-    "yarn": "^1.22.4"
+    "vue-spinner": "^1.0.3"
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^2.1.0",

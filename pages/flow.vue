@@ -31,8 +31,8 @@
           <div>
             <a v-scroll-to="'#consult'" href="#consult">
               <img
-                src="/flow/sp/sp_flow_01_02_03_nav@2x.png"
-                alt="新型コロナ受診相談窓口へ"
+                src="/flow/sp/sp_flow_01_02_03_nav_2@2x.png"
+                alt="帰国者・接触者相談センターへ"
               />
             </a>
           </div>
@@ -47,8 +47,8 @@
           <div>
             <a v-scroll-to="'#consult'" href="#consult">
               <img
-                src="/flow/sp/sp_flow_01_02_03_nav@2x.png"
-                alt="新型コロナ受診相談窓口へ"
+                src="/flow/sp/sp_flow_01_02_03_nav_2@2x.png"
+                alt="帰国者・接触者相談センターへ"
               />
             </a>
           </div>
@@ -63,8 +63,8 @@
           <div>
             <a v-scroll-to="'#consult'" href="#consult">
               <img
-                src="/flow/sp/sp_flow_01_02_03_nav@2x.png"
-                alt="新型コロナ受診相談窓口へ"
+                src="/flow/sp/sp_flow_01_02_03_nav_2@2x.png"
+                alt="帰国者・接触者相談センターへ"
               />
             </a>
           </div>
@@ -119,7 +119,7 @@
             </div>
 
             <h4 class="SodanHeader">
-              経済産業省 遠隔健康相談事業
+              新型コロナ一般相談窓口
             </h4>
 
             <div
@@ -127,35 +127,19 @@
               style="margin-top: 10px; margin-bottom: 10px; "
             >
               <div style="font-size: 0.875rem; margin-bottom: 10px;">
-                3月31日まで無料で医師に遠隔相談できます
+                愛知県保健医療局<br />健康医務部健康対策課<br />感染症グループ
               </div>
-              <div>
+              <p
+                style="display: flex; justify-content: center; align-items: center;"
+              >
                 <a
-                  class="Link"
-                  href="https://medpeer.co.jp/press/7471.html"
-                  target="_blank"
-                  rel="noopener"
+                  style="font-size: 8.3333333333vw; font-weight: bold; text-align: center; text-decoration: none;"
+                  href="tel:0529546272"
                 >
-                  first call（株式会社Mediplat）
-                  <v-icon size="16">
-                    mdi-open-in-new
-                  </v-icon>
+                  052-954-6272
                 </a>
-              </div>
+              </p>
 
-              <div>
-                <a
-                  class="Link"
-                  href="https://linecorp.com/ja/pr/news/ja/2020/3119"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  LINEヘルスケア
-                  <v-icon size="16">
-                    mdi-open-in-new
-                  </v-icon>
-                </a>
-              </div>
             </div>
           </div>
           <div class="mt-4">
@@ -169,21 +153,8 @@
         </div>
         <div id="consult" class="Flow-Card-Parts Flat">
           <h3 class="SodanHeader Title">
-            新型コロナ受診相談窓口
+            帰国者・接触者<br />相談センター
           </h3>
-          <p class="SodanHeader">
-            愛知県保健医療局<br />健康医務部健康対策課<br />感染症グループ
-          </p>
-          <p
-            style="display: flex; justify-content: center; align-items: center;"
-          >
-            <a
-              style="font-size: 8.3333333333vw; font-weight: bold; text-align: center; text-decoration: none;"
-              href="tel:0529546272"
-            >
-              052-954-6272
-            </a>
-          </p>
           <div class="SodanHeader">
             <div class="SodanChip">
               24時間対応
@@ -191,23 +162,20 @@
           </div>
           <dl>
             <div class="">
-              <dd>
+              <dd>             
                 <a
                   class="Link"
                   href="https://www.pref.aichi.jp/site/covid19-aichi/soudan.html#soudan"
                   target="_blank"
                   rel="noopener"
                 >
-                  または、<br />お住まいの地域の保健所・保健センターへ
-                  <v-icon size="16">
-                    mdi-open-in-new
-                  </v-icon>
+                  <p class="SodanHeader">
+                    お住まいの地域の保健所・保健センターへお電話ください
+                    <v-icon size="16">
+                      mdi-open-in-new
+                    </v-icon>
+                  </p>
                 </a>
-              </dd>
-            </div>
-            <div>
-              <dd>
-                (地域により受付時間が異なります)
               </dd>
             </div>
           </dl>
@@ -215,8 +183,8 @@
         <div class="Flow-Card-Parts">
           <div class="mx-2 mb-5">
             <img
-              src="/flow/sp/sp_flow_06_01@2x.png"
-              alt="新型コロナ受診相談窓口による相談結果／新型コロナ外来受診が必要と判断された場合／新型コロナ外来（帰国者・接触者外来）医師による判断"
+              src="/flow/sp/sp_flow_06_01_2@2x.png"
+              alt="帰国者・接触者相談センターによる相談結果／新型コロナ外来受診が必要と判断された場合／新型コロナ外来（帰国者・接触者外来）医師による判断"
             />
           </div>
           <div class="Col2Btn">
