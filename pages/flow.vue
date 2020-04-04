@@ -129,17 +129,18 @@
               <div style="font-size: 0.875rem; margin-bottom: 10px;">
                 愛知県保健医療局<br />健康医務部健康対策課<br />感染症グループ
               </div>
-              <p
-                style="display: flex; justify-content: center; align-items: center;"
-              >
-                <a
-                  style="font-size: 8.3333333333vw; font-weight: bold; text-align: center; text-decoration: none;"
-                  href="tel:0529546272"
+              <div>
+                <p
+                  style="display: flex; justify-content: center; align-items: center;"
                 >
-                  052-954-6272
-                </a>
-              </p>
-
+                  <a
+                    style="font-size: 8.3333333333vw; font-weight: bold; text-align: center; text-decoration: none;"
+                    href="tel:0529546272"
+                  >
+                    052-954-6272
+                  </a>
+                </p>
+              </div>
             </div>
           </div>
           <div class="mt-4">
@@ -162,7 +163,7 @@
           </div>
           <dl>
             <div class="">
-              <dd>             
+              <dd>
                 <a
                   class="Link"
                   href="https://www.pref.aichi.jp/site/covid19-aichi/soudan.html#soudan"
