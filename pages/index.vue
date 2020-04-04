@@ -28,6 +28,9 @@
           title="検査陽性者の状況"
           :title-id="'details-of-confirmed-cases'"
           :date="headerItem.date"
+          :url="
+            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
+          "
         >
           <confirmed-cases-table v-bind="confirmedCases" />
         </svg-card>
@@ -62,13 +65,15 @@
       </v-col>
       <v-col cols="12" md="6" class="DataCard">
         <time-bar-chart
-          title="検査実施数"
+          title="検査実施件数"
           :title-id="'number-of-inspections'"
           :chart-id="'time-bar-chart-inspections'"
           :chart-data="inspectionsGraph"
           :date="DataInspections.inspections_summary.date"
           :unit="'件'"
-          :remarks="'※3/1は1/30からの合算値、3/8は3/2からの合算値'"
+          :remarks="
+            '※3/1は1/30からの合算値、3/8は3/2からの合算値、3/15は3/9からの合算値'
+          "
           :url="
             'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
           "
