@@ -40,7 +40,7 @@ export default {
     },
     date: {
       type: String,
-      required: true
+      required: false
     },
     url: {
       type: String,
