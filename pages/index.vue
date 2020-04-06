@@ -69,7 +69,7 @@
           :title-id="'number-of-inspections'"
           :chart-id="'time-bar-chart-inspections'"
           :chart-data="inspectionsGraph"
-          :date="DataInspections.inspections_summary.date"
+          :date="Data.inspections_summary.date"
           :unit="'件'"
           :remarks="
             '※3/1は1/30からの合算値、3/8は3/2からの合算値、3/15は3/9からの合算値'
@@ -125,7 +125,6 @@ import TimeBarChart from '@/components/TimeBarChart.vue'
 import WhatsNew from '@/components/WhatsNew.vue'
 // import StaticInfo from '@/components/StaticInfo.vue'
 import Data from '@/data/data.json'
-import DataInspections from '@/data/data_inspections.json'
 // import MetroData from '@/data/metro.json'
 import DataTable from '@/components/DataTable.vue'
 import formatGraph from '@/utils/formatGraph'
@@ -153,9 +152,7 @@ export default {
     // 感染者数
     const patientsTable = formatTable(Data.patients.data)
 
-    const inspectionsGraph = formatGraph(
-      DataInspections.inspections_summary.data
-    )
+    const inspectionsGraph = formatGraph(Data.inspections_summary.data)
     // 退院者グラフ
     // const dischargesGraph = formatGraph(Data.discharges_summary.data)
 
@@ -201,7 +198,6 @@ export default {
 
     const data = {
       Data,
-      DataInspections,
       patientsTable,
       patientsGraph,
       inspectionsGraph,
