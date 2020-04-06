@@ -401,33 +401,27 @@
             新型コロナ対策パーソナルサポート
           </tspan>
         </a>
-
         <a
-          xlink:href="https://www.meti.go.jp/press/2019/03/20200311004/20200311004.html"
+          xlink:href="https://www.pref.aichi.jp/site/covid19-aichi/"
           target="_blank"
           rel="noopener"
         >
-          <tspan class="b" x="-55" y="160">経済産業省 遠隔健康相談事業</tspan>
-        </a>
+          <tspan class="b" x="-55" y="160">新型コロナ一般相談窓口</tspan>
+          <tspan class="c" x="-35" y="180">
+            愛知県保健医療局健康医務部
+          </tspan>
+          <tspan class="c" x="-35" y="195">
+            健康対策課感染症グループ
+          </tspan>
 
-        <tspan class="c" x="-70" y="185">
-          3月31日まで、無料で医師に遠隔相談できます
-        </tspan>
-
-        <a
-          xlink:href="https://medpeer.co.jp/press/7471.html"
-          target="_blank"
-          rel="noopener"
-        >
-          <tspan x="-20" y="210">first call</tspan>
-        </a>
-
-        <a
-          xlink:href="https://linecorp.com/ja/pr/news/ja/2020/3119"
-          target="_blank"
-          rel="noopener"
-        >
-          <tspan x="90" y="210">LINEヘルスケア</tspan>
+          <tspan
+            style="font-weight: bold; font-size: 24px;"
+            class="c"
+            x="-15"
+            y="220"
+          >
+            052-954-6272
+          </tspan>
         </a>
       </text>
 
@@ -449,7 +443,7 @@
         />
       </g>
 
-      <g transform="translate(660 695)">
+      <!-- <g transform="translate(660 695)">
         <path class="d" d="M0,0H19V19H0Z" />
         <path
           class="ao"
@@ -474,7 +468,7 @@
           d="M15.667,15.667H4.583V4.583h5.542V3H4.583A1.583,1.583,0,0,0,3,4.583V15.667A1.583,1.583,0,0,0,4.583,17.25H15.667a1.588,1.588,0,0,0,1.583-1.583V10.125H15.667ZM11.708,3V4.583H14.55L6.768,12.365l1.116,1.116L15.667,5.7V8.542H17.25V3Z"
           transform="translate(-0.625 -0.625)"
         />
-      </g>
+      </g>  -->
 
       <g class="az" transform="matrix(1, 0, 0, 1, -3, -3)">
         <g class="a" transform="translate(3 517)">
@@ -648,17 +642,8 @@
       />
 
       <text class="n" transform="translate(901 60)">
-        <tspan x="-70" y="0">新型コロナ</tspan>
-        <tspan x="-85" y="30">受診相談窓口</tspan>
-      </text>
-      <text class="c" transform="translate(901 130)">
-        <tspan x="-65" y="0">愛知県保健医療局</tspan>
-        <tspan x="-80" y="18">健康医務部健康対策課</tspan>
-        <tspan x="-55" y="36">感染症グループ</tspan>
-
-        <tspan x="-100" y="75" style="font-size: 27px; font-weight: bold;">
-          052-954-6272
-        </tspan>
+        <tspan x="-100" y="50">帰国者・接触者</tspan>
+        <tspan x="-85" y="80">相談センター</tspan>
       </text>
 
       <g transform="translate(-53 -51)">
@@ -1224,7 +1209,7 @@
         </g>
       </g>
       <text class="am" transform="translate(333 826)">
-        <tspan x="-322.663" y="0">新型コロナ受診相談窓口</tspan>
+        <tspan x="-322.663" y="0">帰国者・接触者相談センター</tspan>
         <tspan class="ad" xml:space="preserve" y="0">による相談結果</tspan>
       </text>
       <g transform="translate(520 1006)">
@@ -1304,18 +1289,18 @@
             rel="noopener"
           >
             <text class="c" transform="translate(783 300)" style="">
-              <tspan x="0" y="0">または</tspan>
+              <!-- <tspan x="0" y="0">または</tspan> -->
               <tspan x="0" y="32">お住まいの地域の</tspan>
               <tspan x="0" y="54">保健所・保健センターへ</tspan>
-              <tspan x="0" y="76">お電話ください※</tspan>
+              <tspan x="0" y="76">お電話ください</tspan>
             </text>
           </a>
 
-          <text class="c" transform="translate(803 410)" style="">
+          <!-- <text class="c" transform="translate(803 410)" style="">
             <tspan x="-20" y="0">※</tspan>
             <tspan x="0" y="0">地域により受付時間が</tspan>
             <tspan x="0" y="22">異なります</tspan>
-          </text>
+          </text> -->
 
           <g transform="translate(910 360)">
             <path class="d" d="M0,0H19V19H0Z" />
