@@ -71,9 +71,7 @@
           :chart-data="inspectionsGraph"
           :date="Data.inspections_summary.date"
           :unit="'件'"
-          :remarks="
-            '※3/1は1/30からの合算値、3/8は3/2からの合算値、3/15は3/9からの合算値、3/22は3/16からの合算値'
-          "
+          :remarks="inspectionsRemarks"
           :url="
             'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
           "
@@ -129,6 +127,7 @@ import Data from '@/data/data.json'
 import DataTable from '@/components/DataTable.vue'
 import formatGraph from '@/utils/formatGraph'
 import formatTable from '@/utils/formatTable'
+import formatRemarks from '@/utils/formatRemarks'
 import formatConfirmedCases from '@/utils/formatConfirmedCases'
 // import News from '@/data/news.json'
 import SvgCard from '@/components/SvgCard.vue'
@@ -153,6 +152,8 @@ export default {
     const patientsTable = formatTable(Data.patients.data)
 
     const inspectionsGraph = formatGraph(Data.inspections_summary.data)
+
+    const inspectionsRemarks = formatRemarks(Data.inspections_summary.data)
     // 退院者グラフ
     // const dischargesGraph = formatGraph(Data.discharges_summary.data)
 
@@ -201,6 +202,7 @@ export default {
       patientsTable,
       patientsGraph,
       inspectionsGraph,
+      inspectionsRemarks,
       // dischargesGraph,
       // contactsGraph,
       // querentsGraph,
