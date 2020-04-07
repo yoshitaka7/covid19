@@ -19,7 +19,7 @@ export default (data: DataType[]) => {
       const date = new Date(d['日付'])
       const subTotal = d['小計']
       if (!isNaN(subTotal)) {
-        patSum += subTotal
+        patSum += subTotal * 1
         graphData.push({
           label: `${date.getMonth() + 1}/${date.getDate()}`,
           transition: subTotal,
