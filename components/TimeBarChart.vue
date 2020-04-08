@@ -4,7 +4,7 @@
     :title-id="titleId"
     :date="date"
     :url="url"
-    :remarks="remarks"
+    :notes="notes"
   >
     <template v-slot:button>
       <data-selector v-model="dataKind" />
@@ -15,8 +15,8 @@
       :options="displayOption"
       :height="240"
     />
-    <div v-for="remarks in remarks" :key="remarks.message">
-      {{ remarks }}
+    <div v-for="notes in notes" :key="notes.message">
+      {{ notes }}
     </div>
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
@@ -73,7 +73,7 @@ export default {
       required: false,
       default: ''
     },
-    remarks: {
+    notes: {
       type: Array,
       required: false,
       default: () => []

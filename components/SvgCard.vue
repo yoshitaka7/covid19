@@ -5,7 +5,7 @@
     :title-id="titleId"
     :date="date"
     :url="url"
-    :remarks="remarks"
+    :notes="notes"
   >
     <template v-slot:button>
       <p class="Graph-Desc">
@@ -14,8 +14,8 @@
       </p>
     </template>
     <slot />
-    <div v-for="remarks in remarks" :key="remarks.message">
-      {{ remarks }}
+    <div v-for="notes in notes" :key="notes.message">
+      {{ notes }}
     </div>
   </data-view>
 </template>
@@ -57,7 +57,7 @@ export default {
       required: false,
       default: ''
     },
-    remarks: {
+    notes: {
       type: Array,
       required: false,
       default: () => []
