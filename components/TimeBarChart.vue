@@ -15,6 +15,9 @@
       :options="displayOption"
       :height="240"
     />
+    <div v-for="remarks in remarks" :key="remarks.message">
+      {{ remarks }}
+    </div>
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
         :l-text="displayInfo.lText"
@@ -71,9 +74,9 @@ export default {
       default: ''
     },
     remarks: {
-      type: String,
+      type: Array,
       required: false,
-      default: ''
+      default: () => []
     }
   },
   data() {
