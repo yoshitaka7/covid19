@@ -14,8 +14,8 @@
       class="cardTable"
     />
     <div class="note" />
-    <div v-for="notes in notes" :key="notes">
-      {{ notes }}
+    <div v-for="annotation in annotation" :key="annotation">
+      {{ annotation }}
     </div>
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
@@ -106,7 +106,7 @@ export default {
       required: false,
       default: ''
     },
-    notes: {
+    annotation: {
       type: Array,
       required: false,
       default: () => []

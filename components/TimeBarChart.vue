@@ -4,7 +4,7 @@
     :title-id="titleId"
     :date="date"
     :url="url"
-    :notes="notes"
+    :annotation="annotation"
   >
     <template v-slot:button>
       <data-selector v-model="dataKind" />
@@ -15,8 +15,8 @@
       :options="displayOption"
       :height="240"
     />
-    <div v-for="notes in notes" :key="notes.message">
-      {{ notes }}
+    <div v-for="annotation in annotation" :key="annotation.message">
+      {{ annotation }}
     </div>
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
@@ -73,7 +73,7 @@ export default {
       required: false,
       default: ''
     },
-    notes: {
+    annotation: {
       type: Array,
       required: false,
       default: () => []
