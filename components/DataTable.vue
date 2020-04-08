@@ -14,8 +14,8 @@
       class="cardTable"
     />
     <div class="note" />
-    <div v-for="annotation in annotation" :key="annotation">
-      {{ annotation }}
+    <div v-for="annotations in annotation" :key="annotations">
+      {{ annotations }}
     </div>
     <template v-slot:infoPanel>
       <data-view-basic-info-panel

@@ -14,8 +14,8 @@
       </p>
     </template>
     <slot />
-    <div v-for="annotation in annotation" :key="annotation.message">
-      {{ annotation }}
+    <div v-for="annotations in annotation" :key="annotations">
+      {{ annotations }}
     </div>
   </data-view>
 </template>

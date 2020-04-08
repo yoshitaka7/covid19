@@ -15,8 +15,8 @@
       :options="displayOption"
       :height="240"
     />
-    <div v-for="annotation in annotation" :key="annotation.message">
-      {{ annotation }}
+    <div v-for="annotations in annotation" :key="annotations">
+      {{ annotations }}
     </div>
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
