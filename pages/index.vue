@@ -6,7 +6,12 @@
       :date="headerItem.date"
     />
     <whats-new
-      class="mb-4"
+      class="mb-1"
+      text="4月10日、愛知県に緊急事態宣言が発出されました。すべての不要不急の外出は控えてください。"
+      url="https://www.pref.aichi.jp/site/covid19-aichi/"
+    />
+    <whats-new
+      class="mb-1"
       :text="newsItem.text"
       :date="newsItem.date"
       :url="newsItem.url"
