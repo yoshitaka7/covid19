@@ -124,7 +124,9 @@ export default {
               data: this.chartData.map(d => {
                 return d.transition
               }),
-              backgroundColor: '#bd3f4c',
+              backgroundColor: this.chartData.map(d => {
+                return d.summarized ? '#1976d2' : '#bd3f4c'
+              }),
               borderWidth: 0
             }
           ]
