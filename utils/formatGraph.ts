@@ -1,12 +1,14 @@
 type DataType = {
   日付: Date
   小計: number
+  合算: string
 }
 
 type GraphDataType = {
   label: string
   transition: number
   cumulative: number
+  summarized: boolean
 }
 
 export default (data: DataType[]) => {
@@ -23,7 +25,8 @@ export default (data: DataType[]) => {
         graphData.push({
           label: `${date.getMonth() + 1}/${date.getDate()}`,
           transition: subTotal,
-          cumulative: patSum
+          cumulative: patSum,
+          summarized: !!d['合算']
         })
       }
     })
