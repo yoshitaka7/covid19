@@ -26,6 +26,17 @@
         </v-icon>
       </span>
     </a>
+    <a
+      v-if="subText !== null"
+      class="WhatsNew-list-item-anchor"
+      :href="subUrl"
+      target="_blank"
+      rel="noopener"
+    >
+      <span class="WhatsNew-list-item-anchor-link">
+        {{ subText }}
+      </span>
+    </a>
   </div>
 </template>
 
@@ -45,6 +56,14 @@ export default {
     url: {
       type: String,
       required: true
+    },
+    subText: {
+      type: String,
+      required: false
+    },
+    subUrl: {
+      type: String,
+      required: false
     }
   },
   methods: {
@@ -60,6 +79,8 @@ export default {
 
 <style lang="scss">
 .WhatsNew {
+  display: flex;
+  align-items: center;
   @include card-container();
   padding: 10px;
   margin-bottom: 20px;
