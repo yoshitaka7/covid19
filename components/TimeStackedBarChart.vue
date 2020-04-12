@@ -1,10 +1,15 @@
 <template>
-  <data-view :title="title" :title-id="titleId" :date="date">
+  <data-view
+    :title="title"
+    :title-id="titleId"
+    :date="date"
+    :url="url"
+    :remarks="remarks"
+  >
     <template v-slot:button>
-      <p class="Graph-Desc">
+      <!-- <p class="Graph-Desc">
         （注）同一の対象者について複数の検体を調査する場合あり
-      </p>
-      <data-selector v-model="dataKind" />
+      </p> -->
     </template>
     <bar
       :chart-id="chartId"
@@ -12,6 +17,13 @@
       :options="options"
       :height="240"
     />
+    <div>
+      <ul class="remarks">
+        <li v-for="remarks_text in remarks" :key="remarks_text">
+          {{ remarks_text }}
+        </li>
+      </ul>
+    </div>
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
         :l-text="displayInfo.lText"
@@ -24,11 +36,10 @@
 
 <script>
 import DataView from '@/components/DataView.vue'
-import DataSelector from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 
 export default {
-  components: { DataView, DataSelector, DataViewBasicInfoPanel },
+  components: { DataView, DataViewBasicInfoPanel },
   props: {
     title: {
       type: String,
@@ -47,7 +58,12 @@ export default {
     },
     chartData: {
       type: Array,
-      required: false,
+      required: true,
+      default: () => []
+    },
+    chartLegends: {
+      type: Array,
+      required: true,
       default: () => []
     },
     date: {
@@ -55,100 +71,77 @@ export default {
       required: true,
       default: ''
     },
-    items: {
-      type: Array,
-      required: false,
-      default: () => []
+    latestValueField: {
+      type: String,
+      required: true,
+      default: ''
     },
-    labels: {
-      type: Array,
-      required: false,
-      default: () => []
-    },
+    // items: {
+    //   type: Array,
+    //   required: false,
+    //   default: () => []
+    // },
+    // labels: {
+    //   type: Array,
+    //   required: false,
+    //   default: () => []
+    // },
     unit: {
       type: String,
       required: false,
       default: ''
+    },
+    url: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    remarks: {
+      type: Array,
+      required: false,
+      default: () => []
     }
   },
-  data() {
-    return {
-      dataKind: 'transition'
-    }
-  },
+  // data() {
+  //   return {
+  //     dataKind: 'transition'
+  //   }
+  // },
   computed: {
+    displayLatestValueRatio() {
+      const lastDay = this.chartData.slice(-1)[0][this.latestValueField]
+      const lastDayBefore = this.chartData.slice(-2)[0][this.latestValueField]
+      return lastDay && lastDayBefore
+        ? this.formatDayBeforeRatio(lastDay - lastDayBefore)
+        : '-'
+    },
     displayInfo() {
-      if (this.dataKind === 'transition') {
-        return {
-          lText: this.sum(this.pickLastNumber(this.chartData)).toLocaleString(),
-          sText: `${this.labels[this.labels.length - 1]} の合計`,
-          unit: this.unit
-        }
-      }
       return {
-        lText: this.sum(this.cumulativeSum(this.chartData)).toLocaleString(),
-        sText: `${this.labels[this.labels.length - 1]} の全体累計`,
+        lText:
+          this.chartData
+            .slice(-1)[0]
+            [this.latestValueField]?.toLocaleString() ?? '-',
+        sText: `${this.chartData.slice(-1)[0].label} 実績値（前日比：${
+          this.displayLatestValueRatio
+        } ${this.unit}）`,
         unit: this.unit
       }
     },
     displayData() {
-      const colorArray = ['#a83945', '#f39da5']
-      if (this.dataKind === 'transition') {
-        return {
-          labels: this.labels,
-          datasets: this.chartData.map((item, index) => {
-            return {
-              label: this.items[index],
-              data: item,
-              backgroundColor: colorArray[index],
-              borderWidth: 0
-            }
-          })
-        }
-      }
       return {
-        labels: this.labels,
-        datasets: this.chartData.map((item, index) => {
-          return {
-            label: this.items[index],
-            data: this.cumulative(item),
-            backgroundColor: colorArray[index],
-            borderWidth: 0
-          }
-        })
+        labels: this.chartData.map(d => {
+          return d.label
+        }),
+        datasets: this.chartLegends.map(legend => ({
+          label: legend.label,
+          data: this.chartData.map(d => d[legend.field]),
+          borderWidth: 0,
+          backgroundColor: legend.backgroundColor
+        }))
       }
     },
     options() {
-      const unit = this.unit
-      const sumArray = this.eachArraySum(this.chartData)
-      const data = this.chartData
-      const cumulativeData = this.chartData.map(item => {
-        return this.cumulative(item)
-      })
-      const cumulativeSumArray = this.eachArraySum(cumulativeData)
       return {
-        tooltips: {
-          displayColors: false,
-          callbacks: {
-            label: tooltipItem => {
-              const labelText =
-                this.dataKind === 'transition'
-                  ? `${sumArray[tooltipItem.index]}${unit}（都内: ${
-                      data[0][tooltipItem.index]
-                    }/その他: ${data[1][tooltipItem.index]}）`
-                  : `${cumulativeSumArray[tooltipItem.index]}${unit}（都内: ${
-                      cumulativeData[0][tooltipItem.index]
-                    }/その他: ${cumulativeData[1][tooltipItem.index]}）`
-              return labelText
-            },
-            title(tooltipItem, data) {
-              return data.labels[tooltipItem[0].index].replace(
-                /(\w+)\/(\w+)/,
-                '$1月$2日'
-              )
-            }
-          }
-        },
         responsive: true,
         maintainAspectRatio: false,
         legend: {
@@ -232,38 +225,16 @@ export default {
     }
   },
   methods: {
-    cumulative(array) {
-      const cumulativeArray = []
-      let patSum = 0
-      array.forEach(d => {
-        patSum += d
-        cumulativeArray.push(patSum)
-      })
-      return cumulativeArray
-    },
-    sum(array) {
-      return array.reduce((acc, cur) => {
-        return acc + cur
-      })
-    },
-    pickLastNumber(chartDataArray) {
-      return chartDataArray.map(array => {
-        return array[array.length - 1]
-      })
-    },
-    cumulativeSum(chartDataArray) {
-      return chartDataArray.map(array => {
-        return array.reduce((acc, cur) => {
-          return acc + cur
-        })
-      })
-    },
-    eachArraySum(chartDataArray) {
-      const sumArray = []
-      for (let i = 0; i < chartDataArray[0].length; i++) {
-        sumArray.push(chartDataArray[0][i] + chartDataArray[1][i])
+    formatDayBeforeRatio(dayBeforeRatio) {
+      const dayBeforeRatioLocaleString = dayBeforeRatio.toLocaleString()
+      switch (Math.sign(dayBeforeRatio)) {
+        case 1:
+          return `+${dayBeforeRatioLocaleString}`
+        case -1:
+          return `${dayBeforeRatioLocaleString}`
+        default:
+          return `${dayBeforeRatioLocaleString}`
       }
-      return sumArray
     }
   }
 }
@@ -274,5 +245,9 @@ export default {
   margin: 10px 0;
   font-size: 12px;
   color: $gray-3;
+}
+
+ul.remarks {
+  list-style-type: '※ ';
 }
 </style>
