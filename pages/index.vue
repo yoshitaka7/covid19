@@ -67,9 +67,7 @@
           :date="Data.main_summary_history.date"
           :latest-value-field="'hospitalized'"
           :unit="'人'"
-          :url="
-            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
-          "
+          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
           :remarks="[
             '愛知県が発表した【感染症発生状況】を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
             '[その他]は、転院数と死亡数の合計です',
