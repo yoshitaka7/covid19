@@ -18,7 +18,7 @@ jobs:
           ref: development
           path: development
       - run: |
-          cp -rf data-branch/data/* development/data/
+          cp -rf data-branch/* development/data/
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v2
         with:
