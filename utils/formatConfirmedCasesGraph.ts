@@ -18,10 +18,12 @@ type MainSummaryDataType = {
 
 type ConfirmedCasesGraphDataType = {
   label: string
-  hospitalized?: number // 入院中
+  milds?: number // 軽症中等症
+  severes?: number // 重症
   isolated?: number // 施設入所
+  transfered?: number // 転院
+  deaths?: number // 死亡
   discharged?: number // 退院
-  others?: number // その他
   unknown?: number // 不定（状況データ無し）
 }
 
@@ -61,16 +63,14 @@ export default (
 
       const m = mainSummaryMap.get(label)
       if (m) {
-        const hospitalized = Number(m['入院中'])
-        const isolated = Number(m['施設入所'])
-        const discharged = Number(m['退院'])
-        const others = Number(m['転院']) + Number(m['死亡'])
         graphData.push({
           label,
-          hospitalized,
-          isolated,
-          discharged,
-          others,
+          milds: Number(m['軽症中等症']),
+          severes: Number(m['重症']),
+          isolated: Number(m['施設入所']),
+          transfered: Number(m['転院']),
+          deaths: Number(m['死亡']),
+          discharged: Number(m['退院']),
           unknown: 0
         })
       } else {

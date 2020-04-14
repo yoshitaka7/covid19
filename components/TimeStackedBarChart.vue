@@ -27,6 +27,7 @@
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
         :l-text="displayInfo.lText"
+        :l-title="displayInfo.lTitle"
         :s-text="displayInfo.sText"
         :unit="displayInfo.unit"
       />
@@ -76,6 +77,11 @@ export default {
       required: true,
       default: ''
     },
+    latestValueTitle: {
+      type: String,
+      required: false,
+      default: ''
+    },
     // items: {
     //   type: Array,
     //   required: false,
@@ -121,6 +127,7 @@ export default {
           this.chartData
             .slice(-1)[0]
             [this.latestValueField]?.toLocaleString() ?? '-',
+        lTitle: this.latestValueTitle,
         sText: `${this.chartData.slice(-1)[0].label} 実績値（前日比：${
           this.displayLatestValueRatio
         } ${this.unit}）`,
@@ -136,6 +143,7 @@ export default {
           label: legend.label,
           data: this.chartData.map(d => d[legend.field]),
           borderWidth: 0,
+          borderColor: 'white',
           backgroundColor: legend.backgroundColor
         }))
       }

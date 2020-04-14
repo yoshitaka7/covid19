@@ -59,18 +59,18 @@
 
       <v-col cols="12" md="6" class="DataCard">
         <time-stacked-bar-chart
-          title="入院中患者数の推移"
+          title="検査陽性者状況の推移"
           :title-id="'number-of-current-patients-history'"
           :chart-id="'time-stacked-bar-chart-patients-history'"
           :chart-data="confirmedCasesGraph"
           :chart-legends="confirmedCasesGraphLegends"
           :date="Data.main_summary_history.date"
-          :latest-value-field="'hospitalized'"
+          :latest-value-field="'discharged'"
+          :latest-value-title="'退院'"
           :unit="'人'"
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
           :remarks="[
             '愛知県が発表した【感染症発生状況】を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
-            '[その他]は、転院数と死亡数の合計です',
             '[不定]は、感染症発生状況が取得できなかった日です（陽性者数累計を表示します）'
           ]"
         />
@@ -217,11 +217,13 @@ export default {
       Data.main_summary_history.data
     )
     const confirmedCasesGraphLegends = [
-      { field: 'hospitalized', label: '入院中', backgroundColor: '#bd3f4c' },
-      { field: 'isolated', label: '施設入所', backgroundColor: '#D43B97' },
       { field: 'discharged', label: '退院', backgroundColor: '#4B7030' },
-      { field: 'others', label: 'その他', backgroundColor: '#79BD48' },
-      { field: 'unknown', label: '不定', backgroundColor: '#DDDDDD' }
+      { field: 'isolated', label: '施設入所', backgroundColor: '#2F7D41' },
+      { field: 'milds', label: '軽症中等症', backgroundColor: '#bd3f4c' },
+      { field: 'severes', label: '重症', backgroundColor: '#C95E38' },
+      { field: 'transfered', label: '転院', backgroundColor: '#cccccc' },
+      { field: 'deaths', label: '死亡', backgroundColor: '#bbbbbb' },
+      { field: 'unknown', label: '不定', backgroundColor: '#dddddd' }
     ]
 
     const sumInfoOfPatients = {
