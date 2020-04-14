@@ -14,7 +14,7 @@
 * good first issue / help wanted / bug を優先して対応いただけると助かります
 
 ## コミュニケーションへの参加方法
-* stopcovid19aichi の Slack アカウントを持っていない場合、[こちらから登録](https://join.slack.com/t/stopcovid19aichi/shared_invite/zt-cp57k9w7-ore0IohNQ1KtjyCoHwZ4Og?fbclid=IwAR2KaZT3hAb6Wla6DTKaLcFEmdm-rHkFqHTMbryJiFYiksjsvpEwdnfe1fA)してください
+* stopcovid19aichi の Slack アカウントを持っていない場合、[こちらから登録](https://join.slack.com/t/stopcovid19aichi/shared_invite/zt-dhottav7-cqCfzVdNIGM8tUn9voVEUg)してください
 
 ## 参加にあたって
 * 開発に参加する前に、[Principle/行動規範](CODE_OF_CONDUCT.md) をご一読ください。
