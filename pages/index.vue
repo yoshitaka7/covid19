@@ -217,10 +217,10 @@ export default {
       Data.main_summary_history.data
     )
     const confirmedCasesGraphLegends = [
-      { field: 'discharged', label: '退院', backgroundColor: '#4B7030' },
-      { field: 'isolated', label: '施設入所', backgroundColor: '#2F7D41' },
+      { field: 'discharged', label: '退院', backgroundColor: '#3A5725' },
+      { field: 'isolated', label: '施設入所', backgroundColor: '#7EBD51' },
       { field: 'milds', label: '軽症中等症', backgroundColor: '#bd3f4c' },
-      { field: 'severes', label: '重症', backgroundColor: '#C95E38' },
+      { field: 'severes', label: '重症', backgroundColor: '#A33641' },
       { field: 'transfered', label: '転院', backgroundColor: '#cccccc' },
       { field: 'deaths', label: '死亡', backgroundColor: '#bbbbbb' },
       { field: 'unknown', label: '不定', backgroundColor: '#dddddd' }
