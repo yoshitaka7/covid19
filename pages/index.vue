@@ -57,7 +57,12 @@
         />
       </v-col>
 
-      <v-col cols="12" md="6" class="DataCard">
+      <v-col
+        v-if="confirmedCasesGraph != null"
+        cols="12"
+        md="6"
+        class="DataCard"
+      >
         <time-stacked-bar-chart
           title="検査陽性者状況の推移"
           :title-id="'number-of-current-patients-history'"
@@ -212,10 +217,14 @@ export default {
     const confirmedCases = formatConfirmedCases(Data.main_summary)
 
     // 入院中患者数の推移
-    const confirmedCasesGraph = formatConfirmedCasesGraph(
-      Data.patients_summary.data,
-      Data.main_summary_history.data
-    )
+    const confirmedCasesGraph =
+      Data.main_summary_history != null
+        ? formatConfirmedCasesGraph(
+            Data.patients_summary.data,
+            Data.main_summary_history.data
+          )
+        : null
+
     const confirmedCasesGraphLegends = [
       { field: 'discharged', label: '退院', backgroundColor: '#0070C0' },
       { field: 'isolated', label: '施設入所', backgroundColor: '#92D050' },
