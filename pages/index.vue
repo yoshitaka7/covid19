@@ -7,11 +7,6 @@
     />
     <whats-new
       class="mb-1"
-      text="4月11日発表のPCR検査結果の誤りが判明したと、愛知県より発表がありました。愛知県より訂正され次第、本サイトも修正します。"
-      url="https://www.pref.aichi.jp/site/covid19-aichi/"
-    />
-    <whats-new
-      class="mb-1"
       text="4月10日、愛知県緊急事態宣言が発出されました"
       url="https://www.pref.aichi.jp/site/covid19-aichi/"
       sub-text="(愛知県公式サイトが閲覧できない場合はこちら)"
