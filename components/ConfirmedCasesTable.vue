@@ -8,10 +8,11 @@
     :aria-label="
       ariaLabel(
         検査実施人数,
-        陽性物数,
+        陽性患者数,
         入院中,
         軽症中等症,
         重症,
+        施設入所,
         死亡,
         転院,
         退院
@@ -107,35 +108,43 @@
       fill="#A83945"
     />
     <rect
-      x="245"
-      y="25"
-      width="28"
-      height="94"
+      x="244"
+      y="24.5"
+      width="21"
+      height="95"
       stroke="#A83945"
-      stroke-width="2"
+      stroke-width="1"
     />
     <rect
-      x="277"
-      y="25"
-      width="28"
-      height="94"
+      x="267"
+      y="24.5"
+      width="21"
+      height="95"
       stroke="#A83945"
-      stroke-width="2"
+      stroke-width="1"
     />
     <rect
-      x="309"
-      y="25"
-      width="30"
-      height="94"
+      x="290"
+      y="24.5"
+      width="21"
+      height="95"
       stroke="#A83945"
-      stroke-width="2"
+      stroke-width="1"
+    />
+    <rect
+      x="313"
+      y="24.5"
+      width="26"
+      height="95"
+      stroke="#A83945"
+      stroke-width="1"
     />
     <text
       class="red text"
       transform="translate(60 100)"
-      :dx="getAdjustX(陽性物数)"
+      :dx="getAdjustX(陽性患者数)"
     >
-      <tspan>{{ 陽性物数 }}</tspan>
+      <tspan>{{ 陽性患者数 }}</tspan>
       <tspan class="unit" dx="-3">人</tspan>
     </text>
     <text
@@ -164,38 +173,53 @@
     </text>
 
     <text
-      class="red text"
-      transform="translate(248 100)"
+      class="red text additional-case"
+      transform="translate(246 100)"
+      :dx="getAdjustX(施設入所)"
+    >
+      <tspan>{{ 施設入所 }}</tspan>
+      <tspan class="unit additional-case" dx="-3">人</tspan>
+    </text>
+    <text x="245.5" y="75" class="red additional-case" text-anchor="start">
+      施設
+    </text>
+    <text x="245.5" y="85" class="red additional-case" text-anchor="start">
+      入所
+    </text>
+
+    <text
+      class="red text additional-case"
+      transform="translate(268.5 100)"
       :dx="getAdjustX(転院)"
     >
       <tspan>{{ 転院 }}</tspan>
-      <tspan class="unit" dx="-3">人</tspan>
+      <tspan class="unit additional-case" dx="-3">人</tspan>
     </text>
-    <text x="245" y="80" font-size="7" class="red text" text-anchor="start">
+    <text x="268.5" y="80" class="red additional-case" text-anchor="start">
       転院
     </text>
 
     <text
-      class="red text"
-      transform="translate(279 100)"
+      class="red text additional-case"
+      transform="translate(292 100)"
       :dx="getAdjustX(死亡)"
     >
       <tspan>{{ 死亡 }}</tspan>
-      <tspan class="unit" dx="-3">人</tspan>
+      <tspan class="unit additional-case" dx="-3">人</tspan>
     </text>
-    <text x="278" y="80" font-size="7" class="red text" text-anchor="start">
+    <text x="291.5" y="80" class="red additional-case" text-anchor="start">
       死亡
     </text>
 
     <text
-      class="red text"
-      transform="translate(310 100)"
+      class="red text additional-case"
+      transform="translate(318.5 100)"
       :dx="getAdjustX(退院)"
     >
       <tspan>{{ 退院 }}</tspan>
-      <tspan class="unit" dx="-3">人</tspan>
+      <tspan class="unit additional-case" dx="-3">人</tspan>
     </text>
-    <text x="310" y="80" font-size="7" class="red text" text-anchor="start">
+    <text x="317" y="80" class="red additional-case" text-anchor="start">
       退院
     </text>
   </svg>
@@ -205,10 +229,11 @@
 export default {
   props: [
     '検査実施人数',
-    '陽性物数',
+    '陽性患者数',
     '入院中',
     '軽症中等症',
     '重症',
+    '施設入所',
     '死亡',
     '転院',
     '退院'
@@ -242,10 +267,11 @@ export default {
       hospitalized,
       mild,
       critically,
+      facilitated,
       deceased,
       discharged
     ) {
-      const ariaLabel = `検査陽性者の状況: 検査実施人数は${inspected}人、うち累積の陽性者数は${positive}人です。入院中は${hospitalized}人で、うち軽症・中等症は${mild}人、また重症は${critically}人です。さらに死亡は${deceased}人、退院は${discharged}人です。`
+      const ariaLabel = `検査陽性者の状況: 検査実施人数は${inspected}人、うち累積の陽性患者数は${positive}人です。入院中は${hospitalized}人で、うち軽症・中等症は${mild}人、また重症は${critically}人、施設入所は${facilitated}人です。さらに死亡は${deceased}人、退院は${discharged}人です。`
       return ariaLabel
     }
   }
@@ -264,8 +290,13 @@ export default {
     font-size: 13px;
     font-weight: bold;
   }
+  .additional-case {
+    font-size: 65%;
+    font-weight: bold;
+  }
   .unit {
-    font-size: 10px;
+    font-size: 9px;
+    font-weight: normal;
   }
 }
 </style>
