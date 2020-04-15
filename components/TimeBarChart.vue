@@ -15,8 +15,12 @@
       :options="displayOption"
       :height="240"
     />
-    <div v-for="remarks_text in remarks" :key="remarks_text">
-      {{ remarks_text }}
+    <div>
+      <ul class="remarks">
+        <li v-for="remarks_text in remarks" :key="remarks_text">
+          {{ remarks_text }}
+        </li>
+      </ul>
     </div>
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
@@ -271,3 +275,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+ul.remarks {
+  list-style-type: '※ ';
+}
+</style>
