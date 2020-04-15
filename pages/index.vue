@@ -36,7 +36,7 @@
           :title-id="'details-of-confirmed-cases'"
           :date="headerItem.date"
           :url="
-            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
+            'https://www.pref.aichi.jp/site/covid19-aichi/'
           "
         >
           <confirmed-cases-table v-bind="confirmedCases" />
