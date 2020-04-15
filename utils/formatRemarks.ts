@@ -13,5 +13,5 @@ export default (data: DataType[]) => {
     .filter(d => d['合算'])
     .map(d => convertDateToShortFormat(new Date(d['日付']).toISOString()))
     .join(', ')
-  return joined !== '' ? `※青色＜${joined}＞は合算値(出典参照)` : ''
+  return joined !== '' ? `青色＜${joined}＞は合算値(出典参照)` : ''
 }
