@@ -57,17 +57,27 @@
         />
       </v-col>
 
-      <v-col cols="12" md="6" class="DataCard">
-        <data-table
-          :title="'陽性患者の属性'"
-          :title-id="'attributes-of-confirmed-cases'"
-          :chart-data="patientsTable"
-          :chart-option="{}"
-          :date="Data.patients.date"
-          :info="sumInfoOfPatients"
-          :url="
-            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
-          "
+      <v-col
+        v-if="confirmedCasesGraph != null"
+        cols="12"
+        md="6"
+        class="DataCard"
+      >
+        <time-stacked-bar-chart
+          title="検査陽性者状況の推移"
+          :title-id="'number-of-current-patients-history'"
+          :chart-id="'time-stacked-bar-chart-patients-history'"
+          :chart-data="confirmedCasesGraph"
+          :chart-legends="confirmedCasesGraphLegends"
+          :date="Data.main_summary_history.date"
+          :latest-value-field="'discharged'"
+          :latest-value-title="'退院'"
+          :unit="'人'"
+          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
+          :remarks="[
+            '愛知県が発表した【感染症発生状況】を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
+            '[不定]は、感染症発生状況が取得できなかった日です（陽性者数累計を表示します）'
+          ]"
         />
       </v-col>
       <v-col cols="12" md="6" class="DataCard">
@@ -80,9 +90,22 @@
           :unit="'件'"
           :remarks="[
             inspectionsRemarks,
-            '※愛知県衛生研究所、名古屋市衛生研究所、厚生労働省機関で実施した県内の新型コロナウイルスの遺伝子検査件数',
-            '※愛知県分に民間施設等の検査件数及び陽性者数を含んでいます（発表時点での把握数）'
+            '愛知県衛生研究所、名古屋市衛生研究所、厚生労働省機関で実施した県内の新型コロナウイルスの遺伝子検査件数',
+            '愛知県分に民間施設等の検査件数及び陽性者数を含んでいます（発表時点での把握数）'
           ]"
+          :url="
+            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
+          "
+        />
+      </v-col>
+      <v-col cols="12" md="6" class="DataCard">
+        <data-table
+          :title="'陽性患者の属性'"
+          :title-id="'attributes-of-confirmed-cases'"
+          :chart-data="patientsTable"
+          :chart-option="{}"
+          :date="Data.patients.date"
+          :info="sumInfoOfPatients"
           :url="
             'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
           "
@@ -130,7 +153,7 @@
 import PageHeader from '@/components/PageHeader.vue'
 import TimeBarChart from '@/components/TimeBarChart.vue'
 // import MetroBarChart from '@/components/MetroBarChart.vue'
-// import TimeStackedBarChart from '@/components/TimeStackedBarChart.vue'
+import TimeStackedBarChart from '@/components/TimeStackedBarChart.vue'
 import WhatsNew from '@/components/WhatsNew.vue'
 // import StaticInfo from '@/components/StaticInfo.vue'
 import Data from '@/data/data.json'
@@ -140,6 +163,7 @@ import formatGraph from '@/utils/formatGraph'
 import formatTable from '@/utils/formatTable'
 import formatRemarks from '@/utils/formatRemarks'
 import formatConfirmedCases from '@/utils/formatConfirmedCases'
+import formatConfirmedCasesGraph from '@/utils/formatConfirmedCasesGraph'
 // import News from '@/data/news.json'
 import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
@@ -149,7 +173,7 @@ export default {
     PageHeader,
     TimeBarChart,
     //    MetroBarChart,
-    //    TimeStackedBarChart,
+    TimeStackedBarChart,
     WhatsNew,
     //    StaticInfo,
     DataTable,
@@ -192,6 +216,25 @@ export default {
     // 検査陽性者の状況
     const confirmedCases = formatConfirmedCases(Data.main_summary)
 
+    // 入院中患者数の推移
+    const confirmedCasesGraph =
+      Data.main_summary_history != null
+        ? formatConfirmedCasesGraph(
+            Data.patients_summary.data,
+            Data.main_summary_history.data
+          )
+        : null
+
+    const confirmedCasesGraphLegends = [
+      { field: 'discharged', label: '退院', backgroundColor: '#0070C0' },
+      { field: 'isolated', label: '施設入所', backgroundColor: '#92D050' },
+      { field: 'milds', label: '軽症中等症', backgroundColor: '#FCD5B5' },
+      { field: 'transfered', label: '転院', backgroundColor: '#7F7F7F' },
+      { field: 'severes', label: '重症', backgroundColor: '#D99694' },
+      { field: 'deaths', label: '死亡', backgroundColor: '#984807' },
+      { field: 'unknown', label: '不定', backgroundColor: '#dddddd' }
+    ]
+
     const sumInfoOfPatients = {
       lText: patientsGraph[
         patientsGraph.length - 1
@@ -222,6 +265,8 @@ export default {
       // inspectionsItems,
       // inspectionsLabels,
       confirmedCases,
+      confirmedCasesGraph,
+      confirmedCasesGraphLegends,
       sumInfoOfPatients,
       sumInfoOfInspections,
       headerItem: {
