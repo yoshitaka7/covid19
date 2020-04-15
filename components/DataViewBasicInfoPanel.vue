@@ -1,6 +1,7 @@
 <template>
   <div class="DataView-DataInfo">
     <span class="DataView-DataInfo-summary">
+      <small class="DataView-DataInfo-summary-unit">{{ lTitle }}</small>
       {{ lText }}
       <small class="DataView-DataInfo-summary-unit">{{ unit }}</small>
     </span>
@@ -62,6 +63,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 @Component
 export default class DataViewBasicInfoPanel extends Vue {
   @Prop() private lText!: string
+  @Prop() private lTitle!: string
   @Prop() private sText!: string
   @Prop() private unit!: string
 }
