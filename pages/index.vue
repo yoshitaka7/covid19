@@ -36,7 +36,7 @@
           :title-id="'details-of-confirmed-cases'"
           :date="headerItem.date"
           :url="
-            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
+            'https://www.pref.aichi.jp/site/covid19-aichi/'
           "
         >
           <confirmed-cases-table v-bind="confirmedCases" />
@@ -214,7 +214,7 @@ export default {
     //   Data.patients.data.filter(patient => patient['備考'] === '死亡')
     // )
     // 検査陽性者の状況
-    const confirmedCases = formatConfirmedCases(Data.main_summary)
+    const confirmedCases = formatConfirmedCases(Data.main_summary_history)
 
     // 入院中患者数の推移
     const confirmedCasesGraph =
