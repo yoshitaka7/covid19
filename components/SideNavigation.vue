@@ -153,7 +153,7 @@ export default {
         {
           title: this.$t('Official statements from Task Force'),
           link:
-            'https://www.pref.aichi.jp/soshiki/kenkotaisaku/novel-coronavirus-taisakuhonbu.html'
+            'https://www.pref.aichi.jp/site/covid19-aichi/novel-coronavirus-taisakuhonbu.html'
         },
         {
           title: this.$t('Cancelled public events'),
