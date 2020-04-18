@@ -7,10 +7,8 @@
     />
     <whats-new
       class="mb-1"
-      text="4月10日、愛知県緊急事態宣言が発出されました"
-      url="https://www.pref.aichi.jp/site/covid19-aichi/"
-      sub-text="(愛知県公式サイトが閲覧できない場合はこちら)"
-      sub-url="https://twitter.com/stopcovid19ai/status/1248512330377256961"
+      text="緊急事態宣言の対象区域が全国に拡大されました。愛知県は「特定警戒都道府県」 に指定されました"
+      url="https://corona.go.jp/"
     />
     <whats-new
       class="mb-1"
