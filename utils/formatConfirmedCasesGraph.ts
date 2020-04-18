@@ -1,3 +1,5 @@
+import dayjs, { Dayjs } from 'dayjs'
+
 type PatientsSummaryDataType = {
   日付: Date
   小計: number
@@ -31,54 +33,76 @@ export default (
   patientSummaries: PatientsSummaryDataType[],
   mainSummaries: MainSummaryDataType[]
 ) => {
+  // Date や日付文字列をYYYY/MM/DD文字列に整形
+  const formatDt = (dtText: string | Date | Dayjs) =>
+    dayjs(dtText).format('YYYY/MM/DD')
+
   const graphData: ConfirmedCasesGraphDataType[] = []
-  const today = new Date()
-  const startDate = new Date(mainSummaries[0]['更新日時']) // new Date('2020/03/15');
-  startDate.setHours(0)
-  startDate.setMinutes(0)
-  startDate.setSeconds(0)
-  startDate.setMilliseconds(0)
+  const today = formatDt(new Date())
+  const startDate = formatDt(mainSummaries[0]['更新日時'])
+
+  // 開始日までの累計を算出
   let patSum = patientSummaries
-    .filter(d => new Date(d['日付']) < startDate)
+    .filter(d => formatDt(d['日付']) < startDate)
     .reduce((pre, d) => pre + d['小計'], 0)
 
+  // patientSummaries と mainSummaries を Map 化
+  const patientSummaryMap = patientSummaries.reduce((pre, d) => {
+    const label = formatDt(d['日付'])
+    pre.set(label, d)
+    return pre
+  }, new Map<string, PatientsSummaryDataType>())
   const mainSummaryMap = mainSummaries.reduce((pre, d) => {
-    const date = new Date(d['更新日時'])
-    const label = `${date.getMonth() + 1}/${date.getDate()}`
+    const label = formatDt(d['更新日時'])
     pre.set(label, d)
     return pre
   }, new Map<string, MainSummaryDataType>())
 
-  patientSummaries
-    .filter(d => new Date(d['日付']) >= startDate)
-    .filter(d => new Date(d['日付']) < today)
-    .filter(
-      d =>
-        new Date(d['日付']) < new Date(mainSummaries.slice(-1)[0]['更新日時'])
-    )
-    .forEach(d => {
-      const date = new Date(d['日付'])
-      const label = `${date.getMonth() + 1}/${date.getDate()}`
-      patSum += Number(d['小計'])
+  // 修了日は patientSummaries と mainSummaries の後端の大きい(未来の)方
+  const maxPatient =
+    formatDt(patientSummaries.slice(-1)[0]?.日付) ?? '1900/01/01'
+  const maxSummary = formatDt(
+    mainSummaries.slice(-1)[0]?.更新日時 ?? '1900/01/01'
+  )
+  const endDate = maxPatient < maxSummary ? maxSummary : maxPatient
 
-      const m = mainSummaryMap.get(label)
-      if (m) {
-        graphData.push({
-          label,
-          milds: Number(m['軽症中等症']),
-          severes: Number(m['重症']),
-          isolated: Number(m['施設入所']),
-          transfered: Number(m['転院']),
-          deaths: Number(m['死亡']),
-          discharged: Number(m['退院']),
-          unknown: 0
-        })
-      } else {
-        graphData.push({
-          label,
-          unknown: patSum
-        })
-      }
-    })
+  // 開始日から修了日までループ
+  let dt = startDate
+  while (dt <= endDate) {
+    if (dt > today) {
+      break
+    }
+
+    const label = dayjs(dt).format('M/D')
+
+    const d = patientSummaryMap.get(dt)
+    if (d != null) {
+      patSum += Number(d['小計'])
+    }
+
+    const m = mainSummaryMap.get(dt)
+    if (m != null) {
+      graphData.push({
+        label,
+        milds: Number(m['軽症中等症']),
+        severes: Number(m['重症']),
+        isolated: Number(m['施設入所']),
+        transfered: Number(m['転院']),
+        deaths: Number(m['死亡']),
+        discharged: Number(m['退院']),
+        unknown: 0
+      })
+    } else {
+      // 不定
+      graphData.push({
+        label,
+        unknown: patSum
+      })
+    }
+
+    // 次の日へ
+    dt = formatDt(dayjs(dt).add(1, 'day'))
+  }
+
   return graphData
 }
