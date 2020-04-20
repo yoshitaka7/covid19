@@ -15,6 +15,14 @@
       :options="displayOption"
       :height="240"
     />
+    <date-select-slider
+      :chart-data="chartData"
+      :value="defaultDisplaySpan"
+      :min="spanMin"
+      :max="spanMax"
+      :min-span-days="minSpanDays"
+      @sliderInput="sliderUpdate"
+    />
     <div>
       <ul class="remarks">
         <li v-for="remarks_text in remarks" :key="remarks_text">
@@ -38,9 +46,15 @@
 import DataView from '@/components/DataView.vue'
 import DataSelector from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
+import DateSelectSlider from '@/components/DateSelectSlider.vue'
 
 export default {
-  components: { DataView, DataSelector, DataViewBasicInfoPanel },
+  components: {
+    DataView,
+    DataSelector,
+    DataViewBasicInfoPanel,
+    DateSelectSlider
+  },
   props: {
     title: {
       type: String,
@@ -84,11 +98,42 @@ export default {
     }
   },
   data() {
+    const minSpanDays = 14
+    const displaySpanLower =
+      !this.chartData || this.chartData.length < minSpanDays
+        ? 0
+        : this.chartData.length - minSpanDays
+    const displaySpanUpper =
+      !this.chartData || this.chartData.length < minSpanDays
+        ? 0
+        : this.chartData.length - 1
     return {
-      dataKind: 'transition'
+      dataKind: 'transition',
+      minSpanDays,
+      defaultDisplaySpan: [displaySpanLower, displaySpanUpper],
+      displaySpan: [displaySpanLower, displaySpanUpper]
     }
   },
   computed: {
+    spanMin() {
+      return 0
+    },
+    spanMax() {
+      return this.chartData.length - 1
+    },
+    displayChartData() {
+      if (!this.chartData || this.chartData.length < this.minSpanDays) {
+        return this.chartData
+      }
+      const lowerIndex = this.displaySpan[0]
+      const lower = lowerIndex < this.chartData.length ? lowerIndex : 0
+      const upperIndex = this.displaySpan[1]
+      const upper =
+        upperIndex < this.chartData.length
+          ? upperIndex
+          : this.chartData.length - 1
+      return this.chartData.slice(lower, upper + 1)
+    },
     displayCumulativeRatio() {
       const lastDay = this.chartData.slice(-1)[0].cumulative
       const lastDayBefore = this.chartData.slice(-2)[0].cumulative
@@ -122,16 +167,16 @@ export default {
     displayData() {
       if (this.dataKind === 'transition') {
         return {
-          labels: this.chartData.map(d => {
+          labels: this.displayChartData.map(d => {
             return d.label
           }),
           datasets: [
             {
               label: this.dataKind,
-              data: this.chartData.map(d => {
+              data: this.displayChartData.map(d => {
                 return d.transition
               }),
-              backgroundColor: this.chartData.map(d => {
+              backgroundColor: this.displayChartData.map(d => {
                 return d.summarized ? '#1976d2' : '#bd3f4c'
               }),
               borderWidth: 0
@@ -140,13 +185,13 @@ export default {
         }
       }
       return {
-        labels: this.chartData.map(d => {
+        labels: this.displayChartData.map(d => {
           return d.label
         }),
         datasets: [
           {
             label: this.dataKind,
-            data: this.chartData.map(d => {
+            data: this.displayChartData.map(d => {
               return d.cumulative
             }),
             backgroundColor: '#bd3f4c',
@@ -261,6 +306,9 @@ export default {
     }
   },
   methods: {
+    sliderUpdate(sliderValue) {
+      this.displaySpan = sliderValue
+    },
     formatDayBeforeRatio(dayBeforeRatio) {
       const dayBeforeRatioLocaleString = dayBeforeRatio.toLocaleString()
       switch (Math.sign(dayBeforeRatio)) {
