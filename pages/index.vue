@@ -41,6 +41,40 @@
 
       <v-col cols="12" md="6" class="DataCard">
         <time-bar-chart
+          title="入院中数"
+          :title-id="'number-of-in-hospital'"
+          :chart-id="'time-bar-chart-in-hospital'"
+          :chart-data="inHospitalGraph"
+          :date="Data.main_summary_history.date"
+          :unit="'人'"
+          :remarks="[
+            '愛知県が発表した【感染症発生状況】を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
+            '感染症発生状況が取得できなかった日の値は表示していません'
+          ]"
+          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
+          :show="false"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <time-bar-chart
+          title="重症者数"
+          :title-id="'number-of-severe'"
+          :chart-id="'time-bar-chart-severe'"
+          :chart-data="severeGraph"
+          :date="Data.main_summary_history.date"
+          :unit="'人'"
+          :remarks="[
+            '愛知県が発表した【感染症発生状況】を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
+            '感染症発生状況が取得できなかった日の値は表示していません'
+          ]"
+          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
+          :show="false"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <time-bar-chart
           title="陽性患者数"
           :title-id="'number-of-confirmed-cases'"
           :chart-id="'time-bar-chart-patients'"
@@ -163,6 +197,8 @@ import formatTable from '@/utils/formatTable'
 import formatRemarks from '@/utils/formatRemarks'
 import formatConfirmedCases from '@/utils/formatConfirmedCases'
 import formatConfirmedCasesGraph from '@/utils/formatConfirmedCasesGraph'
+import formatInHospitalGraph from '@/utils/formatInHospitalGraph'
+import formatSevereGraph from '@/utils/formatSevereGraph'
 // import News from '@/data/news.json'
 import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
@@ -188,6 +224,13 @@ export default {
     const inspectionsGraph = formatGraph(Data.inspections_summary.data)
 
     const inspectionsRemarks = formatRemarks(Data.inspections_summary.data)
+    // 入院中数グラフ
+    const inHospitalGraph = formatInHospitalGraph(
+      Data.main_summary_history.data
+    )
+    // 重症者数グラフ
+    const severeGraph = formatSevereGraph(Data.main_summary_history.data)
+
     // 退院者グラフ
     // const dischargesGraph = formatGraph(Data.discharges_summary.data)
 
@@ -256,6 +299,8 @@ export default {
       patientsGraph,
       inspectionsGraph,
       inspectionsRemarks,
+      inHospitalGraph,
+      severeGraph,
       // dischargesGraph,
       // contactsGraph,
       // querentsGraph,
