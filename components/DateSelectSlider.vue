@@ -7,6 +7,8 @@
     :max="max"
     thumb-label="always"
     style="padding-top: 35px;"
+    color="rgba(189, 63, 76, 1)"
+    track-color="rgba(189, 63, 76, 0.3)"
   >
     <template v-slot:thumb-label="props">
       {{ getSliderLabels(props.value) }}
