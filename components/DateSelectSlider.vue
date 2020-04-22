@@ -35,11 +35,6 @@ export default {
       type: Number,
       required: true,
       default: 1
-    },
-    minSpanDays: {
-      type: Number,
-      required: true,
-      default: 14
     }
   },
   data() {
