@@ -20,7 +20,6 @@
       :value="defaultDisplaySpan"
       :min="spanMin"
       :max="spanMax"
-      :min-span-days="minSpanDays"
       @sliderInput="sliderUpdate"
     />
     <div>
@@ -81,6 +80,11 @@ export default {
       required: true,
       default: ''
     },
+    defaultSpan: {
+      type: Number,
+      required: true,
+      default: 60
+    },
     unit: {
       type: String,
       required: false,
@@ -98,18 +102,13 @@ export default {
     }
   },
   data() {
-    const minSpanDays = 14
     const displaySpanLower =
-      !this.chartData || this.chartData.length < minSpanDays
+      !this.chartData || this.chartData.length < this.defaultSpan
         ? 0
-        : this.chartData.length - minSpanDays
-    const displaySpanUpper =
-      !this.chartData || this.chartData.length < minSpanDays
-        ? 0
-        : this.chartData.length - 1
+        : this.chartData.length - this.defaultSpan
+    const displaySpanUpper = !this.chartData ? 0 : this.chartData.length - 1
     return {
       dataKind: 'transition',
-      minSpanDays,
       defaultDisplaySpan: [displaySpanLower, displaySpanUpper],
       displaySpan: [displaySpanLower, displaySpanUpper]
     }

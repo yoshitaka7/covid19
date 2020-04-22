@@ -33,9 +33,7 @@
           title="検査陽性者の状況"
           :title-id="'details-of-confirmed-cases'"
           :date="headerItem.date"
-          :url="
-            'https://www.pref.aichi.jp/site/covid19-aichi/'
-          "
+          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
         >
           <confirmed-cases-table v-bind="confirmedCases" />
         </svg-card>
@@ -48,6 +46,7 @@
           :chart-id="'time-bar-chart-patients'"
           :chart-data="patientsGraph"
           :date="Data.patients_summary.date"
+          :default-span="60"
           :unit="'人'"
           :url="
             'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
@@ -70,6 +69,7 @@
           :date="Data.main_summary_history.date"
           :latest-value-field="'discharged'"
           :latest-value-title="'退院'"
+          :default-span="60"
           :unit="'人'"
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
           :remarks="[
@@ -85,6 +85,7 @@
           :chart-id="'time-bar-chart-inspections'"
           :chart-data="inspectionsGraph"
           :date="Data.inspections_summary.date"
+          :default-span="60"
           :unit="'件'"
           :remarks="[
             inspectionsRemarks,
