@@ -6,7 +6,7 @@
     :url="url"
     :remarks="remarks"
   >
-    <template v-slot:button>
+    <template v-if="show" v-slot:button>
       <data-selector v-model="dataKind" />
     </template>
     <bar
@@ -20,7 +20,6 @@
       :value="defaultDisplaySpan"
       :min="spanMin"
       :max="spanMax"
-      :min-span-days="minSpanDays"
       @sliderInput="sliderUpdate"
     />
     <div>
@@ -81,6 +80,11 @@ export default {
       required: true,
       default: ''
     },
+    defaultSpan: {
+      type: Number,
+      required: true,
+      default: 60
+    },
     unit: {
       type: String,
       required: false,
@@ -95,21 +99,21 @@ export default {
       type: Array,
       required: false,
       default: () => []
+    },
+    show: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   data() {
-    const minSpanDays = 14
     const displaySpanLower =
-      !this.chartData || this.chartData.length < minSpanDays
+      !this.chartData || this.chartData.length < this.defaultSpan
         ? 0
-        : this.chartData.length - minSpanDays
-    const displaySpanUpper =
-      !this.chartData || this.chartData.length < minSpanDays
-        ? 0
-        : this.chartData.length - 1
+        : this.chartData.length - this.defaultSpan
+    const displaySpanUpper = !this.chartData ? 0 : this.chartData.length - 1
     return {
       dataKind: 'transition',
-      minSpanDays,
       defaultDisplaySpan: [displaySpanLower, displaySpanUpper],
       displaySpan: [displaySpanLower, displaySpanUpper]
     }
@@ -140,6 +144,9 @@ export default {
       return this.formatDayBeforeRatio(lastDay - lastDayBefore)
     },
     displayTransitionRatio() {
+      if (this.chartData.slice(-2)[0].novalue) {
+        return '-'
+      }
       const lastDay = this.chartData.slice(-1)[0].transition
       const lastDayBefore = this.chartData.slice(-2)[0].transition
       return this.formatDayBeforeRatio(lastDay - lastDayBefore)
