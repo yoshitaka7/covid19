@@ -26,7 +26,7 @@
         target="_blank"
         rel="noopener"
       >
-        出典: 愛知県新型コロナウイルス感染症対策サイト
+        出典: 愛知県新型コロナウイルス感染症対策サイト{{ subtext }}
         <v-icon class="ExternalLinkIcon" size="15">
           mdi-open-in-new
         </v-icon>
@@ -47,6 +47,7 @@ export default class DataView extends Vue {
   @Prop() private url!: string
   @Prop() private info!: any // FIXME expect info as {lText:string, sText:string unit:string}
   @Prop() private remarks!: object
+  @Prop() private subtext!: string
 
   formattedDate: string = convertDatetimeToISO8601Format(this.date)
 }
