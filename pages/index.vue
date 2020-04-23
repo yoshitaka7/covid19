@@ -34,6 +34,7 @@
           :title-id="'details-of-confirmed-cases'"
           :date="headerItem.date"
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
+          :subtext="'（一部、県知事のTwitter）'"
         >
           <confirmed-cases-table v-bind="confirmedCases" />
         </svg-card>

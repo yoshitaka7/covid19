@@ -6,6 +6,7 @@
     :date="date"
     :url="url"
     :remarks="remarks"
+    :subtext="subtext"
   >
     <template v-slot:button>
       <p class="Graph-Desc">
@@ -61,6 +62,11 @@ export default {
       type: Array,
       required: false,
       default: () => []
+    },
+    subtext: {
+      type: String,
+      required: false,
+      default: ''
     }
   }
 }
