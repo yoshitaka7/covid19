@@ -14,6 +14,7 @@ type MainSummaryDataType = {
 }
 
 type SingleColumnGraphDataType = {
+  date: Date
   label: string
   transition: number
   novalue: boolean
@@ -45,11 +46,14 @@ export default (mainSummaries: MainSummaryDataType[]) => {
       break
     }
 
-    const label = dayjs(dt).format('M/D')
+    const dayjsDt = dayjs(dt)
+    const date = dayjsDt.toDate()
+    const label = dayjsDt.format('M/D')
 
     const m = mainSummaryMap.get(dt)
     if (m != null) {
       graphData.push({
+        date,
         label,
         transition: Number(m['重症']),
         novalue: false
@@ -57,6 +61,7 @@ export default (mainSummaries: MainSummaryDataType[]) => {
     } else {
       // 値なし
       graphData.push({
+        date,
         label,
         transition: 0,
         novalue: true
@@ -64,7 +69,7 @@ export default (mainSummaries: MainSummaryDataType[]) => {
     }
 
     // 次の日へ
-    dt = formatDt(dayjs(dt).add(1, 'day'))
+    dt = formatDt(dayjsDt.add(1, 'day'))
   }
 
   return graphData
