@@ -6,7 +6,7 @@
     :url="url"
     :remarks="remarks"
   >
-    <template v-slot:button>
+    <template v-if="show" v-slot:button>
       <data-selector v-model="dataKind" />
     </template>
     <bar
@@ -99,6 +99,11 @@ export default {
       type: Array,
       required: false,
       default: () => []
+    },
+    show: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   data() {
@@ -139,6 +144,9 @@ export default {
       return this.formatDayBeforeRatio(lastDay - lastDayBefore)
     },
     displayTransitionRatio() {
+      if (this.chartData.slice(-2)[0].novalue) {
+        return '-'
+      }
       const lastDay = this.chartData.slice(-1)[0].transition
       const lastDayBefore = this.chartData.slice(-2)[0].transition
       return this.formatDayBeforeRatio(lastDay - lastDayBefore)
