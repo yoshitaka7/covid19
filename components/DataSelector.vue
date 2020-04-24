@@ -5,7 +5,18 @@
     mandatory
     @change="$emit('input', $event)"
   >
-    <v-btn v-ripple="false" value="transition" class="DataSelector-Button">
+    <v-btn
+      v-ripple="false"
+      value="weekly-transition"
+      class="DataSelector-Button"
+    >
+      週別
+    </v-btn>
+    <v-btn
+      v-ripple="false"
+      value="daily-transition"
+      class="DataSelector-Button"
+    >
       日別
     </v-btn>
     <v-btn v-ripple="false" value="cumulative" class="DataSelector-Button">
