@@ -126,10 +126,9 @@ export default {
     }
   },
   data() {
-    const displaySpanLower =
-      !this.chartData || this.chartData.length < this.defaultSpan
-        ? 0
-        : this.chartData.length - this.defaultSpan
+    const displaySpanLower = !this.chartData
+      ? 0
+      : this.chartData.length - this.defaultSpan
     const displaySpanUpper = !this.chartData ? 0 : this.chartData.length - 1
     return {
       defaultDisplaySpan: [displaySpanLower, displaySpanUpper],
@@ -144,9 +143,8 @@ export default {
       return this.chartData.length - 1
     },
     displayChartData() {
-      if (!this.chartData || this.chartData.length < this.minSpanDays) {
-        return this.chartData
-      }
+      if (!this.chartData) return this.chartData
+
       const lowerIndex = this.displaySpan[0]
       const lower = lowerIndex < this.chartData.length ? lowerIndex : 0
       const upperIndex = this.displaySpan[1]

@@ -34,6 +34,7 @@
           :title-id="'details-of-confirmed-cases'"
           :date="headerItem.date"
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
+          :subtext="'（一部、県知事のTwitter）'"
         >
           <confirmed-cases-table v-bind="confirmedCases" />
         </svg-card>
@@ -46,6 +47,8 @@
           :chart-id="'time-bar-chart-in-hospital'"
           :chart-data="inHospitalGraph"
           :date="Data.main_summary_history.date"
+          :default-data-kind="'daily-transition'"
+          :default-span="60"
           :unit="'人'"
           :remarks="[
             '愛知県が発表した【感染症発生状況】を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
@@ -63,6 +66,8 @@
           :chart-id="'time-bar-chart-severe'"
           :chart-data="severeGraph"
           :date="Data.main_summary_history.date"
+          :default-data-kind="'daily-transition'"
+          :default-span="60"
           :unit="'人'"
           :remarks="[
             '愛知県が発表した【感染症発生状況】を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
@@ -80,6 +85,7 @@
           :chart-id="'time-bar-chart-patients'"
           :chart-data="patientsGraph"
           :date="Data.patients_summary.date"
+          :default-data-kind="'weekly-transition'"
           :default-span="60"
           :unit="'人'"
           :url="
@@ -119,6 +125,7 @@
           :chart-id="'time-bar-chart-inspections'"
           :chart-data="inspectionsGraph"
           :date="Data.inspections_summary.date"
+          :default-data-kind="'weekly-transition'"
           :default-span="60"
           :unit="'件'"
           :remarks="[
