@@ -46,6 +46,7 @@ import DataView from '@/components/DataView.vue'
 import DataSelector from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
+import { chunkByWeek, reduceGraph } from '@/utils/formatGraph'
 
 export default {
   components: {
@@ -80,9 +81,14 @@ export default {
       required: true,
       default: ''
     },
+    defaultDataKind: {
+      type: String,
+      required: false,
+      default: 'daily-transition'
+    },
     defaultSpan: {
       type: Number,
-      required: true,
+      required: false,
       default: 60
     },
     unit: {
@@ -107,13 +113,12 @@ export default {
     }
   },
   data() {
-    const displaySpanLower =
-      !this.chartData || this.chartData.length < this.defaultSpan
-        ? 0
-        : this.chartData.length - this.defaultSpan
+    const displaySpanLower = !this.chartData
+      ? 0
+      : this.chartData.length - this.defaultSpan
     const displaySpanUpper = !this.chartData ? 0 : this.chartData.length - 1
     return {
-      dataKind: 'transition',
+      dataKind: this.defaultDataKind,
       defaultDisplaySpan: [displaySpanLower, displaySpanUpper],
       displaySpan: [displaySpanLower, displaySpanUpper]
     }
@@ -126,9 +131,8 @@ export default {
       return this.chartData.length - 1
     },
     displayChartData() {
-      if (!this.chartData || this.chartData.length < this.minSpanDays) {
-        return this.chartData
-      }
+      if (!this.chartData) return this.chartData
+
       const lowerIndex = this.displaySpan[0]
       const lower = lowerIndex < this.chartData.length ? lowerIndex : 0
       const upperIndex = this.displaySpan[1]
@@ -152,7 +156,23 @@ export default {
       return this.formatDayBeforeRatio(lastDay - lastDayBefore)
     },
     displayInfo() {
-      if (this.dataKind === 'transition') {
+      if (this.dataKind === 'weekly-transition') {
+        const summarized = this.chartData.filter(d => d.summarized)
+        const noneSummarized = this.chartData.filter(d => !d.summarized)
+        const noneSummarizedChunks = chunkByWeek(noneSummarized, 1)
+        const noneSummarizedReducedChunks = noneSummarizedChunks.map(chunk =>
+          reduceGraph(chunk, false)
+        )
+        const chartData = summarized.concat(noneSummarizedReducedChunks)
+        return {
+          lText: `${chartData.slice(-1)[0].transition.toLocaleString()}`,
+          sText: `${chartData.slice(-1)[0].label} 実績値（前週比：${
+            this.displayTransitionRatio
+          } ${this.unit}）`,
+          unit: this.unit
+        }
+      }
+      if (this.dataKind === 'daily-transition') {
         return {
           lText: `${this.chartData.slice(-1)[0].transition.toLocaleString()}`,
           sText: `${this.chartData.slice(-1)[0].label} 実績値（前日比：${
@@ -172,7 +192,33 @@ export default {
       }
     },
     displayData() {
-      if (this.dataKind === 'transition') {
+      if (this.dataKind === 'weekly-transition') {
+        const summarized = this.displayChartData.filter(d => d.summarized)
+        const noneSummarized = this.displayChartData.filter(d => !d.summarized)
+        const noneSummarizedChunks = chunkByWeek(noneSummarized, 1)
+        const noneSummarizedReducedChunks = noneSummarizedChunks.map(chunk =>
+          reduceGraph(chunk, false)
+        )
+        const chartData = summarized.concat(noneSummarizedReducedChunks)
+        return {
+          labels: chartData.map(d => {
+            return d.label
+          }),
+          datasets: [
+            {
+              label: this.dataKind,
+              data: chartData.map(d => {
+                return d.transition
+              }),
+              backgroundColor: chartData.map(d => {
+                return d.summarized ? '#1976d2' : '#bd3f4c'
+              }),
+              borderWidth: 0
+            }
+          ]
+        }
+      }
+      if (this.dataKind === 'daily-transition') {
         return {
           labels: this.displayChartData.map(d => {
             return d.label
