@@ -168,7 +168,7 @@ export default {
             .slice(-1)[0]
             [this.latestValueField]?.toLocaleString() ?? '-',
         lTitle: this.latestValueTitle,
-        sText: `${this.chartData.slice(-1)[0].label} 実績値（前日比：${
+        sText: `${this.chartData.slice(-1)[0].label} 時点（前日比：${
           this.displayLatestValueRatio
         } ${this.unit}）`,
         unit: this.unit

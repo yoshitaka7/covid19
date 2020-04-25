@@ -56,6 +56,7 @@
           ]"
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
           :show="false"
+          :transition-label="'時点'"
         />
       </v-col>
 
@@ -75,6 +76,7 @@
           ]"
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
           :show="false"
+          :transition-label="'時点'"
         />
       </v-col>
 
