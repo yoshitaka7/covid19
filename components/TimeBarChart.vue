@@ -110,6 +110,11 @@ export default {
       type: Boolean,
       required: false,
       default: true
+    },
+    transitionLabel: {
+      type: String,
+      required: false,
+      default: '実績値'
     }
   },
   data() {
@@ -166,18 +171,18 @@ export default {
         const chartData = summarized.concat(noneSummarizedReducedChunks)
         return {
           lText: `${chartData.slice(-1)[0].transition.toLocaleString()}`,
-          sText: `${chartData.slice(-1)[0].label} 実績値（前週比：${
-            this.displayTransitionRatio
-          } ${this.unit}）`,
+          sText: `${chartData.slice(-1)[0].label} ${
+            this.transitionLabel
+          }（前週比：${this.displayTransitionRatio} ${this.unit}）`,
           unit: this.unit
         }
       }
       if (this.dataKind === 'daily-transition') {
         return {
           lText: `${this.chartData.slice(-1)[0].transition.toLocaleString()}`,
-          sText: `${this.chartData.slice(-1)[0].label} 実績値（前日比：${
-            this.displayTransitionRatio
-          } ${this.unit}）`,
+          sText: `${this.chartData.slice(-1)[0].label} ${
+            this.transitionLabel
+          }（前日比：${this.displayTransitionRatio} ${this.unit}）`,
           unit: this.unit
         }
       }
