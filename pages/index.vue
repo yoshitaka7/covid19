@@ -31,13 +31,23 @@
     /> -->
     <v-row class="DataBlock">
       <v-col cols="12" md="6" class="DataCard">
+        <column-map
+          title="市町村別感染状況"
+          :title-id="'details-of-confirmed-cases'"
+          :date="headerItem.date"
+          :data="patientsPerCities"
+          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
+        >
+          <confirmed-cases-table v-bind="confirmedCases" />
+        </column-map>
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
         <svg-card
           title="検査陽性者の状況"
           :title-id="'details-of-confirmed-cases'"
           :date="headerItem.date"
-          :url="
-            'https://www.pref.aichi.jp/site/covid19-aichi/'
-          "
+          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
         >
           <confirmed-cases-table v-bind="confirmedCases" />
         </svg-card>
@@ -157,6 +167,7 @@ import TimeStackedBarChart from '@/components/TimeStackedBarChart.vue'
 import WhatsNew from '@/components/WhatsNew.vue'
 // import StaticInfo from '@/components/StaticInfo.vue'
 import Data from '@/data/data.json'
+import CityData from '@/data/city_data.json'
 // import MetroData from '@/data/metro.json'
 import DataTable from '@/components/DataTable.vue'
 import formatGraph from '@/utils/formatGraph'
@@ -164,9 +175,11 @@ import formatTable from '@/utils/formatTable'
 import formatRemarks from '@/utils/formatRemarks'
 import formatConfirmedCases from '@/utils/formatConfirmedCases'
 import formatConfirmedCasesGraph from '@/utils/formatConfirmedCasesGraph'
+import formatPatientsPerCities from '@/utils/formatPatientsPerCities'
 // import News from '@/data/news.json'
 import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
+import ColumnMap from '@/components/ColumnMap.vue'
 
 export default {
   components: {
@@ -178,7 +191,8 @@ export default {
     //    StaticInfo,
     DataTable,
     SvgCard,
-    ConfirmedCasesTable
+    ConfirmedCasesTable,
+    ColumnMap
   },
   data() {
     // 感染者数グラフ
@@ -235,6 +249,14 @@ export default {
       { field: 'unknown', label: '不定', backgroundColor: '#dddddd' }
     ]
 
+    // 市区町村別の感染者数
+    const patientsPerCitiesLegends = []
+    const patientsPerCities = formatPatientsPerCities(
+      CityData.data,
+      Data.patients.data,
+      patientsPerCitiesLegends
+    )
+
     const sumInfoOfPatients = {
       lText: patientsGraph[
         patientsGraph.length - 1
@@ -269,6 +291,8 @@ export default {
       confirmedCasesGraphLegends,
       sumInfoOfPatients,
       sumInfoOfInspections,
+      patientsPerCities,
+      patientsPerCitiesLegends,
       headerItem: {
         icon: 'mdi-chart-timeline-variant',
         title: '愛知県内の最新感染動向',
