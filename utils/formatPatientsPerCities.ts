@@ -23,7 +23,7 @@ type CitySummaryDataType = {
 }
 
 type CitySummaryLegendType = {
-  rangeStart: number //
+  range: { min: number; max: number } | number //
   rangeName: string //
   foregroundColor: string //
   backgroundColor: string //
@@ -72,18 +72,61 @@ export default (
     return pre
   }, new Map<string, CitySummaryDataType>())
 
-  legends.push({
-    rangeStart: 0,
-    rangeName: '0人',
-    foregroundColor: '#000000',
-    backgroundColor: '#FFFFFF'
-  } as CitySummaryLegendType)
+  legends.push(
+    ...[
+      {
+        range: 0,
+        rangeName: '0人',
+        foregroundColor: 'black',
+        backgroundColor: 'white'
+      },
+      {
+        range: { min: Number.MIN_SAFE_INTEGER, max: 2 },
+        rangeName: '2人未満',
+        foregroundColor: 'black',
+        backgroundColor: '#c5eddf'
+      },
+      {
+        range: { min: 2.0, max: 8.0 },
+        rangeName: '2人以上',
+        foregroundColor: 'white',
+        backgroundColor: '#8abccf'
+      },
+      {
+        range: { min: 8.0, max: 32.0 },
+        rangeName: '8人以上',
+        foregroundColor: 'white',
+        backgroundColor: '#73a2c6'
+      },
+      {
+        range: { min: 32.0, max: 128.0 },
+        rangeName: '32人以上',
+        foregroundColor: 'white',
+        backgroundColor: '#4771b2'
+      },
+      {
+        range: { min: 128, max: Number.MAX_SAFE_INTEGER },
+        rangeName: '128人以上',
+        foregroundColor: 'white',
+        backgroundColor: '#00429d'
+      }
+    ]
+  )
 
-  // const sorted = Array.from(citySummaryMap.values())
-  //   .filter(x => x.patientsTotal > 0)
-  //   .sort(x => x.patientsPer100k);
+  Array.from(citySummaryMap.values()).map(summary => {
+    const hitIndex = legends.findIndex(legend => {
+      const target = summary.patientsPer100k
+      if (typeof legend.range === 'number') {
+        return legend.range === target
+      } else {
+        return legend.range.min <= target && target < legend.range.max
+      }
+    })
 
-  // const a = Math.floor(sorted.length / 3);
+    summary.legendIndex = hitIndex
+
+    return summary
+  })
 
   return citySummaryMap
 }

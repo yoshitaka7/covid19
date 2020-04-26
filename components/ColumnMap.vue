@@ -18,10 +18,16 @@
     <table class="tabularmaps">
       <tr v-for="(row, rowIndex) in table" :key="rowIndex">
         <td
-          v-for="(cells, colIndex) in row"
+          v-for="(col, colIndex) in row"
           :key="colIndex"
-          style=""
-          :class="{ tmnull: cells[0] == '' }"
+          :style="
+            'background-color: ' +
+              col.backgroundColor +
+              '; color: ' +
+              col.foregroundColor +
+              ';'
+          "
+          :class="{ tmnull: col.values[0] == '' }"
         >
           <div>
             <div
@@ -34,7 +40,7 @@
               <div
                 style="display: flex; flex-direction: column; align-items: flex-center;"
               >
-                <span v-for="(cell, cellIndex) in cells" :key="cellIndex">
+                <span v-for="(cell, cellIndex) in col.values" :key="cellIndex">
                   {{ cell }}
                 </span>
               </div>
@@ -44,8 +50,67 @@
       </tr>
     </table>
 
-    <div v-for="remarks_text in remarks" :key="remarks_text">
-      {{ remarks_text }}
+    <div style="display: flex; margin: 0px 5px;">
+      <div class="ColumnMap-LegendMap">
+        <div class="ColumnMap-LegendItemLabel">
+          凡例
+        </div>
+        <div class="ColumnMap-LegendMapCell">
+          <div
+            class="ColumnMap-PanelText"
+            style="
+              display: flex;
+              flex-direction: column;
+              align-items: flex-center;
+              height: 100%;
+              justify-content: center;
+            "
+          >
+            <span>居住地</span>
+            <span>感染者数</span>
+            <span>感染率※</span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        style="
+        width: 200px;
+        margin-top: 5px;
+        display: flex;
+        flex-direction: column;"
+      >
+        <div class="ColumnMap-LegendItemLabel" style="margin-left: 10px;">
+          感染率で塗り分け
+        </div>
+        <div
+          style="
+          display: flex;
+          align-items: flex-center;
+          justify-content: flex-end;
+          flex-wrap: wrap;
+        "
+        >
+          <div v-for="(legend, legendIndex) in legends" :key="legendIndex">
+            <div
+              class="ColumnMap-LegendItem"
+              :style="
+                'background-color: ' +
+                  legend.backgroundColor +
+                  '; color: ' +
+                  legend.foregroundColor +
+                  ';'
+              "
+            >
+              {{ legend.rangeName }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-for="remarks_text in remarks" :key="remarks_text">
+        {{ remarks_text }}
+      </div>
     </div>
   </data-view>
 </template>
@@ -76,6 +141,33 @@
     margin: 0 auto;
     white-space: nowrap;
     overflow: hidden;
+  }
+  &-LegendMap {
+    width: calc(100% - 200px);
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+  }
+  &-LegendMapCell {
+    width: 60px;
+    height: 60px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    text-align: center;
+    padding: 5px 0px;
+  }
+  &-LegendItemLabel {
+    font-size: 11px;
+  }
+  &-LegendItem {
+    width: 60px;
+    font-size: 10px;
+    line-height: 25px;
+    text-align: center;
+    border-radius: 0px;
+    border: 1px solid #333;
+    margin-left: 5px;
+    margin-bottom: 5px;
   }
 }
 
@@ -185,10 +277,18 @@ export default {
         return row.map(col => {
           const hit = this.data.get(col.trim())
           if (hit == null) {
-            return ['', '', '']
+            return {
+              values: ['', '', ''],
+              foregroundColor: 'transparent',
+              backgroundColor: 'white'
+            }
           }
 
-          return [hit.cityName, hit.patientsTotal, hit.patientsPer100k]
+          return {
+            values: [hit.cityName, hit.patientsTotal, hit.patientsPer100k],
+            foregroundColor: this.legends[hit.legendIndex].foregroundColor,
+            backgroundColor: this.legends[hit.legendIndex].backgroundColor
+          }
         })
       })
     }

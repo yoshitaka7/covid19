@@ -36,6 +36,7 @@
           :title-id="'details-of-confirmed-cases'"
           :date="headerItem.date"
           :data="patientsPerCities"
+          :legends="patientsPerCitiesLegends"
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
         >
           <confirmed-cases-table v-bind="confirmedCases" />
