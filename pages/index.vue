@@ -35,8 +35,6 @@
           :date="headerItem.date"
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
           :subtext="'（一部、県知事のTwitter）'"
-          :title-date="confirmedCases['更新日時']"
-          :title-remark="confirmedCases['備考']"
         >
           <confirmed-cases-table v-bind="confirmedCases" />
         </svg-card>
@@ -119,7 +117,7 @@
           :remarks="[
             '愛知県が発表した【感染症発生状況】を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
             '[不定]は、感染症発生状況が取得できなかった日です（陽性者数累計を表示します）',
-            '凡例をクリックするとその項目の[表示/非表示]が切り替えられます'
+            '凡例をクリックするとその項目の[表示/非表示]が切り替えられます」を追加する'
           ]"
         />
       </v-col>

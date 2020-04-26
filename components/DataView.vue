@@ -5,9 +5,6 @@
         <h3 :id="titleId" class="DataView-ToolbarTitle">
           {{ title }}
         </h3>
-        <div v-if="titleDate" class="DataView-ToolbarTitleDate">
-          {{ formattedTitleDate }} 現在
-        </div>
         <slot name="button" />
       </div>
       <v-spacer />
@@ -40,10 +37,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import {
-  convertDatetimeToISO8601Format,
-  convertDatetimeToShortFormat
-} from '@/utils/formatDate'
+import { convertDatetimeToISO8601Format } from '@/utils/formatDate'
 
 @Component
 export default class DataView extends Vue {
@@ -52,12 +46,10 @@ export default class DataView extends Vue {
   @Prop() private date!: string
   @Prop() private url!: string
   @Prop() private info!: any // FIXME expect info as {lText:string, sText:string unit:string}
-  @Prop() private titleDate!: string
   @Prop() private remarks!: object
   @Prop() private subtext!: string
 
   formattedDate: string = convertDatetimeToISO8601Format(this.date)
-  formattedTitleDate: string = convertDatetimeToShortFormat(this.titleDate)
 }
 </script>
 
@@ -109,15 +101,6 @@ export default class DataView extends Vue {
     font-size: 1.25rem;
     font-weight: normal;
     line-height: 1.5;
-  }
-  &-ToolbarTitleDate {
-    width: 100%;
-    text-align: right;
-    white-space: nowrap;
-    display: inline-block;
-    font-size: 12px;
-    line-height: 12px;
-    color: $gray-3;
   }
   &-CardText {
     margin-bottom: 46px;
