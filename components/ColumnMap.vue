@@ -284,10 +284,19 @@ export default {
             }
           }
 
+          const foregroundColor =
+            hit.legendIndex >= 0
+              ? this.legends[hit.legendIndex].foregroundColor
+              : 'black'
+          const backgroundColor =
+            hit.legendIndex >= 0
+              ? this.legends[hit.legendIndex].backgroundColor
+              : 'white'
+
           return {
             values: [hit.cityName, hit.patientsTotal, hit.patientsPer100k],
-            foregroundColor: this.legends[hit.legendIndex].foregroundColor,
-            backgroundColor: this.legends[hit.legendIndex].backgroundColor
+            foregroundColor,
+            backgroundColor
           }
         })
       })
