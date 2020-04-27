@@ -3,18 +3,11 @@
     class="ColumnMap"
     :title="title"
     :title-id="titleId"
-    :date="date"
     :url="url"
+    :date="date"
     :remarks="remarks"
+    :title-date="titleDate"
   >
-    <template v-slot:button>
-      <p class="Graph-Desc">
-        ※
-        公表されている居住地が、54市町村以外(尾張地方、三河地方など)の場合や、県外は対象外<br />
-        ※ 10万人あたり感染者数の算出には、推計人口(2020年3月1日時点)を使用
-      </p>
-    </template>
-
     <table class="tabularmaps">
       <tr v-for="(row, rowIndex) in table" :key="rowIndex">
         <td
@@ -37,9 +30,7 @@
                   : 'ColumnMap-PanelText'
               "
             >
-              <div
-                style="display: flex; flex-direction: column; align-items: flex-center;"
-              >
+              <div class="ColumnMap-CellsContainer">
                 <span v-for="(cell, cellIndex) in col.values" :key="cellIndex">
                   {{ cell }}
                 </span>
@@ -50,22 +41,13 @@
       </tr>
     </table>
 
-    <div style="display: flex; margin: 0px 5px;">
-      <div class="ColumnMap-LegendMap">
-        <div class="ColumnMap-LegendItemLabel">
+    <div class="ColumnMap-LegendPanel">
+      <div class="ColumnMap-LegendMapPanel">
+        <div class="ColumnMap-LegendTitle">
           凡例
         </div>
         <div class="ColumnMap-LegendMapCell">
-          <div
-            class="ColumnMap-PanelText"
-            style="
-              display: flex;
-              flex-direction: column;
-              align-items: flex-center;
-              height: 100%;
-              justify-content: center;
-            "
-          >
+          <div class="ColumnMap-LegendMapText">
             <span>居住地</span>
             <span>感染者数</span>
             <span>感染率※</span>
@@ -73,27 +55,14 @@
         </div>
       </div>
 
-      <div
-        style="
-        width: 200px;
-        margin-top: 5px;
-        display: flex;
-        flex-direction: column;"
-      >
-        <div class="ColumnMap-LegendItemLabel" style="margin-left: 10px;">
+      <div class="ColumnMap-LegendColorPanel">
+        <div class="ColumnMap-LegendTitle" style="margin-left: 10px;">
           感染率で塗り分け
         </div>
-        <div
-          style="
-          display: flex;
-          align-items: flex-center;
-          justify-content: flex-end;
-          flex-wrap: wrap;
-        "
-        >
+        <div class="ColumnMap-LegendColorContainer">
           <div v-for="(legend, legendIndex) in legends" :key="legendIndex">
             <div
-              class="ColumnMap-LegendItem"
+              class="ColumnMap-LegendColor"
               :style="
                 'background-color: ' +
                   legend.backgroundColor +
@@ -107,11 +76,12 @@
           </div>
         </div>
       </div>
-
-      <div v-for="remarks_text in remarks" :key="remarks_text">
-        {{ remarks_text }}
-      </div>
     </div>
+    <ul class="remarks">
+      <li v-for="remarks_text in remarks" :key="remarks_text">
+        {{ remarks_text }}
+      </li>
+    </ul>
   </data-view>
 </template>
 
@@ -142,7 +112,16 @@
     white-space: nowrap;
     overflow: hidden;
   }
-  &-LegendMap {
+  &-CellsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-center;
+  }
+  &-LegendPanel {
+    display: flex;
+    margin: 0px 5px 15px 5px;
+  }
+  &-LegendMapPanel {
     width: calc(100% - 200px);
     margin-top: 5px;
     display: flex;
@@ -156,10 +135,10 @@
     text-align: center;
     padding: 5px 0px;
   }
-  &-LegendItemLabel {
+  &-LegendTitle {
     font-size: 11px;
   }
-  &-LegendItem {
+  &-LegendColor {
     width: 60px;
     font-size: 10px;
     line-height: 25px;
@@ -168,6 +147,31 @@
     border: 1px solid #333;
     margin-left: 5px;
     margin-bottom: 5px;
+  }
+  &-LegendMapText {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-center;
+    height: 100%;
+    justify-content: center;
+    font-size: 11px;
+    line-height: 1.3;
+    width: calc(11px * 4);
+    margin: 0 auto;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  &-LegendColorPanel {
+    width: 200px;
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+  }
+  &-LegendColorContainer {
+    display: flex;
+    align-items: flex-center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
   }
 }
 
@@ -207,6 +211,10 @@
 #tmtitle {
   color: white;
 }
+ul.remarks {
+  font-size: 0.75rem;
+  list-style-type: '※ ';
+}
 </style>
 
 <script>
@@ -225,6 +233,7 @@ export default {
     },
     date: {
       type: String,
+      required: true,
       default: ''
     },
     data: {
@@ -246,6 +255,16 @@ export default {
       type: Array,
       required: false,
       default: () => []
+    },
+    titleDate: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    titleRemark: {
+      type: String,
+      required: false,
+      default: ''
     }
   },
   computed: {

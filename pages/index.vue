@@ -29,19 +29,6 @@
     /> -->
     <v-row class="DataBlock">
       <v-col cols="12" md="6" class="DataCard">
-        <column-map
-          title="市町村別感染状況"
-          :title-id="'details-of-confirmed-cases'"
-          :date="headerItem.date"
-          :data="patientsPerCities"
-          :legends="patientsPerCitiesLegends"
-          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
-        >
-          <confirmed-cases-table v-bind="confirmedCases" />
-        </column-map>
-      </v-col>
-
-      <v-col cols="12" md="6" class="DataCard">
         <svg-card
           title="検査陽性者の状況"
           :title-id="'details-of-confirmed-cases'"
@@ -166,6 +153,21 @@
           :url="
             'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
           "
+        />
+      </v-col>
+      <v-col cols="12" md="6" class="DataCard">
+        <column-map
+          title="市町村別感染状況"
+          :title-id="'patients-per-cities'"
+          :date="Data.patients.date"
+          :data="patientsPerCities"
+          :legends="patientsPerCitiesLegends"
+          :title-date="Data.patients.date"
+          :remarks="[
+            '公表されている居住地が、54市町村以外(尾張地方、三河地方など)や県外は対象外',
+            '感染率とは10万人あたり感染者数を指し、その算出には、推計人口(2020年3月1日時点)を使用'
+          ]"
+          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
         />
       </v-col>
       <!--
