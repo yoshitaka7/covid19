@@ -7,10 +7,8 @@
     />
     <whats-new
       class="mb-1"
-      text="4月10日、愛知県緊急事態宣言が発出されました"
-      url="https://www.pref.aichi.jp/site/covid19-aichi/"
-      sub-text="(愛知県公式サイトが閲覧できない場合はこちら)"
-      sub-url="https://twitter.com/stopcovid19ai/status/1248512330377256961"
+      text="緊急事態宣言の対象区域が全国に拡大されました。愛知県は「特定警戒都道府県」 に指定されました"
+      url="https://corona.go.jp/"
     />
     <whats-new
       class="mb-1"
@@ -35,12 +33,53 @@
           title="検査陽性者の状況"
           :title-id="'details-of-confirmed-cases'"
           :date="headerItem.date"
-          :url="
-            'https://www.pref.aichi.jp/site/covid19-aichi/'
-          "
+          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
+          :subtext="'（一部、県知事のTwitter）'"
+          :title-date="confirmedCases['更新日時']"
+          :title-remark="confirmedCases['備考']"
         >
           <confirmed-cases-table v-bind="confirmedCases" />
         </svg-card>
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <time-bar-chart
+          title="入院中数"
+          :title-id="'number-of-in-hospital'"
+          :chart-id="'time-bar-chart-in-hospital'"
+          :chart-data="inHospitalGraph"
+          :date="Data.main_summary_history.date"
+          :default-data-kind="'daily-transition'"
+          :default-span="60"
+          :unit="'人'"
+          :remarks="[
+            '愛知県が発表した【感染症発生状況】を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
+            '感染症発生状況が取得できなかった日の値は表示していません'
+          ]"
+          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
+          :show="false"
+          :transition-label="'時点'"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <time-bar-chart
+          title="重症者数"
+          :title-id="'number-of-severe'"
+          :chart-id="'time-bar-chart-severe'"
+          :chart-data="severeGraph"
+          :date="Data.main_summary_history.date"
+          :default-data-kind="'daily-transition'"
+          :default-span="60"
+          :unit="'人'"
+          :remarks="[
+            '愛知県が発表した【感染症発生状況】を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
+            '感染症発生状況が取得できなかった日の値は表示していません'
+          ]"
+          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
+          :show="false"
+          :transition-label="'時点'"
+        />
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
@@ -50,6 +89,8 @@
           :chart-id="'time-bar-chart-patients'"
           :chart-data="patientsGraph"
           :date="Data.patients_summary.date"
+          :default-data-kind="'weekly-transition'"
+          :default-span="60"
           :unit="'人'"
           :url="
             'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
@@ -72,6 +113,7 @@
           :date="Data.main_summary_history.date"
           :latest-value-field="'discharged'"
           :latest-value-title="'退院'"
+          :default-span="60"
           :unit="'人'"
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
           :remarks="[
@@ -87,6 +129,8 @@
           :chart-id="'time-bar-chart-inspections'"
           :chart-data="inspectionsGraph"
           :date="Data.inspections_summary.date"
+          :default-data-kind="'weekly-transition'"
+          :default-span="60"
           :unit="'件'"
           :remarks="[
             inspectionsRemarks,
@@ -164,6 +208,8 @@ import formatTable from '@/utils/formatTable'
 import formatRemarks from '@/utils/formatRemarks'
 import formatConfirmedCases from '@/utils/formatConfirmedCases'
 import formatConfirmedCasesGraph from '@/utils/formatConfirmedCasesGraph'
+import formatInHospitalGraph from '@/utils/formatInHospitalGraph'
+import formatSevereGraph from '@/utils/formatSevereGraph'
 // import News from '@/data/news.json'
 import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
@@ -189,6 +235,13 @@ export default {
     const inspectionsGraph = formatGraph(Data.inspections_summary.data)
 
     const inspectionsRemarks = formatRemarks(Data.inspections_summary.data)
+    // 入院中数グラフ
+    const inHospitalGraph = formatInHospitalGraph(
+      Data.main_summary_history.data
+    )
+    // 重症者数グラフ
+    const severeGraph = formatSevereGraph(Data.main_summary_history.data)
+
     // 退院者グラフ
     // const dischargesGraph = formatGraph(Data.discharges_summary.data)
 
@@ -257,6 +310,8 @@ export default {
       patientsGraph,
       inspectionsGraph,
       inspectionsRemarks,
+      inHospitalGraph,
+      severeGraph,
       // dischargesGraph,
       // contactsGraph,
       // querentsGraph,

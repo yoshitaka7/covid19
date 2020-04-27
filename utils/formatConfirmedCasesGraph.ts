@@ -58,13 +58,8 @@ export default (
     return pre
   }, new Map<string, MainSummaryDataType>())
 
-  // 修了日は patientSummaries と mainSummaries の後端の大きい(未来の)方
-  const maxPatient =
-    formatDt(patientSummaries.slice(-1)[0]?.日付) ?? '1900/01/01'
-  const maxSummary = formatDt(
-    mainSummaries.slice(-1)[0]?.更新日時 ?? '1900/01/01'
-  )
-  const endDate = maxPatient < maxSummary ? maxSummary : maxPatient
+  // 終了日は mainSummaries の後端
+  const endDate = formatDt(mainSummaries.slice(-1)[0]?.更新日時 ?? '1900/01/01');
 
   // 開始日から修了日までループ
   let dt = startDate
