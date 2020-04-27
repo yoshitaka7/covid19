@@ -6,7 +6,7 @@
     :url="url"
     :remarks="remarks"
   >
-    <template v-slot:button>
+    <template v-if="show" v-slot:button>
       <data-selector v-model="dataKind" />
     </template>
     <bar
@@ -14,6 +14,13 @@
       :chart-data="displayData"
       :options="displayOption"
       :height="240"
+    />
+    <date-select-slider
+      :chart-data="chartData"
+      :value="defaultDisplaySpan"
+      :min="spanMin"
+      :max="spanMax"
+      @sliderInput="sliderUpdate"
     />
     <div>
       <ul class="remarks">
@@ -38,9 +45,16 @@
 import DataView from '@/components/DataView.vue'
 import DataSelector from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
+import DateSelectSlider from '@/components/DateSelectSlider.vue'
+import { chunkByWeek, reduceGraph } from '@/utils/formatGraph'
 
 export default {
-  components: { DataView, DataSelector, DataViewBasicInfoPanel },
+  components: {
+    DataView,
+    DataSelector,
+    DataViewBasicInfoPanel,
+    DateSelectSlider
+  },
   props: {
     title: {
       type: String,
@@ -67,6 +81,16 @@ export default {
       required: true,
       default: ''
     },
+    defaultDataKind: {
+      type: String,
+      required: false,
+      default: 'daily-transition'
+    },
+    defaultSpan: {
+      type: Number,
+      required: false,
+      default: 60
+    },
     unit: {
       type: String,
       required: false,
@@ -81,31 +105,84 @@ export default {
       type: Array,
       required: false,
       default: () => []
+    },
+    show: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    transitionLabel: {
+      type: String,
+      required: false,
+      default: '実績値'
     }
   },
   data() {
+    const displaySpanLower = !this.chartData
+      ? 0
+      : this.chartData.length - this.defaultSpan
+    const displaySpanUpper = !this.chartData ? 0 : this.chartData.length - 1
     return {
-      dataKind: 'transition'
+      dataKind: this.defaultDataKind,
+      defaultDisplaySpan: [displaySpanLower, displaySpanUpper],
+      displaySpan: [displaySpanLower, displaySpanUpper]
     }
   },
   computed: {
+    spanMin() {
+      return 0
+    },
+    spanMax() {
+      return this.chartData.length - 1
+    },
+    displayChartData() {
+      if (!this.chartData) return this.chartData
+
+      const lowerIndex = this.displaySpan[0]
+      const lower = lowerIndex < this.chartData.length ? lowerIndex : 0
+      const upperIndex = this.displaySpan[1]
+      const upper =
+        upperIndex < this.chartData.length
+          ? upperIndex
+          : this.chartData.length - 1
+      return this.chartData.slice(lower, upper + 1)
+    },
     displayCumulativeRatio() {
       const lastDay = this.chartData.slice(-1)[0].cumulative
       const lastDayBefore = this.chartData.slice(-2)[0].cumulative
       return this.formatDayBeforeRatio(lastDay - lastDayBefore)
     },
     displayTransitionRatio() {
+      if (this.chartData.slice(-2)[0].novalue) {
+        return '-'
+      }
       const lastDay = this.chartData.slice(-1)[0].transition
       const lastDayBefore = this.chartData.slice(-2)[0].transition
       return this.formatDayBeforeRatio(lastDay - lastDayBefore)
     },
     displayInfo() {
-      if (this.dataKind === 'transition') {
+      if (this.dataKind === 'weekly-transition') {
+        const summarized = this.chartData.filter(d => d.summarized)
+        const noneSummarized = this.chartData.filter(d => !d.summarized)
+        const noneSummarizedChunks = chunkByWeek(noneSummarized, 1)
+        const noneSummarizedReducedChunks = noneSummarizedChunks.map(chunk =>
+          reduceGraph(chunk, false)
+        )
+        const chartData = summarized.concat(noneSummarizedReducedChunks)
+        return {
+          lText: `${chartData.slice(-1)[0].transition.toLocaleString()}`,
+          sText: `${chartData.slice(-1)[0].label} ${
+            this.transitionLabel
+          }（前週比：${this.displayTransitionRatio} ${this.unit}）`,
+          unit: this.unit
+        }
+      }
+      if (this.dataKind === 'daily-transition') {
         return {
           lText: `${this.chartData.slice(-1)[0].transition.toLocaleString()}`,
-          sText: `${this.chartData.slice(-1)[0].label} 実績値（前日比：${
-            this.displayTransitionRatio
-          } ${this.unit}）`,
+          sText: `${this.chartData.slice(-1)[0].label} ${
+            this.transitionLabel
+          }（前日比：${this.displayTransitionRatio} ${this.unit}）`,
           unit: this.unit
         }
       }
@@ -120,18 +197,44 @@ export default {
       }
     },
     displayData() {
-      if (this.dataKind === 'transition') {
+      if (this.dataKind === 'weekly-transition') {
+        const summarized = this.displayChartData.filter(d => d.summarized)
+        const noneSummarized = this.displayChartData.filter(d => !d.summarized)
+        const noneSummarizedChunks = chunkByWeek(noneSummarized, 1)
+        const noneSummarizedReducedChunks = noneSummarizedChunks.map(chunk =>
+          reduceGraph(chunk, false)
+        )
+        const chartData = summarized.concat(noneSummarizedReducedChunks)
         return {
-          labels: this.chartData.map(d => {
+          labels: chartData.map(d => {
             return d.label
           }),
           datasets: [
             {
               label: this.dataKind,
-              data: this.chartData.map(d => {
+              data: chartData.map(d => {
                 return d.transition
               }),
-              backgroundColor: this.chartData.map(d => {
+              backgroundColor: chartData.map(d => {
+                return d.summarized ? '#1976d2' : '#bd3f4c'
+              }),
+              borderWidth: 0
+            }
+          ]
+        }
+      }
+      if (this.dataKind === 'daily-transition') {
+        return {
+          labels: this.displayChartData.map(d => {
+            return d.label
+          }),
+          datasets: [
+            {
+              label: this.dataKind,
+              data: this.displayChartData.map(d => {
+                return d.transition
+              }),
+              backgroundColor: this.displayChartData.map(d => {
                 return d.summarized ? '#1976d2' : '#bd3f4c'
               }),
               borderWidth: 0
@@ -140,13 +243,13 @@ export default {
         }
       }
       return {
-        labels: this.chartData.map(d => {
+        labels: this.displayChartData.map(d => {
           return d.label
         }),
         datasets: [
           {
             label: this.dataKind,
-            data: this.chartData.map(d => {
+            data: this.displayChartData.map(d => {
               return d.cumulative
             }),
             backgroundColor: '#bd3f4c',
@@ -261,6 +364,9 @@ export default {
     }
   },
   methods: {
+    sliderUpdate(sliderValue) {
+      this.displaySpan = sliderValue
+    },
     formatDayBeforeRatio(dayBeforeRatio) {
       const dayBeforeRatioLocaleString = dayBeforeRatio.toLocaleString()
       switch (Math.sign(dayBeforeRatio)) {

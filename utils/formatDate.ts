@@ -11,3 +11,7 @@ export const convertDateToISO8601Format = (dateString: string): string => {
 export const convertDateToShortFormat = (dateString: string): string => {
   return dayjs(dateString).format('M/D')
 }
+
+export const convertDatetimeToShortFormat = (dateString: string): string => {
+  return dayjs(dateString).format('M/D H:mm')
+}

@@ -17,6 +17,13 @@
       :options="options"
       :height="240"
     />
+    <date-select-slider
+      :chart-data="chartData"
+      :value="defaultDisplaySpan"
+      :min="spanMin"
+      :max="spanMax"
+      @sliderInput="sliderUpdate"
+    />
     <div>
       <ul class="remarks">
         <li v-for="remarks_text in remarks" :key="remarks_text">
@@ -38,9 +45,14 @@
 <script>
 import DataView from '@/components/DataView.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
+import DateSelectSlider from '@/components/DateSelectSlider.vue'
 
 export default {
-  components: { DataView, DataViewBasicInfoPanel },
+  components: {
+    DataView,
+    DataViewBasicInfoPanel,
+    DateSelectSlider
+  },
   props: {
     title: {
       type: String,
@@ -82,6 +94,11 @@ export default {
       required: false,
       default: ''
     },
+    defaultSpan: {
+      type: Number,
+      required: true,
+      default: 60
+    },
     // items: {
     //   type: Array,
     //   required: false,
@@ -108,12 +125,35 @@ export default {
       default: () => []
     }
   },
-  // data() {
-  //   return {
-  //     dataKind: 'transition'
-  //   }
-  // },
+  data() {
+    const displaySpanLower = !this.chartData
+      ? 0
+      : this.chartData.length - this.defaultSpan
+    const displaySpanUpper = !this.chartData ? 0 : this.chartData.length - 1
+    return {
+      defaultDisplaySpan: [displaySpanLower, displaySpanUpper],
+      displaySpan: [displaySpanLower, displaySpanUpper]
+    }
+  },
   computed: {
+    spanMin() {
+      return 0
+    },
+    spanMax() {
+      return this.chartData.length - 1
+    },
+    displayChartData() {
+      if (!this.chartData) return this.chartData
+
+      const lowerIndex = this.displaySpan[0]
+      const lower = lowerIndex < this.chartData.length ? lowerIndex : 0
+      const upperIndex = this.displaySpan[1]
+      const upper =
+        upperIndex < this.chartData.length
+          ? upperIndex
+          : this.chartData.length - 1
+      return this.chartData.slice(lower, upper + 1)
+    },
     displayLatestValueRatio() {
       const lastDay = this.chartData.slice(-1)[0][this.latestValueField]
       const lastDayBefore = this.chartData.slice(-2)[0][this.latestValueField]
@@ -128,7 +168,7 @@ export default {
             .slice(-1)[0]
             [this.latestValueField]?.toLocaleString() ?? '-',
         lTitle: this.latestValueTitle,
-        sText: `${this.chartData.slice(-1)[0].label} 実績値（前日比：${
+        sText: `${this.chartData.slice(-1)[0].label} 時点（前日比：${
           this.displayLatestValueRatio
         } ${this.unit}）`,
         unit: this.unit
@@ -136,12 +176,12 @@ export default {
     },
     displayData() {
       return {
-        labels: this.chartData.map(d => {
+        labels: this.displayChartData.map(d => {
           return d.label
         }),
         datasets: this.chartLegends.map(legend => ({
           label: legend.label,
-          data: this.chartData.map(d => d[legend.field]),
+          data: this.displayChartData.map(d => d[legend.field]),
           borderWidth: 0,
           borderColor: 'white',
           backgroundColor: legend.backgroundColor
@@ -233,6 +273,9 @@ export default {
     }
   },
   methods: {
+    sliderUpdate(sliderValue) {
+      this.displaySpan = sliderValue
+    },
     formatDayBeforeRatio(dayBeforeRatio) {
       const dayBeforeRatioLocaleString = dayBeforeRatio.toLocaleString()
       switch (Math.sign(dayBeforeRatio)) {
