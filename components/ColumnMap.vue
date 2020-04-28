@@ -25,8 +25,8 @@
           <div>
             <div
               :class="
-                $vuetify.breakpoint.xs
-                  ? 'ColumnMap-PanelTextForXS'
+                $vuetify.breakpoint.md
+                  ? 'ColumnMap-PanelTextForMD'
                   : 'ColumnMap-PanelText'
               "
             >
@@ -104,7 +104,7 @@
     white-space: nowrap;
     overflow: hidden;
   }
-  &-PanelTextForXS {
+  &-PanelTextForMD {
     font-size: 9px;
     line-height: 1.3;
     width: calc(9px * 3.5);
