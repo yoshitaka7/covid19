@@ -59,7 +59,7 @@ export default (
   }, new Map<string, MainSummaryDataType>())
 
   // 終了日は mainSummaries の後端
-  const endDate = formatDt(mainSummaries.slice(-1)[0]?.更新日時 ?? '1900/01/01')
+  const endDate = formatDt(mainSummaries.slice(-1)[0]?.更新日時 ?? '1900/01/01');
 
   // 開始日から修了日までループ
   let dt = startDate
