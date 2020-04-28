@@ -100,7 +100,8 @@
     "About us": "当サイトについて",
     "Other local Government": "他自治体の対策サイト",
     "Powered by:": "Powered by:",
-    "SAKURA internet Inc.": "さくらインターネット"
+    "SAKURA internet Inc.": "さくらインターネット",
+    "Nagoya COVID-19 Special Site": "名古屋市新型コロナウイルス感染症対策特設サイト"
   }
 }
 </i18n>
@@ -179,6 +180,12 @@ export default {
         {
           title: this.$t('Government official Twitter'),
           link: 'https://twitter.com/pref_aichi',
+          divider: true
+        },
+        {
+          title: this.$t('Nagoya COVID-19 Special Site'),
+          link:
+            'https://nagoyabousai.maps.arcgis.com/apps/Cascade/index.html?appid=04c0250edfe54ae4af7f1c8755d275b5',
           divider: true
         },
         {
