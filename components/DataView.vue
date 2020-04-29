@@ -99,6 +99,7 @@ export default class DataView extends Vue {
     height: auto !important;
   }
   &-TitleContainer {
+    width: 100%;
     padding: 14px 0 8px;
     color: $gray-2;
   }
