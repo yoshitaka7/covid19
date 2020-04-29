@@ -8,7 +8,14 @@
     :remarks="remarks"
     :title-date="titleDate"
   >
-    <table class="tabularmaps">
+    <table
+      class="tabularmaps"
+      :class="
+        $vuetify.breakpoint.xs
+          ? 'ColumnMap-TableSpacingForXS'
+          : 'ColumnMap-TableSpacing'
+      "
+    >
       <tr v-for="(row, rowIndex) in table" :key="rowIndex">
         <td
           v-for="(col, colIndex) in row"
@@ -25,8 +32,8 @@
           <div>
             <div
               :class="
-                $vuetify.breakpoint.xs
-                  ? 'ColumnMap-PanelTextForXS'
+                $vuetify.breakpoint.mdAndDown
+                  ? 'ColumnMap-PanelTextForMD'
                   : 'ColumnMap-PanelText'
               "
             >
@@ -96,6 +103,12 @@
     font-size: 11px;
     color: $gray-3;
   }
+  &-TableSpacing {
+    border-spacing: 5px;
+  }
+  &-TableSpacingForXS {
+    border-spacing: 1px;
+  }
   &-PanelText {
     font-size: 11px;
     line-height: 1.3;
@@ -104,10 +117,10 @@
     white-space: nowrap;
     overflow: hidden;
   }
-  &-PanelTextForXS {
+  &-PanelTextForMD {
     font-size: 9px;
     line-height: 1.3;
-    width: calc(9px * 3.5);
+    width: calc(9px * 3.2);
     margin: 0 auto;
     white-space: nowrap;
     overflow: hidden;
@@ -177,7 +190,6 @@
 
 /* tabularmaps */
 .tabularmaps {
-  border-spacing: 5px;
   border-collapse: separate;
   display: inline-block;
   width: 100%; // 90vw;
