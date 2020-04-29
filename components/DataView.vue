@@ -120,11 +120,11 @@ export default class DataView extends Vue {
     color: $gray-3;
   }
   &-CardText {
-    margin-bottom: 46px;
+    margin-bottom: 78px;
     margin-top: 35px;
   }
   &-CardTextForXS {
-    margin-bottom: 46px;
+    margin-bottom: 78px;
     margin-top: 70px;
   }
   &-Footer {
@@ -134,6 +134,7 @@ export default class DataView extends Vue {
     color: $gray-3 !important;
     justify-content: space-between;
     flex-direction: row-reverse;
+    width: 97%;
     .OpenDataLink {
       text-decoration: none;
       .ExternalLinkIcon {
@@ -144,5 +145,9 @@ export default class DataView extends Vue {
 }
 .v-toolbar__content {
   height: auto !important;
+}
+.v-footer {
+  position: absolute;
+  bottom: 0;
 }
 </style>
