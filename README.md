@@ -1,4 +1,4 @@
-# 愛知県 新型コロナウイルス感染症対策サイト
+# 愛知県 新型コロナウイルス感染症対策サイト(テスト)
 
 ![](https://github.com/code4nagoya/covid19/workflows/production%20deploy/badge.svg)
 
