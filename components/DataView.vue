@@ -20,7 +20,7 @@
     >
       <slot />
     </v-card-text>
-    <v-footer class="DataView-Footer">
+    <v-footer absolute class="DataView-Footer">
       <time :datetime="formattedDate">{{ date }} 更新</time>
       <a
         v-if="url"
@@ -146,9 +146,5 @@ export default class DataView extends Vue {
 }
 .v-toolbar__content {
   height: auto !important;
-}
-.v-footer {
-  position: absolute;
-  bottom: 0;
 }
 </style>
