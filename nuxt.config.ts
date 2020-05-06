@@ -67,6 +67,10 @@ const config: Configuration = {
         hid: 'twitter:image',
         name: 'twitter:image',
         content: 'https://stopcovid19.code4.nagoya/ogp.png'
+      },
+      {
+        name: 'google-site-verification',
+        content: '1eIAbiY2dh-CPjLLY2LejVtfSp2WXQ8_DlLvjy7xsLE'
       }
     ],
     link: [

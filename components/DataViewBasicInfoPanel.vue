@@ -57,7 +57,7 @@
     @include card-h2();
   }
   &-CardText {
-    margin-bottom: 46px;
+    margin-bottom: 78px;
     margin-top: 20px;
   }
 }
