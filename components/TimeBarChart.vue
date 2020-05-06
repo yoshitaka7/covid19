@@ -24,9 +24,14 @@
     />
     <div>
       <ul class="remarks">
-        <li v-for="remarks_text in remarks" :key="remarks_text">
-          {{ remarks_text }}
-        </li>
+        <!-- eslint-disable vue/no-v-html -->
+        <li
+          v-for="remarks_text in remarks"
+          :key="remarks_text"
+          v-sanitaize
+          v-html="remarks_text"
+        />
+        <!-- eslint-disable vue/no-v-html -->
       </ul>
     </div>
     <template v-slot:infoPanel>
