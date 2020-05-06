@@ -14,12 +14,14 @@
       class="cardTable"
     />
     <div class="note" />
+    <!-- eslint-disable vue/no-v-html -->
     <div
       v-for="remarks_text in remarks"
       :key="remarks_text"
       v-sanitaize
       v-html="remarks_text"
     />
+    <!-- eslint-disable vue/no-v-html -->
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
         :l-text="info.lText"
