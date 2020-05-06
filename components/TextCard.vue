@@ -8,8 +8,9 @@
         {{ title }}
       </template>
     </h2>
-    <!-- eslint-disable-next-line vue/no-v-html -->
+    <!-- eslint-disable vue/no-v-html -->
     <p v-if="body" v-sanitaize class="TextCard-Body" v-html="body" />
+    <!-- eslint-disable vue/no-v-html -->
     <p class="TextCard-Body">
       <slot />
     </p>
