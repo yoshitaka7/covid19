@@ -27,6 +27,7 @@
         <li
           v-for="remarks_text in remarks"
           :key="remarks_text"
+          v-sanitaize
           v-html="remarks_text"
         />
       </ul>
