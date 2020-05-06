@@ -97,6 +97,10 @@ const config: Configuration = {
     {
       src: '@/plugins/vuetify.ts',
       ssr: true
+    },
+    {
+      src: '@/plugins/vue-sanitize-html.js',
+      ssr: true
     }
   ],
   /*
