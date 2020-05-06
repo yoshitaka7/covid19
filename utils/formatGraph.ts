@@ -1,7 +1,14 @@
 import dayjs from 'dayjs'
 
-type DataType = {
+type DataTypeDaily = {
   日付: Date
+  小計: number
+  合算: string
+}
+
+type DataTypeWeekly = {
+  開始日: string
+  終了日: string
   小計: number
   合算: string
 }
@@ -14,7 +21,7 @@ type GraphDataType = {
   summarized: boolean
 }
 
-export default (data: DataType[]) => {
+export default (data: DataTypeDaily[]) => {
   const graphData: GraphDataType[] = []
   const today = new Date()
   let patSum = 0
@@ -28,6 +35,30 @@ export default (data: DataType[]) => {
         graphData.push({
           date,
           label: `${date.getMonth() + 1}/${date.getDate()}`,
+          transition: subTotal,
+          cumulative: patSum,
+          summarized: !!d['合算']
+        })
+      }
+    })
+  return graphData
+}
+
+export const formatGraphWeekly = (data: DataTypeWeekly[]) => {
+  const graphData: GraphDataType[] = []
+  const today = dayjs()
+  let patSum = 0
+  data
+    .filter(d => dayjs(d['終了日']) < today)
+    .forEach(d => {
+      const startDt = dayjs(d['開始日'])
+      const endDt = dayjs(d['終了日'])
+      const subTotal = d['小計']
+      if (!isNaN(subTotal)) {
+        patSum += subTotal * 1
+        graphData.push({
+          date: new Date(startDt.format('YYYY-MM-DD')),
+          label: `${startDt.format('M/D')}～${endDt.format('M/D')}`, // `${date.getMonth() + 1}/${date.getDate()}`,
           transition: subTotal,
           cumulative: patSum,
           summarized: !!d['合算']

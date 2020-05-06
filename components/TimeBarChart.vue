@@ -81,6 +81,11 @@ export default {
       required: false,
       default: () => []
     },
+    chartDataWeekly: {
+      type: Array,
+      required: false,
+      default: () => []
+    },
     date: {
       type: String,
       required: true,
@@ -141,16 +146,19 @@ export default {
       return this.chartData.length - 1
     },
     displayChartData() {
-      if (!this.chartData) return this.chartData
+      let chartData = this.chartData
+      if (this.dataKind === 'weekly-transition') {
+        chartData = this.chartDataWeekly
+      }
+
+      if (!chartData) return chartData
 
       const lowerIndex = this.displaySpan[0]
-      const lower = lowerIndex < this.chartData.length ? lowerIndex : 0
+      const lower = lowerIndex < chartData.length ? lowerIndex : 0
       const upperIndex = this.displaySpan[1]
       const upper =
-        upperIndex < this.chartData.length
-          ? upperIndex
-          : this.chartData.length - 1
-      return this.chartData.slice(lower, upper + 1)
+        upperIndex < chartData.length ? upperIndex : chartData.length - 1
+      return chartData.slice(lower, upper + 1)
     },
     displayCumulativeRatio() {
       const lastDay = this.chartData.slice(-1)[0].cumulative
@@ -203,13 +211,14 @@ export default {
     },
     displayData() {
       if (this.dataKind === 'weekly-transition') {
-        const summarized = this.displayChartData.filter(d => d.summarized)
-        const noneSummarized = this.displayChartData.filter(d => !d.summarized)
-        const noneSummarizedChunks = chunkByWeek(noneSummarized, 1)
-        const noneSummarizedReducedChunks = noneSummarizedChunks.map(chunk =>
-          reduceGraph(chunk, false)
-        )
-        const chartData = summarized.concat(noneSummarizedReducedChunks)
+        // const summarized = this.displayChartData.filter(d => d.summarized)
+        // const noneSummarized = this.displayChartData.filter(d => !d.summarized)
+        // const noneSummarizedChunks = chunkByWeek(noneSummarized, 1)
+        // const noneSummarizedReducedChunks = noneSummarizedChunks.map(chunk =>
+        //   reduceGraph(chunk, false)
+        // )
+        // const chartData = summarized.concat(noneSummarizedReducedChunks)
+        const chartData = this.chartDataWeekly
         return {
           labels: chartData.map(d => {
             return d.label
@@ -223,7 +232,20 @@ export default {
               backgroundColor: chartData.map(d => {
                 return d.summarized ? '#1976d2' : '#bd3f4c'
               }),
-              borderWidth: 0
+              borderWidth: 0,
+              options: {
+                scales: {
+                  xAxes: [
+                    {
+                      ticks: {
+                        autoSkip: false,
+                        maxRotation: 0,
+                        minRotation: 0
+                      }
+                    }
+                  ]
+                }
+              }
             }
           ]
         }

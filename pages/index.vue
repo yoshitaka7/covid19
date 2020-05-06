@@ -89,7 +89,8 @@
           title="陽性患者数"
           :title-id="'number-of-confirmed-cases'"
           :chart-id="'time-bar-chart-patients'"
-          :chart-data="patientsGraph"
+          :chart-data="patientsGraphDaily"
+          :chart-data-weekly="patientsGraphWeekly"
           :date="Data.patients_summary.date"
           :default-data-kind="'weekly-transition'"
           :default-span="60"
@@ -214,6 +215,7 @@ import Data from '@/data/data.json'
 import CityData from '@/data/city_data.json'
 // import MetroData from '@/data/metro.json'
 import formatGraph from '@/utils/formatGraph'
+import { formatGraphWeekly } from '@/utils/formatGraph'
 import formatRemarks from '@/utils/formatRemarks'
 import formatConfirmedCases from '@/utils/formatConfirmedCases'
 import formatConfirmedCasesGraph from '@/utils/formatConfirmedCasesGraph'
@@ -224,6 +226,7 @@ import formatSevereGraph from '@/utils/formatSevereGraph'
 import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
+import weeklizer from '@/utils/weeklizer'
 
 export default {
   components: {
@@ -238,8 +241,15 @@ export default {
     ColumnMap
   },
   data() {
+    // 週次化
+    const dataWeekly = weeklizer(Data) // Data_weekly.json 化までのつなぎ
+
     // 感染者数グラフ
-    const patientsGraph = formatGraph(Data.patients_summary.data)
+    const patientsGraphDaily = formatGraph(Data.patients_summary.data)
+    const patientsGraphWeekly = formatGraphWeekly(
+      dataWeekly.patients_summary.data
+    )
+    console.debug('patientsGraphWeekly', patientsGraphWeekly)
 
     const inspectionsGraph = formatGraph(Data.inspections_summary.data)
 
@@ -315,7 +325,8 @@ export default {
 
     const data = {
       Data,
-      patientsGraph,
+      patientsGraphDaily,
+      patientsGraphWeekly,
       inspectionsGraph,
       inspectionsRemarks,
       inHospitalGraph,
