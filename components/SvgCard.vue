@@ -18,9 +18,11 @@
       </p>
     </template>
     <slot />
-    <div v-for="remarks_text in remarks" :key="remarks_text">
-      {{ remarks_text }}
-    </div>
+    <div
+      v-for="remarks_text in remarks"
+      :key="remarks_text"
+      v-html="remarks_text"
+    />
   </data-view>
 </template>
 
