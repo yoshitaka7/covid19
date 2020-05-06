@@ -24,9 +24,11 @@
     />
     <div>
       <ul class="remarks">
-        <li v-for="remarks_text in remarks" :key="remarks_text">
-          {{ remarks_text }}
-        </li>
+        <li
+          v-for="remarks_text in remarks"
+          :key="remarks_text"
+          v-html="remarks_text"
+        />
       </ul>
     </div>
     <template v-slot:infoPanel>

@@ -62,6 +62,12 @@ export default class DataView extends Vue {
 </script>
 
 <style lang="scss">
+.RemarksLink {
+  text-decoration: none;
+  .ExternalLinkIcon {
+    vertical-align: text-bottom;
+  }
+}
 .DataView {
   &-DataInfo {
     &-summary {
