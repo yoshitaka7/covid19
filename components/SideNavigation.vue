@@ -87,12 +87,6 @@
     "Aichi Prefecture Government": "愛知県",
     "Tokyo COVID-19 Task Force": "新型コロナウイルス感染症対策本部",
     "The latest updates": "県内の最新感染動向",
-    "If you have any symptoms": "新型コロナウイルス感染症が心配なときに",
-    "for Families with children": "お子様をお持ちの皆様へ",
-    "for Citizens": "県民の皆様へ",
-    "for Enterprises and Employees": "企業の皆様・はたらく皆様へ",
-    "Official statements from Task Force": "愛知県新型コロナウイルス感染症対策本部会議報",
-    "Cancelled public events": "愛知労働局主催等 中止又は延期するイベント等",
     "Government official website": "愛知県公式ホームページ",
     "Government official LINE": "愛知県-新型コロナ対策パーソナルサポート(LINE)",
     "Government official Twitter": "愛知県庁公式Twitter",
@@ -127,39 +121,6 @@ export default {
           title: this.$t('The latest updates'),
           link: '/',
           divider: true
-        },
-        {
-          icon: 'covid',
-          title: this.$t('If you have any symptoms'),
-          link: '/flow',
-          divider: true
-        },
-        {
-          icon: 'parent',
-          title: this.$t('for Families with children'),
-          link: '/parent'
-        },
-        {
-          icon: 'mdi-account-multiple',
-          title: this.$t('for Citizens'),
-          link:
-            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
-        },
-        {
-          icon: 'mdi-domain',
-          title: this.$t('for Enterprises and Employees'),
-          link: '/worker',
-          divider: true
-        },
-        {
-          title: this.$t('Official statements from Task Force'),
-          link:
-            'https://www.pref.aichi.jp/site/covid19-aichi/novel-coronavirus-taisakuhonbu.html'
-        },
-        {
-          title: this.$t('Cancelled public events'),
-          link:
-            'https://jsite.mhlw.go.jp/aichi-roudoukyoku/news_topics/2019_covid-19_event.html'
         },
         {
           title: this.$t('Message from Governor Omura'),
