@@ -149,19 +149,6 @@
         />
       </v-col>
       <v-col cols="12" md="6" class="DataCard">
-        <data-table
-          :title="'陽性患者の属性'"
-          :title-id="'attributes-of-confirmed-cases'"
-          :chart-data="patientsTable"
-          :chart-option="{}"
-          :date="Data.patients.date"
-          :info="sumInfoOfPatients"
-          :url="
-            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
-          "
-        />
-      </v-col>
-      <v-col cols="12" md="6" class="DataCard">
         <column-map
           title="市町村別感染状況"
           :title-id="'patients-per-cities'"
@@ -224,9 +211,7 @@ import WhatsNew from '@/components/WhatsNew.vue'
 import Data from '@/data/data.json'
 import CityData from '@/data/city_data.json'
 // import MetroData from '@/data/metro.json'
-import DataTable from '@/components/DataTable.vue'
 import formatGraph from '@/utils/formatGraph'
-import formatTable from '@/utils/formatTable'
 import formatRemarks from '@/utils/formatRemarks'
 import formatConfirmedCases from '@/utils/formatConfirmedCases'
 import formatConfirmedCasesGraph from '@/utils/formatConfirmedCasesGraph'
@@ -246,7 +231,6 @@ export default {
     TimeStackedBarChart,
     WhatsNew,
     //    StaticInfo,
-    DataTable,
     SvgCard,
     ConfirmedCasesTable,
     ColumnMap
@@ -254,8 +238,6 @@ export default {
   data() {
     // 感染者数グラフ
     const patientsGraph = formatGraph(Data.patients_summary.data)
-    // 感染者数
-    const patientsTable = formatTable(Data.patients.data)
 
     const inspectionsGraph = formatGraph(Data.inspections_summary.data)
 
@@ -321,14 +303,6 @@ export default {
       patientsPerCitiesLegends
     )
 
-    const sumInfoOfPatients = {
-      lText: patientsGraph[
-        patientsGraph.length - 1
-      ].cumulative.toLocaleString(),
-      sText: patientsGraph[patientsGraph.length - 1].label + 'の累計',
-      unit: '人'
-    }
-
     const sumInfoOfInspections = {
       lText: inspectionsGraph[
         inspectionsGraph.length - 1
@@ -339,7 +313,6 @@ export default {
 
     const data = {
       Data,
-      patientsTable,
       patientsGraph,
       inspectionsGraph,
       inspectionsRemarks,
@@ -355,7 +328,6 @@ export default {
       confirmedCases,
       confirmedCasesGraph,
       confirmedCasesGraphLegends,
-      sumInfoOfPatients,
       sumInfoOfInspections,
       patientsPerCities,
       patientsPerCitiesLegends,
