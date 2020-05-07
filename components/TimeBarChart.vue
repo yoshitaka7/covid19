@@ -320,12 +320,12 @@ export default {
               ticks: {
                 fontSize: 9,
                 maxTicksLimit: 20,
-                fontColor: '#808080',
-                maxRotation: 0,
-                minRotation: 0,
-                callback: label => {
-                  return label.split('/')[1]
-                }
+                fontColor: '#808080'
+                // maxRotation: 0,
+                // minRotation: 0,
+                // callback: label => {
+                //   return label.split('/')[1]
+                // }
               }
             },
             {
