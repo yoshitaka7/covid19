@@ -1,6 +1,6 @@
 <template>
   <data-view
-    :title="title"
+    :title="displayTitle"
     :title-id="titleId"
     :date="date"
     :url="url"
@@ -122,6 +122,9 @@ export default {
     }
   },
   computed: {
+    displayTitle() {
+      return `${this.title}${this.activeChartSet?.titlePostfix ?? ''}`
+    },
     displaySpan: {
       get() {
         return this.displaySpanInner

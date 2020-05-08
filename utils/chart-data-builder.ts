@@ -11,6 +11,7 @@ import {
 } from '@/utils/types'
 
 type ChartData = {
+  titlePostfix: string // グラフタイトルの接尾辞
   data: GraphDataType[]
   valueField: string // 'transition'
   valueUnit: string // '人'
@@ -29,6 +30,7 @@ export const buildPatientChartSet = (
   const chartDataSet = new Map<string, ChartData>()
 
   chartDataSet.set('daily-transition', {
+    titlePostfix: '',
     data: patientsGraphDaily,
     valueField: 'transition',
     valueUnit: '人',
@@ -38,6 +40,7 @@ export const buildPatientChartSet = (
   })
 
   chartDataSet.set('weekly-transition', {
+    titlePostfix: '(週別)',
     data: patientsGraphWeekly,
     latestLabel: '実績値',
     diffLabel: '前週比',
@@ -50,6 +53,7 @@ export const buildPatientChartSet = (
   })
 
   chartDataSet.set('daily-cumulative', {
+    titlePostfix: '',
     data: patientsGraphDaily,
     valueField: 'cumulative',
     valueUnit: '人',
@@ -73,6 +77,7 @@ export const buildInspectionsChartSet = (
   const chartDataSet = new Map<string, ChartData>()
 
   chartDataSet.set('daily-transition', {
+    titlePostfix: '',
     data: inspectionssGraphDaily,
     valueField: 'transition',
     valueUnit: '件',
@@ -82,6 +87,7 @@ export const buildInspectionsChartSet = (
   })
 
   chartDataSet.set('weekly-transition', {
+    titlePostfix: '(週別)',
     data: inspectionssGraphWeekly,
     latestLabel: '実績値',
     diffLabel: '前週比',
@@ -94,6 +100,7 @@ export const buildInspectionsChartSet = (
   })
 
   chartDataSet.set('daily-cumulative', {
+    titlePostfix: '',
     data: inspectionssGraphDaily,
     valueField: 'cumulative',
     valueUnit: '件',
@@ -114,6 +121,7 @@ export const buildInHospitalChartSet = (
   const chartDataSet = new Map<string, ChartData>()
 
   chartDataSet.set('daily-transition', {
+    titlePostfix: '',
     data: graphDataDaily,
     valueField: 'transition',
     valueUnit: '人',
@@ -134,6 +142,7 @@ export const buildSevereChartSet = (
   const chartDataSet = new Map<string, ChartData>()
 
   chartDataSet.set('daily-transition', {
+    titlePostfix: '',
     data: graphDataDaily,
     valueField: 'transition',
     valueUnit: '人',
