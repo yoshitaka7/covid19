@@ -16,11 +16,11 @@
       :height="240"
     />
     <date-select-slider
-      :chart-data="chartData2"
+      :chart-data="activeChartData"
       :value="displaySpan"
       :min="spanMin"
       :max="spanMax"
-      :labeler="sliderLabeler"
+      :labeler="sliderLabelFormatter"
       @sliderInput="sliderUpdate"
     />
     <div>
@@ -134,18 +134,10 @@ export default {
     }
   },
   data() {
-    const chartData = this.chartDataWeekly
-    const displaySpanLower = !chartData
-      ? 0
-      : chartData.length - this.defaultSpan
-    const displaySpanUpper = !chartData ? 0 : this.chartData.length - 1
-    console.debug('[displaySpanLower, displaySpanUpper]', [
-      displaySpanLower,
-      displaySpanUpper
-    ])
+    const update = this.getSliderUpdate(this.chartDataWeekly)
     return {
       dataKind: this.defaultDataKind,
-      displaySpanInner: [displaySpanLower, displaySpanUpper]
+      displaySpanInner: update
     }
   },
   computed: {
@@ -170,21 +162,18 @@ export default {
         daily: {
           data: this.chartData,
           diffLabel: '前日比',
-          sliderLabeler: (x, _) => x.label
+          sliderLabelFormatter: (x, _) => x.label
         },
         weekly: {
           data: this.chartDataWeekly,
           diffLabel: '前週比',
-          sliderLabeler: (x, isFrom) => {
+          sliderLabelFormatter: (x, isFrom) => {
             const index = x.label.indexOf('～')
             return isFrom
               ? x.label.substring(0, index)
               : x.label.substring(index + 1)
           }
         }
-        // 'cumulative': {
-        //   data: this.chartDataWeekly
-        // },
       }
 
       return chartDataSet
@@ -193,16 +182,16 @@ export default {
       return 0
     },
     spanMax() {
-      return this.chartData2.length - 1
+      return this.activeChartData.length - 1
     },
-    chartData2() {
+    activeChartData() {
       return this.chartDataSet[this.spanKind].data
     },
-    sliderLabeler() {
-      return this.chartDataSet[this.spanKind].sliderLabeler
+    sliderLabelFormatter() {
+      return this.chartDataSet[this.spanKind].sliderLabelFormatter
     },
     displayChartData() {
-      const chartData = this.chartData2
+      const chartData = this.activeChartData
       if (!chartData) return this.chartData
 
       const lowerIndex = this.displaySpan[0]
@@ -213,15 +202,15 @@ export default {
       return chartData.slice(lower, upper + 1)
     },
     displayCumulativeRatio() {
-      const chartData = this.chartData2
+      const chartData = this.activeChartData
       console.debug('chartData1', chartData)
       const lastDay = chartData.slice(-1)[0].cumulative
       const lastDayBefore = chartData.slice(-2)[0].cumulative
       return this.formatDayBeforeRatio(lastDay - lastDayBefore)
     },
     displayTransitionRatio() {
-      const chartData = this.chartData2
-      console.debug('displayTransitionRatio chartData2', chartData)
+      const chartData = this.activeChartData
+      console.debug('displayTransitionRatio activeChartData', chartData)
       if (chartData.slice(-2)[0].novalue) {
         return '-'
       }
@@ -248,54 +237,7 @@ export default {
       }
     },
     displayData() {
-      // if (this.dataKind === 'weekly-transition') {
-      //   // const summarized = this.displayChartData.filter(d => d.summarized)
-      //   // const noneSummarized = this.displayChartData.filter(d => !d.summarized)
-      //   // const noneSummarizedChunks = chunkByWeek(noneSummarized, 1)
-      //   // const noneSummarizedReducedChunks = noneSummarizedChunks.map(chunk =>
-      //   //   reduceGraph(chunk, false)
-      //   // )
-      //   // const chartData = summarized.concat(noneSummarizedReducedChunks)
-      //   const chartData = this.chartDataWeekly
-      //   return {
-      //     labels: chartData.map(d => {
-      //       return d.label
-      //     }),
-      //     datasets: [
-      //       {
-      //         label: this.dataKind,
-      //         data: chartData.map(d => {
-      //           return d.transition
-      //         }),
-      //         backgroundColor: chartData.map(d => {
-      //           return d.summarized ? '#1976d2' : '#bd3f4c'
-      //         }),
-      //         borderWidth: 0
-      //       }
-      //     ]
-      //   }
-      // }
-      // if (this.dataKind === 'daily-transition') {
-      //   return {
-      //     labels: this.displayChartData.map(d => {
-      //       return d.label
-      //     }),
-      //     datasets: [
-      //       {
-      //         label: this.dataKind,
-      //         data: this.displayChartData.map(d => {
-      //           return d.transition
-      //         }),
-      //         backgroundColor: this.displayChartData.map(d => {
-      //           return d.summarized ? '#1976d2' : '#bd3f4c'
-      //         }),
-      //         borderWidth: 0
-      //       }
-      //     ]
-      //   }
-      // }
-
-      const valueF =
+      const getValue =
         this.valueKind === 'transition' ? d => d.transition : d => d.cumulative
 
       return {
@@ -306,7 +248,7 @@ export default {
           {
             label: this.dataKind,
             data: this.displayChartData.map(d => {
-              return valueF(d)
+              return getValue(d)
             }),
             backgroundColor: '#bd3f4c',
             borderWidth: 0
@@ -350,55 +292,8 @@ export default {
                 fontSize: 9,
                 maxTicksLimit: 20,
                 fontColor: '#808080'
-                // maxRotation: 0,
-                // minRotation: 0,
-                // callback: label => {
-                //   return label.split('/')[1]
-                // }
               }
             }
-            // {
-            //   id: 'month',
-            //   stacked: true,
-            //   gridLines: {
-            //     drawOnChartArea: false,
-            //     drawTicks: true,
-            //     drawBorder: false,
-            //     tickMarkLength: 10
-            //   },
-            //   ticks: {
-            //     fontSize: 11,
-            //     fontColor: '#808080',
-            //     padding: 3,
-            //     fontStyle: 'bold',
-            //     gridLines: {
-            //       display: true
-            //     },
-            //     callback: label => {
-            //       const monthStringArry = [
-            //         'Jan',
-            //         'Feb',
-            //         'Mar',
-            //         'Apr',
-            //         'May',
-            //         'Jun',
-            //         'Jul',
-            //         'Aug',
-            //         'Sep',
-            //         'Oct',
-            //         'Nov',
-            //         'Dec'
-            //       ]
-            //       const month = monthStringArry.indexOf(label.split(' ')[0]) + 1
-            //       return month + '月'
-            //     }
-            //   },
-            //   type: 'time',
-            //   time: {
-            //     parser: 'M/D',
-            //     unit: 'month'
-            //   }
-            // }
           ],
           yAxes: [
             {
@@ -422,17 +317,8 @@ export default {
   watch: {
     dataKind(newVal) {
       console.debug('watch dataKind', newVal)
-
-      const chartData = this.chartData2
-      const displaySpanLower = !chartData
-        ? 0
-        : chartData.length - this.defaultSpan
-      const displaySpanUpper = !chartData ? 0 : this.chartData.length - 1
-      console.debug('[displaySpanLower, displaySpanUpper]', [
-        displaySpanLower,
-        displaySpanUpper
-      ])
-      this.sliderUpdate([displaySpanLower, displaySpanUpper])
+      const update = this.getSliderUpdate(this.activeChartData)
+      this.sliderUpdate(update)
     }
   },
   methods: {
@@ -453,6 +339,13 @@ export default {
         default:
           return `${dayBeforeRatioLocaleString}`
       }
+    },
+    getSliderUpdate(chartData) {
+      const displaySpanLower = !chartData
+        ? 0
+        : chartData.length - this.defaultSpan
+      const displaySpanUpper = !chartData ? 0 : this.chartData.length - 1
+      return [displaySpanLower, displaySpanUpper]
     }
   }
 }
