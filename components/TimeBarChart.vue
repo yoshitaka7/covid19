@@ -327,7 +327,7 @@ export default {
             },
             title(tooltipItem, data) {
               return data.labels[tooltipItem[0].index].replace(
-                /(\w+)\/(\w+)/,
+                /(\w+)\/(\w+)/g,
                 '$1月$2日'
               )
             }
@@ -356,49 +356,49 @@ export default {
                 //   return label.split('/')[1]
                 // }
               }
-            },
-            {
-              id: 'month',
-              stacked: true,
-              gridLines: {
-                drawOnChartArea: false,
-                drawTicks: true,
-                drawBorder: false,
-                tickMarkLength: 10
-              },
-              ticks: {
-                fontSize: 11,
-                fontColor: '#808080',
-                padding: 3,
-                fontStyle: 'bold',
-                gridLines: {
-                  display: true
-                },
-                callback: label => {
-                  const monthStringArry = [
-                    'Jan',
-                    'Feb',
-                    'Mar',
-                    'Apr',
-                    'May',
-                    'Jun',
-                    'Jul',
-                    'Aug',
-                    'Sep',
-                    'Oct',
-                    'Nov',
-                    'Dec'
-                  ]
-                  const month = monthStringArry.indexOf(label.split(' ')[0]) + 1
-                  return month + '月'
-                }
-              },
-              type: 'time',
-              time: {
-                parser: 'M/D',
-                unit: 'month'
-              }
             }
+            // {
+            //   id: 'month',
+            //   stacked: true,
+            //   gridLines: {
+            //     drawOnChartArea: false,
+            //     drawTicks: true,
+            //     drawBorder: false,
+            //     tickMarkLength: 10
+            //   },
+            //   ticks: {
+            //     fontSize: 11,
+            //     fontColor: '#808080',
+            //     padding: 3,
+            //     fontStyle: 'bold',
+            //     gridLines: {
+            //       display: true
+            //     },
+            //     callback: label => {
+            //       const monthStringArry = [
+            //         'Jan',
+            //         'Feb',
+            //         'Mar',
+            //         'Apr',
+            //         'May',
+            //         'Jun',
+            //         'Jul',
+            //         'Aug',
+            //         'Sep',
+            //         'Oct',
+            //         'Nov',
+            //         'Dec'
+            //       ]
+            //       const month = monthStringArry.indexOf(label.split(' ')[0]) + 1
+            //       return month + '月'
+            //     }
+            //   },
+            //   type: 'time',
+            //   time: {
+            //     parser: 'M/D',
+            //     unit: 'month'
+            //   }
+            // }
           ],
           yAxes: [
             {
