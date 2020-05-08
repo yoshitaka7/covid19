@@ -77,9 +77,9 @@ export default {
       default: 'time-bar-chart'
     },
     chartDataSet: {
-      type: Object,
+      type: Map,
       required: true,
-      default: () => {}
+      default: () => new Map()
     },
     date: {
       type: String,
@@ -114,7 +114,7 @@ export default {
   },
   data() {
     const update = this.getSliderUpdate(
-      this.chartDataSet[this.defaultDataKind]?.data
+      this.chartDataSet.get(this.defaultDataKind)?.data
     )
     return {
       dataKind: this.defaultDataKind,
@@ -137,7 +137,7 @@ export default {
       return this.activeChartSet?.data ? this.activeChartSet.data.length - 1 : 0
     },
     activeChartSet() {
-      return this.chartDataSet[this.dataKind]
+      return this.chartDataSet.get(this.dataKind)
     },
     displayChartData() {
       const chartData = this.activeChartSet.data
