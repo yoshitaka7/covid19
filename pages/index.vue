@@ -89,12 +89,10 @@
           title="陽性患者数"
           :title-id="'number-of-confirmed-cases'"
           :chart-id="'time-bar-chart-patients'"
-          :chart-data="patientsGraphDaily"
-          :chart-data-weekly="patientsGraphWeekly"
+          :chart-data-set="patientsGraphSet"
           :date="Data.patients_summary.date"
           :default-data-kind="'weekly-transition'"
           :default-span="60"
-          :unit="'人'"
           :url="
             'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
           "
@@ -249,7 +247,39 @@ export default {
     const patientsGraphWeekly = formatGraphWeekly(
       dataWeekly.patients_summary.data
     )
-    console.debug('patientsGraphWeekly', patientsGraphWeekly)
+    // console.debug('patientsGraphWeekly', patientsGraphWeekly)
+
+    const patientsGraphSet = {
+      'daily-transition': {
+        data: patientsGraphDaily,
+        valueField: 'transition',
+        valueUnit: '人',
+        latestLabel: '実績値',
+        diffLabel: '前日比',
+        sliderLabelFormatter: (x, _) => x.label
+      },
+      'weekly-transition': {
+        data: patientsGraphWeekly,
+        latestLabel: '実績値',
+        diffLabel: '前週比',
+        valueField: 'transition',
+        valueUnit: '人',
+        sliderLabelFormatter: (x, isFrom) => {
+          const index = x.label.indexOf('～')
+          return isFrom
+            ? x.label.substring(0, index)
+            : x.label.substring(index + 1)
+        }
+      },
+      'daily-cumulative': {
+        data: patientsGraphDaily,
+        valueField: 'cumulative',
+        valueUnit: '人',
+        latestLabel: '累計値',
+        diffLabel: '前日比',
+        sliderLabelFormatter: (x, _) => x.label
+      }
+    }
 
     const inspectionsGraph = formatGraph(Data.inspections_summary.data)
 
@@ -327,6 +357,7 @@ export default {
       Data,
       patientsGraphDaily,
       patientsGraphWeekly,
+      patientsGraphSet,
       inspectionsGraph,
       inspectionsRemarks,
       inHospitalGraph,

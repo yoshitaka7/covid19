@@ -16,11 +16,11 @@
       :height="240"
     />
     <date-select-slider
-      :chart-data="activeChartData"
+      :chart-data="activeChartSet.data"
       :value="displaySpan"
       :min="spanMin"
       :max="spanMax"
-      :labeler="sliderLabelFormatter"
+      :label-formatter="activeChartSet.sliderLabelFormatter"
       @sliderInput="sliderUpdate"
     />
     <div>
@@ -52,7 +52,6 @@ import DataView from '@/components/DataView.vue'
 import DataSelector from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
-// import { chunkByWeek, reduceGraph } from '@/utils/formatGraph'
 
 export default {
   components: {
@@ -77,15 +76,10 @@ export default {
       required: false,
       default: 'time-bar-chart'
     },
-    chartData: {
-      type: Array,
-      required: false,
-      default: () => []
-    },
-    chartDataWeekly: {
-      type: Array,
-      required: false,
-      default: () => []
+    chartDataSet: {
+      type: Object,
+      required: true,
+      default: () => {}
     },
     date: {
       type: String,
@@ -102,11 +96,6 @@ export default {
       required: false,
       default: 60
     },
-    unit: {
-      type: String,
-      required: false,
-      default: ''
-    },
     url: {
       type: String,
       required: false,
@@ -121,20 +110,12 @@ export default {
       type: Boolean,
       required: false,
       default: true
-    },
-    transitionLabel: {
-      type: String,
-      required: false,
-      default: '実績値'
-    },
-    cumulativeLabel: {
-      type: String,
-      required: false,
-      default: '累計値'
     }
   },
   data() {
-    const update = this.getSliderUpdate(this.chartDataWeekly)
+    const update = this.getSliderUpdate(
+      this.chartDataSet[this.defaultDataKind]?.data
+    )
     return {
       dataKind: this.defaultDataKind,
       displaySpanInner: update
@@ -149,51 +130,17 @@ export default {
         this.displaySpanInner = value
       }
     },
-    spanKind() {
-      // daily or weekly
-      return this.dataKind.substring(0, this.dataKind.indexOf('-'))
-    },
-    valueKind() {
-      // transition or cumulative
-      return this.dataKind.substring(this.dataKind.indexOf('-') + 1)
-    },
-    chartDataSet() {
-      const chartDataSet = {
-        daily: {
-          data: this.chartData,
-          diffLabel: '前日比',
-          sliderLabelFormatter: (x, _) => x.label
-        },
-        weekly: {
-          data: this.chartDataWeekly,
-          diffLabel: '前週比',
-          sliderLabelFormatter: (x, isFrom) => {
-            const index = x.label.indexOf('～')
-            return isFrom
-              ? x.label.substring(0, index)
-              : x.label.substring(index + 1)
-          }
-        }
-      }
-
-      return chartDataSet
-    },
     spanMin() {
       return 0
     },
     spanMax() {
-      return this.activeChartData.length - 1
+      return this.activeChartSet?.data ? this.activeChartSet.data.length - 1 : 0
     },
-    activeChartData() {
-      return this.chartDataSet[this.spanKind].data
-    },
-    sliderLabelFormatter() {
-      return this.chartDataSet[this.spanKind].sliderLabelFormatter
+    activeChartSet() {
+      return this.chartDataSet[this.dataKind]
     },
     displayChartData() {
-      const chartData = this.activeChartData
-      if (!chartData) return this.chartData
-
+      const chartData = this.activeChartSet.data
       const lowerIndex = this.displaySpan[0]
       const lower = lowerIndex < chartData.length ? lowerIndex : 0
       const upperIndex = this.displaySpan[1]
@@ -201,44 +148,30 @@ export default {
         upperIndex < chartData.length ? upperIndex : chartData.length - 1
       return chartData.slice(lower, upper + 1)
     },
-    displayCumulativeRatio() {
-      const chartData = this.activeChartData
-      console.debug('chartData1', chartData)
-      const lastDay = chartData.slice(-1)[0].cumulative
-      const lastDayBefore = chartData.slice(-2)[0].cumulative
-      return this.formatDayBeforeRatio(lastDay - lastDayBefore)
-    },
-    displayTransitionRatio() {
-      const chartData = this.activeChartData
-      console.debug('displayTransitionRatio activeChartData', chartData)
+    displayDiffValue() {
+      const chart = this.activeChartSet
+      const chartData = chart.data
       if (chartData.slice(-2)[0].novalue) {
         return '-'
       }
-      const lastDay = chartData.slice(-1)[0].transition
-      const lastDayBefore = chartData.slice(-2)[0].transition
+      const lastDay = chartData.slice(-1)[0][chart.valueField]
+      const lastDayBefore = chartData.slice(-2)[0][chart.valueField]
       return this.formatDayBeforeRatio(lastDay - lastDayBefore)
     },
     displayInfo() {
-      const chart = this.chartDataSet[this.spanKind]
-      const latestData = chart.data[chart.data.length - 1]
-      const diffValueText =
-        this.valueKind === 'transition'
-          ? this.displayTransitionRatio
-          : this.displayCumulativeRatio
-      const valueLabel =
-        this.valueKind === 'transition'
-          ? this.transitionLabel
-          : this.cumulativeLabel
-
+      const chartSet = this.activeChartSet
+      const latestData = chartSet.data.slice(-1)[0]
+      const latestValueText = latestData[chartSet.valueField].toLocaleString()
+      const diffValueText = this.displayDiffValue
       return {
-        lText: `${latestData.transition.toLocaleString()}`,
-        sText: `${latestData.label} ${valueLabel}（${chart.diffLabel}：${diffValueText} ${this.unit}）`,
-        unit: this.unit
+        lText: latestValueText,
+        sText: `${latestData.label} ${chartSet.latestLabel}（${chartSet.diffLabel}：${diffValueText} ${chartSet.valueUnit}）`,
+        unit: chartSet.valueUnit
       }
     },
     displayData() {
-      const getValue =
-        this.valueKind === 'transition' ? d => d.transition : d => d.cumulative
+      const valueField = this.activeChartSet.valueField
+      const getValue = d => d[valueField]
 
       return {
         labels: this.displayChartData.map(d => {
@@ -257,7 +190,7 @@ export default {
       }
     },
     displayOption() {
-      const unit = this.unit
+      const unit = this.activeChartSet.valueUnit
       return {
         tooltips: {
           displayColors: false,
@@ -315,37 +248,26 @@ export default {
     }
   },
   watch: {
-    dataKind(newVal) {
-      console.debug('watch dataKind', newVal)
-      const update = this.getSliderUpdate(this.activeChartData)
+    dataKind(_) {
+      const update = this.getSliderUpdate(this.activeChartSet.data)
       this.sliderUpdate(update)
     }
   },
   methods: {
     sliderUpdate(sliderValue) {
-      console.debug(
-        'sliderUpdate [displaySpanLower, displaySpanUpper]',
-        sliderValue
-      )
       this.displaySpan = sliderValue
     },
     formatDayBeforeRatio(dayBeforeRatio) {
       const dayBeforeRatioLocaleString = dayBeforeRatio.toLocaleString()
-      switch (Math.sign(dayBeforeRatio)) {
-        case 1:
-          return `+${dayBeforeRatioLocaleString}`
-        case -1:
-          return `${dayBeforeRatioLocaleString}`
-        default:
-          return `${dayBeforeRatioLocaleString}`
-      }
+      const prefix = Math.sign(dayBeforeRatio) === 1 ? '+' : ''
+      return `${prefix}${dayBeforeRatioLocaleString}`
     },
     getSliderUpdate(chartData) {
-      const displaySpanLower = !chartData
-        ? 0
-        : chartData.length - this.defaultSpan
-      const displaySpanUpper = !chartData ? 0 : this.chartData.length - 1
-      return [displaySpanLower, displaySpanUpper]
+      if (!chartData) {
+        return [0, 0]
+      }
+
+      return [chartData.length - this.defaultSpan, chartData.length - 1]
     }
   }
 }

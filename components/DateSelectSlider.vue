@@ -38,7 +38,7 @@ export default {
       required: true,
       default: 1
     },
-    labeler: {
+    labelFormatter: {
       type: Function,
       required: false,
       default: () => (d, _) => d.label
@@ -59,19 +59,8 @@ export default {
   },
   methods: {
     getSliderLabels(index) {
-      console.debug(
-        'getSliderLabels sliderValue',
-        this.sliderValue,
-        this.chartData[this.sliderValue[0]].label,
-        this.chartData[this.sliderValue[1]].label
-      )
-      console.debug(
-        'getSliderLabels chartData[index]',
-        index,
-        this.chartData[index].label
-      )
       if (index < this.chartData.length) {
-        return this.labeler(
+        return this.labelFormatter(
           this.chartData[index],
           this.sliderValue[0] === index
         )
