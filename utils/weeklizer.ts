@@ -7,17 +7,20 @@ import {
   InspectionsSummaryWeekly
 } from '../utils/types'
 
+// 週次化の週の開始日と終了日
 type WeekRange = {
   from: Dayjs
   to: Dayjs
 }
 
+// 週次化された感染者群
 type WeeklizedPatientsSummary = {
   from: Dayjs
   to: Dayjs
   data: PatientsSummaryDaily[]
 }
 
+// 週次化された検査データ群
 type WeeklizedInspectionsSummary = {
   from: Dayjs
   to: Dayjs
@@ -25,7 +28,7 @@ type WeeklizedInspectionsSummary = {
 }
 
 export default (Data: any): DataWeekly => {
-  const chunkStartYoubi = 1 // 0:日曜日、1:月曜日…
+  const chunkStartYoubi = 1 // 週次化の開始曜日<0:日曜日、1:月曜日…6:土曜日>
 
   const patientsSummaryWeekly = weeklizePatientsSummary(
     Data.patients_summary.data as PatientsSummaryDaily[],
@@ -49,6 +52,7 @@ export default (Data: any): DataWeekly => {
   } as DataWeekly
 }
 
+// 感染者一覧を週次化する
 const weeklizePatientsSummary = (
   patientsSummaryDaily: PatientsSummaryDaily[],
   chunkStartYoubi: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
@@ -86,13 +90,14 @@ const weeklizePatientsSummary = (
   })
 
   // 開始日、終了日の調整
-  patientsSummaryWeekly[0]['開始日'] = '2020-01-30' // 初回データは 1月30日（木曜日）～3月1日（日曜日） の合算
+  patientsSummaryWeekly[0]['開始日'] = patientsSummaryDaily[0]['日付']
   patientsSummaryWeekly[patientsSummaryWeekly.length - 1]['終了日'] =
     patientsSummaryDaily[patientsSummaryDaily.length - 1]['日付']
 
   return patientsSummaryWeekly
 }
 
+// 検査数を週次化する
 const weeklizeInspectionsSummary = (
   inspectionsSummaryDaily: InspectionsSummaryDaily[],
   chunkStartYoubi: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
@@ -134,20 +139,27 @@ const weeklizeInspectionsSummary = (
   })
 
   // 開始日、終了日の調整
-  inspectionsSummaryWeekly[0]['開始日'] = inspectionsSummaryDaily[0]['日付']
+  inspectionsSummaryWeekly[0]['開始日'] = '2020-01-30' // 初回データは 1月30日（木曜日）～3月1日（日曜日） の合算
   inspectionsSummaryWeekly[inspectionsSummaryWeekly.length - 1]['終了日'] =
     inspectionsSummaryDaily[inspectionsSummaryDaily.length - 1]['日付']
 
   return inspectionsSummaryWeekly
 }
 
+// 開始日、終了日、開始曜日を指定して、日付範囲のリストを作る
+// 例：
+// 開始:2020/02/06、終了:2020/02/21、開始曜日:月(1)
+//  ↓
+// [{ 2/3,  2/9  },
+//  { 2/10, 2/16 },
+//  { 2/17, 2/23 }]
 const makeWeekRanges = (
   beginDate: Dayjs,
   lastDate: Dayjs,
   chunkStartYoubi: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
 ): WeekRange[] => {
-  const beginYoubiOffset = chunkStartYoubi - beginDate.day()
-  const beginStartWeekDate = beginDate.add(beginYoubiOffset, 'day')
+  const beginYoubiOffset = 7 - beginDate.day() - chunkStartYoubi
+  const beginStartWeekDate = beginDate.subtract(beginYoubiOffset, 'day')
   const diffWeeks = lastDate.diff(beginStartWeekDate, 'week')
 
   const weeks: WeekRange[] = []
