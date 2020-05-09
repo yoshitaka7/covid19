@@ -10,7 +10,10 @@
       </span>
     </span>
     <br />
-    <small class="DataView-DataInfo-date">{{ sText }}</small>
+    <div class="DataView-DataInfo-date">
+      <small class="DataView-DataInfo-date-part">{{ sTextLeft }}</small>
+      <small class="DataView-DataInfo-date-part">{{ sTextRight }}</small>
+    </div>
   </div>
 </template>
 
@@ -18,6 +21,7 @@
 .DataView {
   &-DataInfo {
     margin-top: 20px;
+    max-width: 40%;
     text-align: right;
     &-summary {
       display: inline-block;
@@ -34,8 +38,14 @@
       }
     }
     &-date {
-      white-space: nowrap;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    &-date-part {
       display: inline-block;
+      white-space: nowrap;
       margin-left: 4px;
       font-size: 12px;
       line-height: 12px;
@@ -75,5 +85,15 @@ export default class DataViewBasicInfoPanel extends Vue {
   @Prop() private lTitle!: string
   @Prop() private sText!: string
   @Prop() private unit!: string
+
+  get sTextLeft() {
+    const index = this.sText.indexOf('（')
+    return this.sText.substring(0, index)
+  }
+
+  get sTextRight() {
+    const index = this.sText.indexOf('（')
+    return this.sText.substring(index)
+  }
 }
 </script>
