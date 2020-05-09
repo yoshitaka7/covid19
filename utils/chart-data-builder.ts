@@ -69,10 +69,15 @@ export const buildInspectionsChartSet = (
   dataDaily: InspectionsSummaryDaily[],
   dataWeekly: InspectionsSummaryWeekly[]
 ): Map<string, ChartData> => {
+  // 日次グラフでは、元から週次に合算されたデータは表示しない
   const inspectionssGraphDaily = formatGraph(dataDaily).filter(
     d => !d.summarized
   )
-  const inspectionssGraphWeekly = formatGraphWeekly(dataWeekly).splice(1)
+
+  // 週次グラフでは、3/2以降のデータのみ表示（3/1以前は1週間より長い期間が合算されているため)
+  const inspectionssGraphWeekly = formatGraphWeekly(dataWeekly).filter(
+    d => d.date >= new Date('2020-03-02')
+  )
 
   const chartDataSet = new Map<string, ChartData>()
 

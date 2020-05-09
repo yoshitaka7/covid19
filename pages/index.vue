@@ -41,7 +41,7 @@
           title="入院中数"
           :title-id="'number-of-in-hospital'"
           :chart-id="'time-bar-chart-in-hospital'"
-          :chart-data-set="inHospitalSet"
+          :chart-data-set="inHospitalChartSet"
           :date="Data.main_summary_history.date"
           :default-data-kind="'daily-transition'"
           :default-span="60"
@@ -60,7 +60,7 @@
           title="重症者数"
           :title-id="'number-of-severe'"
           :chart-id="'time-bar-chart-severe'"
-          :chart-data-set="severeSet"
+          :chart-data-set="severeChartSet"
           :date="Data.main_summary_history.date"
           :default-data-kind="'daily-transition'"
           :default-span="60"
@@ -80,7 +80,7 @@
           title="陽性患者数"
           :title-id="'number-of-confirmed-cases'"
           :chart-id="'time-bar-chart-patients'"
-          :chart-data-set="patientsSet"
+          :chart-data-set="patientsChartSet"
           :date="Data.patients_summary.date"
           :default-data-kind="'weekly-transition'"
           :default-span="60"
@@ -96,7 +96,7 @@
       </v-col>
 
       <v-col
-        v-if="confirmedCasesGraph != null"
+        v-if="confirmedCasesChart != null"
         cols="12"
         md="6"
         class="DataCard"
@@ -105,8 +105,8 @@
           title="検査陽性者状況の推移"
           :title-id="'number-of-current-patients-history'"
           :chart-id="'time-stacked-bar-chart-patients-history'"
-          :chart-data="confirmedCasesGraph"
-          :chart-legends="confirmedCasesGraphLegends"
+          :chart-data="confirmedCasesChart"
+          :chart-legends="confirmedCasesChartLegends"
           :date="Data.main_summary_history.date"
           :latest-value-field="'discharged'"
           :latest-value-title="'退院'"
@@ -125,7 +125,7 @@
           title="検査実施件数"
           :title-id="'number-of-inspections'"
           :chart-id="'time-bar-chart-inspections'"
-          :chart-data-set="inspectionsSet"
+          :chart-data-set="inspectionsChartSet"
           :date="Data.inspections_summary.date"
           :default-data-kind="'weekly-transition'"
           :default-span="60"
@@ -195,30 +195,30 @@ export default {
     const dataWeekly = weeklizer(Data) // Data_weekly.json 化までのつなぎ
 
     // 感染者数グラフ
-    const patientsSet = buildPatientChartSet(
+    const patientsChartSet = buildPatientChartSet(
       Data.patients_summary.data,
       dataWeekly.patients_summary.data
     )
 
     // 検査数グラフ
-    const inspectionsSet = buildInspectionsChartSet(
+    const inspectionsChartSet = buildInspectionsChartSet(
       Data.inspections_summary.data,
       dataWeekly.inspections_summary.data
     )
 
     // 入院中数グラフ
-    const inHospitalSet = buildInHospitalChartSet(
+    const inHospitalChartSet = buildInHospitalChartSet(
       Data.main_summary_history.data
     )
 
     // 重症者数グラフ
-    const severeSet = buildSevereChartSet(Data.main_summary_history.data)
+    const severeChartSet = buildSevereChartSet(Data.main_summary_history.data)
 
     // 検査陽性者の状況
     const confirmedCases = formatConfirmedCases(Data.main_summary_history)
 
     // 入院中患者数の推移
-    const confirmedCasesGraph =
+    const confirmedCasesChart =
       Data.main_summary_history != null
         ? formatConfirmedCasesGraph(
             Data.patients_summary.data,
@@ -226,7 +226,7 @@ export default {
           )
         : null
 
-    const confirmedCasesGraphLegends = [
+    const confirmedCasesChartLegends = [
       { field: 'discharged', label: '退院', backgroundColor: '#0070C0' },
       { field: 'isolated', label: '施設入所', backgroundColor: '#92D050' },
       { field: 'milds', label: '軽症中等症', backgroundColor: '#FCD5B5' },
@@ -246,13 +246,13 @@ export default {
 
     const data = {
       Data,
-      patientsSet,
-      inspectionsSet,
-      inHospitalSet,
-      severeSet,
+      patientsChartSet,
+      inspectionsChartSet,
+      inHospitalChartSet,
+      severeChartSet,
       confirmedCases,
-      confirmedCasesGraph,
-      confirmedCasesGraphLegends,
+      confirmedCasesChart,
+      confirmedCasesChartLegends,
       patientsPerCities,
       patientsPerCitiesLegends,
       headerItem: {
