@@ -1,6 +1,6 @@
 <template>
   <data-view
-    :title="title"
+    :title="displayTitle"
     :title-id="titleId"
     :date="date"
     :url="url"
@@ -16,10 +16,11 @@
       :height="240"
     />
     <date-select-slider
-      :chart-data="chartData"
-      :value="defaultDisplaySpan"
+      :chart-data="activeChartSet.data"
+      :value="displaySpan"
       :min="spanMin"
       :max="spanMax"
+      :label-formatter="activeChartSet.sliderLabelFormatter"
       @sliderInput="sliderUpdate"
     />
     <div>
@@ -51,7 +52,6 @@ import DataView from '@/components/DataView.vue'
 import DataSelector from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
-import { chunkByWeek, reduceGraph } from '@/utils/formatGraph'
 
 export default {
   components: {
@@ -76,10 +76,10 @@ export default {
       required: false,
       default: 'time-bar-chart'
     },
-    chartData: {
-      type: Array,
-      required: false,
-      default: () => []
+    chartDataSet: {
+      type: Map,
+      required: true,
+      default: () => new Map()
     },
     date: {
       type: String,
@@ -96,11 +96,6 @@ export default {
       required: false,
       default: 60
     },
-    unit: {
-      type: String,
-      required: false,
-      default: ''
-    },
     url: {
       type: String,
       required: false,
@@ -115,138 +110,72 @@ export default {
       type: Boolean,
       required: false,
       default: true
-    },
-    transitionLabel: {
-      type: String,
-      required: false,
-      default: '実績値'
     }
   },
   data() {
-    const displaySpanLower = !this.chartData
-      ? 0
-      : this.chartData.length - this.defaultSpan
-    const displaySpanUpper = !this.chartData ? 0 : this.chartData.length - 1
+    const update = this.getSliderUpdate(
+      this.chartDataSet.get(this.defaultDataKind)?.data
+    )
     return {
       dataKind: this.defaultDataKind,
-      defaultDisplaySpan: [displaySpanLower, displaySpanUpper],
-      displaySpan: [displaySpanLower, displaySpanUpper]
+      displaySpanInner: update
     }
   },
   computed: {
+    displayTitle() {
+      return `${this.title}${this.activeChartSet?.titlePostfix ?? ''}`
+    },
+    displaySpan: {
+      get() {
+        return this.displaySpanInner
+      },
+      set(value) {
+        this.displaySpanInner = value
+      }
+    },
     spanMin() {
       return 0
     },
     spanMax() {
-      return this.chartData.length - 1
+      return this.activeChartSet?.data ? this.activeChartSet.data.length - 1 : 0
+    },
+    activeChartSet() {
+      return this.chartDataSet.get(this.dataKind)
     },
     displayChartData() {
-      if (!this.chartData) return this.chartData
-
+      const chartData = this.activeChartSet.data
       const lowerIndex = this.displaySpan[0]
-      const lower = lowerIndex < this.chartData.length ? lowerIndex : 0
+      const lower = lowerIndex < chartData.length ? lowerIndex : 0
       const upperIndex = this.displaySpan[1]
       const upper =
-        upperIndex < this.chartData.length
-          ? upperIndex
-          : this.chartData.length - 1
-      return this.chartData.slice(lower, upper + 1)
+        upperIndex < chartData.length ? upperIndex : chartData.length - 1
+      return chartData.slice(lower, upper + 1)
     },
-    displayCumulativeRatio() {
-      const lastDay = this.chartData.slice(-1)[0].cumulative
-      const lastDayBefore = this.chartData.slice(-2)[0].cumulative
-      return this.formatDayBeforeRatio(lastDay - lastDayBefore)
-    },
-    displayTransitionRatio() {
-      if (this.chartData.slice(-2)[0].novalue) {
+    displayDiffValue() {
+      const chart = this.activeChartSet
+      const chartData = chart.data
+      if (chartData.slice(-2)[0].novalue) {
         return '-'
       }
-      const lastDay = this.chartData.slice(-1)[0].transition
-      const lastDayBefore = this.chartData.slice(-2)[0].transition
+      const lastDay = chartData.slice(-1)[0][chart.valueField]
+      const lastDayBefore = chartData.slice(-2)[0][chart.valueField]
       return this.formatDayBeforeRatio(lastDay - lastDayBefore)
     },
     displayInfo() {
-      if (this.dataKind === 'weekly-transition') {
-        const summarized = this.chartData.filter(d => d.summarized)
-        const noneSummarized = this.chartData.filter(d => !d.summarized)
-        const noneSummarizedChunks = chunkByWeek(noneSummarized, 1)
-        const noneSummarizedReducedChunks = noneSummarizedChunks.map(chunk =>
-          reduceGraph(chunk, false)
-        )
-        const chartData = summarized.concat(noneSummarizedReducedChunks)
-        return {
-          lText: `${chartData.slice(-1)[0].transition.toLocaleString()}`,
-          sText: `${chartData.slice(-1)[0].label} ${
-            this.transitionLabel
-          }（前週比：${this.displayTransitionRatio} ${this.unit}）`,
-          unit: this.unit
-        }
-      }
-      if (this.dataKind === 'daily-transition') {
-        return {
-          lText: `${this.chartData.slice(-1)[0].transition.toLocaleString()}`,
-          sText: `${this.chartData.slice(-1)[0].label} ${
-            this.transitionLabel
-          }（前日比：${this.displayTransitionRatio} ${this.unit}）`,
-          unit: this.unit
-        }
-      }
+      const chartSet = this.activeChartSet
+      const latestData = chartSet.data.slice(-1)[0]
+      const latestValueText = latestData[chartSet.valueField].toLocaleString()
+      const diffValueText = this.displayDiffValue
       return {
-        lText: this.chartData[
-          this.chartData.length - 1
-        ].cumulative.toLocaleString(),
-        sText: `${this.chartData.slice(-1)[0].label} 累計値（前日比：${
-          this.displayCumulativeRatio
-        } ${this.unit}）`,
-        unit: this.unit
+        lText: latestValueText,
+        sText: `${latestData.label} ${chartSet.latestLabel}（${chartSet.diffLabel}：${diffValueText} ${chartSet.valueUnit}）`,
+        unit: chartSet.valueUnit
       }
     },
     displayData() {
-      if (this.dataKind === 'weekly-transition') {
-        const summarized = this.displayChartData.filter(d => d.summarized)
-        const noneSummarized = this.displayChartData.filter(d => !d.summarized)
-        const noneSummarizedChunks = chunkByWeek(noneSummarized, 1)
-        const noneSummarizedReducedChunks = noneSummarizedChunks.map(chunk =>
-          reduceGraph(chunk, false)
-        )
-        const chartData = summarized.concat(noneSummarizedReducedChunks)
-        return {
-          labels: chartData.map(d => {
-            return d.label
-          }),
-          datasets: [
-            {
-              label: this.dataKind,
-              data: chartData.map(d => {
-                return d.transition
-              }),
-              backgroundColor: chartData.map(d => {
-                return d.summarized ? '#1976d2' : '#bd3f4c'
-              }),
-              borderWidth: 0
-            }
-          ]
-        }
-      }
-      if (this.dataKind === 'daily-transition') {
-        return {
-          labels: this.displayChartData.map(d => {
-            return d.label
-          }),
-          datasets: [
-            {
-              label: this.dataKind,
-              data: this.displayChartData.map(d => {
-                return d.transition
-              }),
-              backgroundColor: this.displayChartData.map(d => {
-                return d.summarized ? '#1976d2' : '#bd3f4c'
-              }),
-              borderWidth: 0
-            }
-          ]
-        }
-      }
+      const valueField = this.activeChartSet.valueField
+      const getValue = d => d[valueField]
+
       return {
         labels: this.displayChartData.map(d => {
           return d.label
@@ -255,7 +184,7 @@ export default {
           {
             label: this.dataKind,
             data: this.displayChartData.map(d => {
-              return d.cumulative
+              return getValue(d)
             }),
             backgroundColor: '#bd3f4c',
             borderWidth: 0
@@ -264,7 +193,7 @@ export default {
       }
     },
     displayOption() {
-      const unit = this.unit
+      const unit = this.activeChartSet.valueUnit
       return {
         tooltips: {
           displayColors: false,
@@ -276,7 +205,7 @@ export default {
             },
             title(tooltipItem, data) {
               return data.labels[tooltipItem[0].index].replace(
-                /(\w+)\/(\w+)/,
+                /(\w+)\/(\w+)/g,
                 '$1月$2日'
               )
             }
@@ -298,54 +227,7 @@ export default {
               ticks: {
                 fontSize: 9,
                 maxTicksLimit: 20,
-                fontColor: '#808080',
-                maxRotation: 0,
-                minRotation: 0,
-                callback: label => {
-                  return label.split('/')[1]
-                }
-              }
-            },
-            {
-              id: 'month',
-              stacked: true,
-              gridLines: {
-                drawOnChartArea: false,
-                drawTicks: true,
-                drawBorder: false,
-                tickMarkLength: 10
-              },
-              ticks: {
-                fontSize: 11,
-                fontColor: '#808080',
-                padding: 3,
-                fontStyle: 'bold',
-                gridLines: {
-                  display: true
-                },
-                callback: label => {
-                  const monthStringArry = [
-                    'Jan',
-                    'Feb',
-                    'Mar',
-                    'Apr',
-                    'May',
-                    'Jun',
-                    'Jul',
-                    'Aug',
-                    'Sep',
-                    'Oct',
-                    'Nov',
-                    'Dec'
-                  ]
-                  const month = monthStringArry.indexOf(label.split(' ')[0]) + 1
-                  return month + '月'
-                }
-              },
-              type: 'time',
-              time: {
-                parser: 'M/D',
-                unit: 'month'
+                fontColor: '#808080'
               }
             }
           ],
@@ -368,20 +250,27 @@ export default {
       }
     }
   },
+  watch: {
+    dataKind(_) {
+      const update = this.getSliderUpdate(this.activeChartSet.data)
+      this.sliderUpdate(update)
+    }
+  },
   methods: {
     sliderUpdate(sliderValue) {
       this.displaySpan = sliderValue
     },
     formatDayBeforeRatio(dayBeforeRatio) {
       const dayBeforeRatioLocaleString = dayBeforeRatio.toLocaleString()
-      switch (Math.sign(dayBeforeRatio)) {
-        case 1:
-          return `+${dayBeforeRatioLocaleString}`
-        case -1:
-          return `${dayBeforeRatioLocaleString}`
-        default:
-          return `${dayBeforeRatioLocaleString}`
+      const prefix = Math.sign(dayBeforeRatio) === 1 ? '+' : ''
+      return `${prefix}${dayBeforeRatioLocaleString}`
+    },
+    getSliderUpdate(chartData) {
+      if (!chartData) {
+        return [0, 0]
       }
+
+      return [chartData.length - this.defaultSpan, chartData.length - 1]
     }
   }
 }
