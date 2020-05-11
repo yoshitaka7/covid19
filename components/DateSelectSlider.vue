@@ -37,6 +37,11 @@ export default {
       type: Number,
       required: true,
       default: 1
+    },
+    labelFormatter: {
+      type: Function,
+      required: false,
+      default: () => (d, _) => d.label
     }
   },
   data() {
@@ -47,12 +52,19 @@ export default {
   watch: {
     sliderValue(newValue, _oldValue) {
       this.$emit('sliderInput', newValue)
+    },
+    value(newValue) {
+      this.sliderValue = newValue
     }
   },
   methods: {
     getSliderLabels(index) {
       if (index < this.chartData.length) {
-        return this.chartData[index].label
+        return this.labelFormatter(
+          this.chartData[index],
+          this.sliderValue[0] === index
+        )
+        // return this.chartData[index].label
       }
       return this.chartData[this.chartData.length - 1].label
     }

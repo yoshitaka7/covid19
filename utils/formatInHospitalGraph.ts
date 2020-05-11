@@ -1,31 +1,12 @@
 import dayjs, { Dayjs } from 'dayjs'
+import { MainSummaryDataType, GraphDataType } from '@/utils/types'
 
-type MainSummaryDataType = {
-  更新日時: Date
-  検査実施人数: number
-  陽性患者数: number
-  入院中: number
-  軽症中等症: number
-  重症: number
-  転院: number
-  施設入所: number
-  死亡: number
-  退院: number
-}
-
-type SingleColumnGraphDataType = {
-  date: Date
-  label: string
-  transition: number
-  novalue: boolean
-}
-
-export default (mainSummaries: MainSummaryDataType[]) => {
+export default (mainSummaries: MainSummaryDataType[]): GraphDataType[] => {
   // Date や日付文字列をYYYY/MM/DD文字列に整形
   const formatDt = (dtText: string | Date | Dayjs) =>
     dayjs(dtText).format('YYYY/MM/DD')
 
-  const graphData: SingleColumnGraphDataType[] = []
+  const graphData: GraphDataType[] = []
   const today = formatDt(new Date())
   const startDate = formatDt(mainSummaries[0]['更新日時'])
 

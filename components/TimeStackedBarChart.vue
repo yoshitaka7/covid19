@@ -22,6 +22,7 @@
       :value="defaultDisplaySpan"
       :min="spanMin"
       :max="spanMax"
+      :label-formatter="labelFormatter"
       @sliderInput="sliderUpdate"
     />
     <div>
@@ -141,6 +142,9 @@ export default {
     }
   },
   computed: {
+    labelFormatter() {
+      return (d, _) => d.label
+    },
     spanMin() {
       return 0
     },

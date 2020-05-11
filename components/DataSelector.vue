@@ -23,7 +23,7 @@
     </v-btn>
     <v-btn
       v-ripple="false"
-      value="cumulative"
+      value="daily-cumulative"
       class="DataSelector-Button"
       :x-small="true"
     >
