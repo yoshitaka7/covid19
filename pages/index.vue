@@ -173,6 +173,7 @@ import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
 import weeklizer from '@/utils/weeklizer'
+import normalizer from '@/utils/normalizer'
 import {
   buildPatientChartSet,
   buildInspectionsChartSet,
@@ -191,6 +192,9 @@ export default {
     ColumnMap
   },
   data() {
+    // 日次データの補正
+    normalizer(Data)
+
     // 日次データを週次化
     const dataWeekly = weeklizer(Data) // Data_weekly.json 化までのつなぎ
 
