@@ -7,8 +7,8 @@
     />
     <whats-new
       class="mb-1"
-      text="5/14、政府は、愛知県の緊急事態宣言を解除しました。愛知県独自の「愛知県緊急事態宣言」は引き続き発出中です。"
-      url="https://www.pref.aichi.jp/site/covid19-aichi/2020051402.html"
+      text="5/14、政府は愛知県の緊急事態宣言を解除しました。愛知県独自の「愛知県緊急事態措置」は 5/31 まで継続します。"
+      url="https://www.pref.aichi.jp/site/covid19-aichi/covid19-aichi.html"
     />
     <whats-new
       class="mb-1"
