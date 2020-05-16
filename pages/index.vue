@@ -37,6 +37,15 @@
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
+        <my-button
+          greet="Hello"
+          :date="Data.patients_summary.date"
+          :daily-data="Data.patients_summary.data"
+          :weekly-data="dataWeekly.patients_summary.data"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
         <time-bar-chart
           title="入院中数"
           :title-id="'number-of-in-hospital'"
@@ -172,6 +181,7 @@ import formatPatientsPerCities from '@/utils/formatPatientsPerCities'
 import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
+import MyButton from '@/components/TimeBarLineChart.vue'
 import weeklizer from '@/utils/weeklizer'
 import normalizer from '@/utils/normalizer'
 import {
@@ -189,7 +199,8 @@ export default {
     WhatsNew,
     SvgCard,
     ConfirmedCasesTable,
-    ColumnMap
+    ColumnMap,
+    MyButton
   },
   data() {
     // 日次データの補正
@@ -250,6 +261,7 @@ export default {
 
     const data = {
       Data,
+      dataWeekly,
       patientsChartSet,
       inspectionsChartSet,
       inHospitalChartSet,
