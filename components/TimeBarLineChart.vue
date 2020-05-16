@@ -89,7 +89,7 @@ type GraphDataType = {
     DateSelectSlider
   }
 })
-export default class MyButton extends Vue {
+export default class TimeBarLineChart extends Vue {
   @Prop()
   public chartId?: string
 
