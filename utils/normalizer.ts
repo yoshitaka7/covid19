@@ -1,8 +1,36 @@
 import dayjs from 'dayjs'
+import * as Enumerable from 'linq'
+import { PatientsSummaryDaily } from './types'
 
 // data.json の補正を行う
 // 補正の必要がなくなったら削除する
 export default (Data: any): void => {
+  normalizePatientsSummary(Data)
+
+  const source = Enumerable.from(
+    Data.patients_summary.data as PatientsSummaryDaily[]
+  ).reverse()
+  const list = source
+    .select(d => d['日付'])
+    .select((_, index) => source.skip(index).take(7))
+    .select(d => {
+      const first = d.first()
+      return {
+        日付: first['日付'],
+        小計: first['小計'],
+        合算: first['合算'],
+        平均: d.count() === 7 ? d.average(d => Number(d['小計'])) : undefined
+      }
+    })
+    .reverse()
+    .toArray()
+
+  console.debug(list)
+
+  Data.patients_summary.data = list
+}
+
+const normalizePatientsSummary = (Data: any) => {
   try {
     // とりあえず落ちないように
 

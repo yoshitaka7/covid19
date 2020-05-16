@@ -2,6 +2,7 @@ export type PatientsSummaryDaily = {
   日付: string
   小計: number
   合算?: string
+  平均?: number
 }
 
 export type PatientsSummaryWeekly = {
