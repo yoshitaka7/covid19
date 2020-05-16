@@ -22,9 +22,22 @@
       :value="displaySpan"
       :min="spanMin"
       :max="spanMax"
-      :label-formatter="chartData.sliderLabelFormatter"
+      :label-formatter="sliderLabelFormatter"
       @sliderInput="sliderUpdate"
     />
+
+    <div>
+      <ul class="remarks">
+        <!-- eslint-disable vue/no-v-html -->
+        <li
+          v-for="remarks_text in remarks"
+          :key="remarks_text"
+          v-sanitaize
+          v-html="remarks_text"
+        />
+        <!-- eslint-disable vue/no-v-html -->
+      </ul>
+    </div>
 
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
@@ -36,6 +49,12 @@
   </data-view>
 </template>
 
+<style lang="scss" scoped>
+ul.remarks {
+  list-style-type: '※ ';
+}
+</style>
+
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import dayjs from 'dayjs'
@@ -45,18 +64,19 @@ import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
 import { PatientsSummaryDaily, PatientsSummaryWeekly } from '~/utils/types'
 
-type DataKind = 'daily-transition' | 'weekly-transition'
+type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
 
-type ChartData2 = {
-  legendBarTitle: string
-  legendLineTitle: string
-  rows: GraphDataType2[]
-  visibleAverage7days: boolean
-  sliderLabelFormatter: (d: GraphDataType2, isFrom: boolean) => string
+type ChartData = {
+  patientsLegendTitle: string
+  patientsUnit: string
+  averageLegendTitle: string
+  averageUnit: string
+  averageVisible: boolean
+  rows: GraphDataType[]
 }
 
-type GraphDataType2 = {
-  date: string
+type GraphDataType = {
+  date: string | string[]
   numberOfPatients: number
   average7days?: number
 }
@@ -71,7 +91,10 @@ type GraphDataType2 = {
 })
 export default class MyButton extends Vue {
   @Prop()
-  public greet?: string
+  public chartId?: string
+
+  @Prop()
+  public title?: string
 
   @Prop()
   public date?: string
@@ -82,30 +105,64 @@ export default class MyButton extends Vue {
   @Prop()
   public weeklyData?: PatientsSummaryWeekly[]
 
-  private displayTitle = 'dispTitle'
-  private titleId = 'title-idid'
-  private url = 'urlurl'
-  private remarks = ['dispTitle']
+  @Prop()
+  public titleId?: string
+
+  @Prop()
+  public url?: string
+
+  @Prop()
+  public remarks?: string[]
+
+  private get displayTitle(): string {
+    return `${this.title}${
+      this.dataKind === 'weekly-transition' ? '(週別)' : ''
+    }`
+  }
+
   private show = true
   private dataKind: DataKind = 'daily-transition'
   private readonly dataKinds = [
-    { key: 'weekly-transition', label: '週別1' } as SelectorItem,
-    { key: 'daily-transition', label: '日別2' } as SelectorItem
+    { key: 'weekly-transition', label: '週別' } as SelectorItem,
+    { key: 'daily-transition', label: '日別' } as SelectorItem,
+    { key: 'daily-cumulative', label: '累計' } as SelectorItem
   ]
 
-  private displayInfo = {
-    lText: 'あ',
-    sText: 'い',
-    unit: 'う'
+  private formatDayBeforeRatio = (dayBeforeRatio: any) => {
+    const dayBeforeRatioLocaleString = dayBeforeRatio.toLocaleString()
+    const prefix = Math.sign(dayBeforeRatio) === 1 ? '+' : ''
+    return `${prefix}${dayBeforeRatioLocaleString}`
   }
 
-  private chartId = 'id'
+  private get displayDiffValue(): string {
+    if (this.chartData.rows.slice(-2)[0] === undefined) {
+      return '-'
+    }
+    const lastDay = this.chartData.rows.slice(-1)[0].numberOfPatients
+    const lastDayBefore = this.chartData.rows.slice(-2)[0].numberOfPatients
+    return this.formatDayBeforeRatio(lastDay - lastDayBefore)
+  }
+
+  private get displayInfo(): any {
+    const latestData = this.chartData.rows.slice(-1)[0]
+    const latestValueText = latestData.numberOfPatients.toLocaleString()
+    const diffValueText = this.displayDiffValue
+    const diffLabel =
+      this.dataKind === 'weekly-transition' ? '前週比' : '前日比'
+    const latestDate = this.formatDateLabel(latestData.date)
+    return {
+      lText: latestValueText,
+      sText: `${latestDate} 時点（${diffLabel}：${diffValueText} ${this.chartData.patientsUnit}）`,
+      unit: this.chartData.patientsUnit
+    }
+  }
+
   get displayData(): Chart.ChartData {
     const datasets: Chart.ChartDataSets[] = [
       {
         type: 'bar',
         yAxisID: 'y-axis-1',
-        label: this.chartData.legendBarTitle, // 凡例名
+        label: this.chartData.patientsLegendTitle, // 凡例名
         data: this.displayGraphData.map(d => d.numberOfPatients),
         backgroundColor: '#bd3f4c',
         order: 2,
@@ -113,14 +170,15 @@ export default class MyButton extends Vue {
       } as Chart.ChartDataSets
     ]
 
-    if (this.chartData.visibleAverage7days) {
+    if (this.chartData.averageVisible) {
       datasets.push({
         type: 'line',
-        yAxisID: 'y-axis-2',
-        label: this.chartData.legendLineTitle, // 凡例名
+        yAxisID: 'y-axis-1',
+        label: this.chartData.averageLegendTitle, // 凡例名
         data: this.displayGraphData.map(d => d.average7days),
-        borderColor: '#CC7004',
+        borderColor: '#0070C0',
         borderWidth: 3,
+        pointRadius: 1,
         fill: false,
         order: 1,
         lineTension: 0
@@ -128,7 +186,7 @@ export default class MyButton extends Vue {
     }
 
     return {
-      labels: this.displayGraphData.map(d => dayjs(d.date).format('M/D')),
+      labels: this.displayGraphData.map(d => this.formatDateLabel(d.date)),
       datasets
     }
   }
@@ -138,16 +196,44 @@ export default class MyButton extends Vue {
       tooltips: {
         displayColors: false,
         callbacks: {
-          label(tooltipItem: any) {
-            const labelText =
-              parseInt(tooltipItem.value).toLocaleString() + 'unit'
-            return labelText
+          label: (
+            tooltipItem: Chart.ChartTooltipItem,
+            chartData: Chart.ChartData
+          ) => {
+            if (
+              tooltipItem.index === undefined ||
+              tooltipItem.datasetIndex === undefined
+            ) {
+              return ''
+            }
+
+            const ds = chartData.datasets!
+            const units = []
+
+            const value1 = (ds[0].data as number[])[tooltipItem.index]
+            const label1 = this.chartData.patientsLegendTitle
+            const unit1 = this.chartData.patientsUnit
+            units.push(`${label1}: ${value1} ${unit1}`)
+
+            if (ds.length > 1 && (ds[1].data as number[])[tooltipItem.index]) {
+              const val2 = (ds[1].data as number[])[tooltipItem.index]
+              const value2: number = Math.round(val2 * 10) / 10
+              const label2 = this.chartData.averageLegendTitle
+              const unit2 = this.chartData.averageUnit
+              units.push(`${label2}: ${value2} ${unit2}`)
+            }
+            return units
           },
-          title(tooltipItem: any, data: any) {
-            return data.labels[tooltipItem[0].index].replace(
-              /(\w+)\/(\w+)/g,
-              '$1月$2日'
-            )
+          title: (tooltipItems: Chart.ChartTooltipItem[]) => {
+            try {
+              const date = this.chartData.rows[tooltipItems[0].index!].date
+
+              return (typeof date === 'string' ? [date] : date)
+                .map(d => dayjs(d).format('M月D日'))
+                .join('～')
+            } catch (_) {
+              return 'error'
+            }
           }
         }
       },
@@ -185,39 +271,38 @@ export default class MyButton extends Vue {
               maxTicksLimit: 8,
               fontColor: '#808080'
             }
-          },
-          {
-            id: 'y-axis-2',
-            display: 'auto',
-            position: 'right',
-            gridLines: {
-              display: true,
-              drawOnChartArea: false,
-              color: '#E5E5E5' // #E5E5E5
-            },
-            ticks: {
-              suggestedMin: 0,
-              maxTicksLimit: 8,
-              fontColor: '#808080', // #808080
-              // suggestedMax: this.scaledTicksYAxisMaxRight,
-              callback(value: number) {
-                return value + '%'
-              }
-            }
           }
         ]
       }
     }
   }
 
-  private defaultSpan: number = 60
+  private readonly defaultSpan: number = 60
+
   private displaySpan: number[] = [0, 0]
+
   private spanMin: number = 0
-  get spanMax(): number {
+
+  private get spanMax(): number {
     return this.chartData.rows.length - 1
   }
 
-  private sliderLabelFormatter = (d: any, _: any) => d.label
+  private readonly sliderLabelFormatter = (
+    d: GraphDataType,
+    isFrom: boolean
+  ) => {
+    if (typeof d.date === 'string') {
+      return dayjs(d.date).format('M/D')
+    } else {
+      return d.date.map(date => dayjs(date).format('M/D'))[isFrom ? 0 : 1]
+    }
+  }
+
+  private formatDateLabel = (date: string | string[]): string => {
+    return (typeof date === 'string' ? [date] : date)
+      .map(d => dayjs(d).format('M/D'))
+      .join('～')
+  }
 
   constructor() {
     super()
@@ -230,6 +315,10 @@ export default class MyButton extends Vue {
     if (weeklyData) {
       this.chartDataSet.set('weekly-transition', weeklyData)
     }
+    const dailyCumulative = this.buildChartData('daily-cumulative')
+    if (dailyCumulative) {
+      this.chartDataSet.set('daily-cumulative', dailyCumulative)
+    }
 
     this.displaySpan = [
       this.chartData.rows.length - this.defaultSpan,
@@ -237,7 +326,7 @@ export default class MyButton extends Vue {
     ]
   }
 
-  private get displayGraphData(): GraphDataType2[] {
+  private get displayGraphData(): GraphDataType[] {
     const chartData = this.chartData.rows
     const lowerIndex = this.displaySpan[0]
     const lower = lowerIndex < chartData.length ? lowerIndex : 0
@@ -252,19 +341,21 @@ export default class MyButton extends Vue {
     this.displaySpan = sliderValue
   }
 
-  private readonly chartDataSet = new Map<string, ChartData2>()
-  private get chartData(): ChartData2 {
+  private readonly chartDataSet = new Map<string, ChartData>()
+  private get chartData(): ChartData {
     const data = this.chartDataSet.get(this.dataKind)
     if (data) {
       return data
     } else {
       return {
-        legendBarTitle: '',
-        legendLineTitle: '',
+        patientsLegendTitle: '',
+        patientsUnit: '',
+        averageLegendTitle: '',
+        averageUnit: '',
+        averageVisible: false,
         rows: [],
-        visibleAverage7days: false,
-        sliderLabelFormatter: (_: GraphDataType2, __: boolean) => ''
-      } as ChartData2
+        sliderLabelFormatter: (_: GraphDataType, __: boolean) => ''
+      } as ChartData
     }
   }
 
@@ -282,7 +373,7 @@ export default class MyButton extends Vue {
     ]
   }
 
-  private buildChartData(dataKind: DataKind): ChartData2 | null {
+  private buildChartData = (dataKind: DataKind): ChartData | null => {
     if (dataKind === 'daily-transition') {
       const today = dayjs()
       const rows = (this.dailyData ?? [])
@@ -291,50 +382,72 @@ export default class MyButton extends Vue {
           return {
             date: dayjs(d['日付']).format('YYYY-MM-DD'),
             numberOfPatients: Number(d['小計']),
-            average7days: Number(d['小計'])
-          } as GraphDataType2
+            average7days: Number(d['平均'])
+          } as GraphDataType
         })
 
       return {
-        legendBarTitle: '陽性者数',
-        legendLineTitle: '7日間平均',
-        rows,
-        visibleAverage7days: true,
-        sliderLabelFormatter: (d: GraphDataType2, _: boolean) =>
-          dayjs(d.date).format('M/D')
-      } as ChartData2
+        patientsLegendTitle: '陽性者数',
+        patientsUnit: '人',
+        averageLegendTitle: '7日間平均',
+        averageUnit: '人',
+        averageVisible: true,
+        rows
+      } as ChartData
+    } else if (dataKind === 'daily-cumulative') {
+      let subTotal = 0
+      const today = dayjs()
+      const rows = (this.dailyData ?? [])
+        .filter(d => dayjs(d['日付']) < today)
+        .map(d => {
+          subTotal += Number(d['小計'])
+          return {
+            date: dayjs(d['日付']).format('YYYY-MM-DD'),
+            numberOfPatients: subTotal,
+            average7days: undefined
+          } as GraphDataType
+        })
+
+      return {
+        patientsLegendTitle: '陽性者累計数',
+        patientsUnit: '人',
+        averageLegendTitle: '',
+        averageUnit: '',
+        averageVisible: false,
+        rows
+      } as ChartData
     } else if (dataKind === 'weekly-transition') {
       const today = dayjs()
       const rows = (this.weeklyData ?? [])
         .filter(d => dayjs(d['開始日']) < today)
         .map(d => {
           return {
-            date: dayjs(d['開始日']).format('YYYY-MM-DD'),
+            date: [
+              dayjs(d['開始日']).format('YYYY-MM-DD'),
+              dayjs(d['終了日']).format('YYYY-MM-DD')
+            ],
             numberOfPatients: Number(d['小計'])
-          } as GraphDataType2
+          } as GraphDataType
         })
 
       return {
-        legendBarTitle: '陽性者数',
-        legendLineTitle: '7日間平均',
-        rows,
-        visibleAverage7days: false,
-        sliderLabelFormatter: (d: GraphDataType2, _: boolean) =>
-          dayjs(d.date).format('M/D')
-      } as ChartData2
+        patientsLegendTitle: '陽性者数',
+        patientsUnit: '人',
+        averageLegendTitle: '7日間平均',
+        averageVisible: false,
+        averageUnit: '',
+        rows
+      } as ChartData
     } else {
       return {
-        legendBarTitle: '',
-        legendLineTitle: '',
+        patientsLegendTitle: '',
+        patientsUnit: '',
+        averageLegendTitle: '',
+        averageUnit: '',
         rows: [],
-        visibleAverage7days: false,
-        sliderLabelFormatter: (_: GraphDataType2, __: boolean) => ''
-      } as ChartData2
+        averageVisible: false
+      } as ChartData
     }
-  }
-
-  public onClick() {
-    alert(this.greet)
   }
 }
 </script>
