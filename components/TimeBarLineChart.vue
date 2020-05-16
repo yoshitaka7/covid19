@@ -240,7 +240,7 @@ export default class MyButton extends Vue {
       responsive: true,
       maintainAspectRatio: false,
       legend: {
-        display: true,
+        display: this.chartData.averageVisible,
         reverse: true
       },
       scales: {
