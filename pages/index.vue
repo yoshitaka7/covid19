@@ -37,7 +37,7 @@
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
-        <time-bar-line-chart
+        <new-patients-chart
           title="陽性患者数"
           title-id="number-of-confirmed-cases"
           chart-id="time-bar-chart-patients"
@@ -191,7 +191,7 @@ import formatPatientsPerCities from '@/utils/formatPatientsPerCities'
 import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
-import TimeBarLineChart from '@/components/TimeBarLineChart.vue'
+import NewPatientsChart from '@/components/NewPatientsChart.vue'
 import weeklizer from '@/utils/weeklizer'
 import normalizer from '@/utils/normalizer'
 import {
@@ -210,7 +210,7 @@ export default {
     SvgCard,
     ConfirmedCasesTable,
     ColumnMap,
-    TimeBarLineChart
+    NewPatientsChart
   },
   data() {
     // 日次データの補正
