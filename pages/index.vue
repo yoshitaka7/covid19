@@ -177,9 +177,7 @@ import HospitalizedChart from '@/components/HospitalizedChart.vue'
 import weeklizer from '@/utils/weeklizer'
 import normalizer from '@/utils/normalizer'
 import {
-  buildPatientChartSet,
   buildInspectionsChartSet,
-  buildInHospitalChartSet,
   buildSevereChartSet
 } from '@/utils/chart-data-builder'
 
@@ -202,21 +200,10 @@ export default {
     // 日次データを週次化
     const dataWeekly = weeklizer(Data) // Data_weekly.json 化までのつなぎ
 
-    // 感染者数グラフ
-    const patientsChartSet = buildPatientChartSet(
-      Data.patients_summary.data,
-      dataWeekly.patients_summary.data
-    )
-
     // 検査数グラフ
     const inspectionsChartSet = buildInspectionsChartSet(
       Data.inspections_summary.data,
       dataWeekly.inspections_summary.data
-    )
-
-    // 入院中数グラフ
-    const inHospitalChartSet = buildInHospitalChartSet(
-      Data.main_summary_history.data
     )
 
     // 重症者数グラフ
@@ -255,9 +242,7 @@ export default {
     const data = {
       Data,
       dataWeekly,
-      patientsChartSet,
       inspectionsChartSet,
-      inHospitalChartSet,
       severeChartSet,
       confirmedCases,
       confirmedCasesChart,

@@ -1,10 +1,7 @@
 import formatGraph, { formatGraphWeekly } from './formatGraph'
-import formatInHospitalGraph from './formatInHospitalGraph'
 import formatSevereGraph from './formatSevereGraph'
 import {
   GraphDataType,
-  PatientsSummaryDaily,
-  PatientsSummaryWeekly,
   MainSummaryDataType,
   InspectionsSummaryDaily,
   InspectionsSummaryWeekly
@@ -18,51 +15,6 @@ type ChartData = {
   latestLabel: string // '実績値'
   diffLabel: string // '前日比',
   sliderLabelFormatter: (d: any, isFrom: boolean) => string
-}
-
-export const buildPatientChartSet = (
-  dataDaily: PatientsSummaryDaily[],
-  dataWeekly: PatientsSummaryWeekly[]
-): Map<string, ChartData> => {
-  const patientsGraphDaily = formatGraph(dataDaily)
-  const patientsGraphWeekly = formatGraphWeekly(dataWeekly)
-
-  const chartDataSet = new Map<string, ChartData>()
-
-  chartDataSet.set('daily-transition', {
-    titlePostfix: '',
-    data: patientsGraphDaily,
-    valueField: 'transition',
-    valueUnit: '人',
-    latestLabel: '実績値',
-    diffLabel: '前日比',
-    sliderLabelFormatter: (x, _) => x.label
-  })
-
-  chartDataSet.set('weekly-transition', {
-    titlePostfix: '(週別)',
-    data: patientsGraphWeekly,
-    latestLabel: '実績値',
-    diffLabel: '前週比',
-    valueField: 'transition',
-    valueUnit: '人',
-    sliderLabelFormatter: (x, isFrom) => {
-      const index = x.label.indexOf('～')
-      return isFrom ? x.label.substring(0, index) : x.label.substring(index + 1)
-    }
-  })
-
-  chartDataSet.set('daily-cumulative', {
-    titlePostfix: '',
-    data: patientsGraphDaily,
-    valueField: 'cumulative',
-    valueUnit: '人',
-    latestLabel: '累計値',
-    diffLabel: '前日比',
-    sliderLabelFormatter: (x, _) => x.label
-  })
-
-  return chartDataSet
 }
 
 export const buildInspectionsChartSet = (
@@ -110,27 +62,6 @@ export const buildInspectionsChartSet = (
     valueField: 'cumulative',
     valueUnit: '件',
     latestLabel: '累計値',
-    diffLabel: '前日比',
-    sliderLabelFormatter: (x, _) => x.label
-  })
-
-  return chartDataSet
-}
-
-export const buildInHospitalChartSet = (
-  dataDaily: MainSummaryDataType[]
-): Map<string, ChartData> => {
-  // 入院中数グラフ
-  const graphDataDaily = formatInHospitalGraph(dataDaily)
-
-  const chartDataSet = new Map<string, ChartData>()
-
-  chartDataSet.set('daily-transition', {
-    titlePostfix: '',
-    data: graphDataDaily,
-    valueField: 'transition',
-    valueUnit: '人',
-    latestLabel: '時点',
     diffLabel: '前日比',
     sliderLabelFormatter: (x, _) => x.label
   })
