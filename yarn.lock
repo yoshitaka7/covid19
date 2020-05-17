@@ -6709,8 +6709,8 @@ lines-and-columns@^1.1.6:
 
 linq@^3.2.2:
   version "3.2.2"
-  resolved "https://pkgs.dev.azure.com/nepulaproj001/npl2ng/_packaging/npmregistry-dev/npm/registry/linq/-/linq-3.2.2.tgz#c012291054f54d78f608a37f7bceec95dca09e40"
-  integrity sha1-wBIpEFT1TXj2CKN/e87sldygnkA=
+  resolved "https://registry.npmjs.org/linq/-/linq-3.2.2.tgz#c012291054f54d78f608a37f7bceec95dca09e40"
+  integrity sha512-AtVkCFwg7dizILt88ent7Bng1OLAnKMWBOLo9Kh7ZPFK8OcfYGi2FEzmr66QJtV7uBYZVf19AbVs0B14rIUi+w==
 
 lint-staged@^10.0.8:
   version "10.0.8"
