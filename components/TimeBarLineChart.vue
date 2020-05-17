@@ -23,34 +23,26 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 import dayjs from 'dayjs'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
 
-export type GraphType = 'bar' | 'line'
+export type GraphKind = 'bar' | 'line'
 
 export type YAxisKind = 'y-axis-left' | 'y-axis-right'
 
 export type DateRange = string | string[]
 
-export type ChartDataSet = {
-  id: string
+export type GraphDataSet = {
   title: string
-  type: GraphType
+  type: GraphKind
   values: number[]
   unit: string
   color?: string
   yAxisKind?: YAxisKind
-  visible: boolean
+  visible?: boolean
   order?: number
 }
 
-export type ChartData = {
-  // patientsLegendTitle: string
-  // patientsUnit: string
-  // averageLegendTitle: string
-  // averageUnit: string
-  // averageVisible: boolean
-  // rows: GraphDataType[]
-
+export type GraphData = {
   dates: DateRange[]
-  datasets: ChartDataSet[]
+  datasets: GraphDataSet[]
 }
 
 @Component({
@@ -63,12 +55,12 @@ export default class TimeBarLineChart extends Vue {
   public chartId?: string
 
   @Prop()
-  public chartData!: ChartData
+  public chartData!: GraphData
 
   @Prop()
   public displaySpan!: number[]
 
-  private buildBarDataSets = (dataset: ChartDataSet): Chart.ChartDataSets => {
+  private buildBarDataSets = (dataset: GraphDataSet): Chart.ChartDataSets => {
     return {
       type: 'bar',
       yAxisID: dataset.yAxisKind ?? 'y-axis-left',
@@ -80,7 +72,7 @@ export default class TimeBarLineChart extends Vue {
     }
   }
 
-  private buildLineDataSets = (dataset: ChartDataSet): Chart.ChartDataSets => {
+  private buildLineDataSets = (dataset: GraphDataSet): Chart.ChartDataSets => {
     return {
       type: 'line',
       yAxisID: dataset.yAxisKind ?? 'y-axis-left',
@@ -88,7 +80,8 @@ export default class TimeBarLineChart extends Vue {
       data: dataset.values,
       borderColor: dataset.color ?? '#0070C0',
       borderWidth: 3,
-      pointRadius: 1,
+      pointRadius: 0,
+      pointHitRadius: 1,
       fill: false,
       order: dataset.order ?? 0,
       lineTension: 0
@@ -103,33 +96,6 @@ export default class TimeBarLineChart extends Vue {
         return this.buildLineDataSets(dataset)
       }
     })
-
-    // const datasets: Chart.ChartDataSets[] = [
-    //   {
-    //     type: 'bar',
-    //     yAxisID: 'y-axis-left',
-    //     label: this.chartData.patientsLegendTitle, // 凡例名
-    //     data: this.displayGraphValues.map(d => d.numberOfPatients),
-    //     backgroundColor: '#bd3f4c',
-    //     order: 2,
-    //     lineTension: 0
-    //   } as Chart.ChartDataSets
-    // ]
-
-    // if (this.chartData.averageVisible) {
-    //   datasets.push({
-    //     type: 'line',
-    //     yAxisID: 'y-axis-left',
-    //     label: this.chartData.averageLegendTitle, // 凡例名
-    //     data: this.displayGraphValues.map(d => d.average7days),
-    //     borderColor: '#0070C0',
-    //     borderWidth: 3,
-    //     pointRadius: 1,
-    //     fill: false,
-    //     order: 1,
-    //     lineTension: 0
-    //   })
-    // }
 
     return {
       labels: this.displayGraphLabels,
@@ -168,7 +134,7 @@ export default class TimeBarLineChart extends Vue {
 
                 return {
                   label: `${label}: ${formatValue} ${unit}`,
-                  visible: dataset.visible
+                  visible: dataset.visible ?? true
                 }
               })
               .filter(d => d.visible)
@@ -190,7 +156,8 @@ export default class TimeBarLineChart extends Vue {
       responsive: true,
       maintainAspectRatio: false,
       legend: {
-        display: this.chartData.datasets.filter(d => d.visible).length > 1,
+        display:
+          this.chartData.datasets.filter(d => d.visible ?? true).length > 1,
         reverse: true
       },
       scales: {
@@ -219,7 +186,11 @@ export default class TimeBarLineChart extends Vue {
             ticks: {
               suggestedMin: 0,
               maxTicksLimit: 8,
-              fontColor: '#808080'
+              fontColor: '#808080',
+              callback: (value: any) => {
+                // console.debug('value: any, index: any, values: any', value, index, values)
+                return value
+              }
             }
           }
         ]
@@ -278,7 +249,7 @@ export default class TimeBarLineChart extends Vue {
     return spanedDates.map(date => this.formatDateLabel(date))
   }
 
-  private get displayGraphValues(): ChartDataSet[] {
+  private get displayGraphValues(): GraphDataSet[] {
     const chartData = this.chartData.dates
     const lowerIndex = this.displaySpan[0]
     const lower = lowerIndex < chartData.length ? lowerIndex : 0
@@ -287,7 +258,7 @@ export default class TimeBarLineChart extends Vue {
       upperIndex < chartData.length ? upperIndex : chartData.length - 1
 
     return this.chartData.datasets
-      .filter(d => d.visible)
+      .filter(d => d.visible ?? true)
       .map(dataset => {
         const cloned = Object.assign({}, dataset)
         cloned.values = dataset.values.slice(lower, upper + 1)

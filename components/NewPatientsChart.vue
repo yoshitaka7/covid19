@@ -52,7 +52,7 @@ import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
-import TimeBarLineChart, { ChartData } from '@/components/TimeBarLineChart.vue'
+import TimeBarLineChart, { GraphData } from '@/components/TimeBarLineChart.vue'
 import { PatientsSummaryDaily, PatientsSummaryWeekly } from '~/utils/types'
 
 type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
@@ -107,7 +107,7 @@ export default class NewPatientsChart extends Vue {
 
   private readonly defaultSpan: number = 60
   private displaySpan: number[] = [0, 0]
-  private readonly chartDataSet = new Map<DataKind, ChartData>()
+  private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private get displayTitle(): string {
     return `${this.title}${
@@ -162,15 +162,15 @@ export default class NewPatientsChart extends Vue {
 
     this.chartDataSet.set(
       'daily-transition',
-      this.buildDailyTransitionChartData()
+      this.buildDailyTransitionGraphData()
     )
     this.chartDataSet.set(
       'weekly-transition',
-      this.buildWeeklyTransitionChartData()
+      this.buildWeeklyTransitionGraphData()
     )
     this.chartDataSet.set(
       'daily-cumulative',
-      this.buildDailyCumulativeChartData()
+      this.buildDailyCumulativeGraphData()
     )
 
     this.displaySpan = [
@@ -184,7 +184,7 @@ export default class NewPatientsChart extends Vue {
     this.displaySpan = sliderValue
   }
 
-  private get chartData(): ChartData {
+  private get chartData(): GraphData {
     const data = this.chartDataSet.get(this.dataKind)
     if (data) {
       return data
@@ -192,7 +192,7 @@ export default class NewPatientsChart extends Vue {
       return {
         dates: [],
         datasets: []
-      } as ChartData
+      } as GraphData
     }
   }
 
@@ -210,7 +210,7 @@ export default class NewPatientsChart extends Vue {
     ]
   }
 
-  private buildDailyTransitionChartData = (): ChartData => {
+  private buildDailyTransitionGraphData = (): GraphData => {
     const today = dayjs()
     const rows = (this.dailyData ?? [])
       .filter(d => dayjs(d['日付']) < today)
@@ -226,28 +226,24 @@ export default class NewPatientsChart extends Vue {
       dates: rows.map(d => d.date),
       datasets: [
         {
-          id: 'daily-transition-patients',
           type: 'bar',
           title: '陽性者数',
           unit: '人',
           values: rows.map(d => d.count),
-          visible: true,
           order: 2
         },
         {
-          id: 'daily-transition-average',
           type: 'line',
           title: '7日間平均',
           unit: '人',
           values: rows.map(d => d.average),
-          visible: true,
           order: 1
         }
       ]
-    } as ChartData
+    } as GraphData
   }
 
-  private buildWeeklyTransitionChartData = (): ChartData => {
+  private buildWeeklyTransitionGraphData = (): GraphData => {
     const today = dayjs()
     const rows = (this.weeklyData ?? [])
       .filter(d => dayjs(d['開始日']) < today)
@@ -265,18 +261,16 @@ export default class NewPatientsChart extends Vue {
       dates: rows.map(d => d.date),
       datasets: [
         {
-          id: 'weekly-transition-patients',
           type: 'bar',
           title: '陽性者数',
           unit: '人',
-          values: rows.map(d => d.count),
-          visible: true
+          values: rows.map(d => d.count)
         }
       ]
-    } as ChartData
+    } as GraphData
   }
 
-  private buildDailyCumulativeChartData = (): ChartData => {
+  private buildDailyCumulativeGraphData = (): GraphData => {
     let subTotal = 0
     const today = dayjs()
     const rows = (this.dailyData ?? [])
@@ -293,15 +287,13 @@ export default class NewPatientsChart extends Vue {
       dates: rows.map(d => d.date),
       datasets: [
         {
-          id: 'daily-cumulative-patients',
           type: 'bar',
           title: '陽性者累計数',
           unit: '人',
-          values: rows.map(d => d.total),
-          visible: true
+          values: rows.map(d => d.total)
         }
       ]
-    } as ChartData
+    } as GraphData
   }
 }
 </script>
