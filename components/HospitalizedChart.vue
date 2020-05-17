@@ -1,6 +1,6 @@
 <template>
   <data-view
-    :title="displayTitle"
+    :title="title"
     :title-id="titleId"
     :date="date"
     :url="url"
@@ -53,7 +53,7 @@ import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
 import TimeBarLineChart, { GraphData } from '@/components/TimeBarLineChart.vue'
-import { PatientsSummaryDaily, PatientsSummaryWeekly } from '~/utils/types'
+import { MainSummaryDataType } from '~/utils/types'
 
 type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
 
@@ -72,7 +72,7 @@ type DisplayInfo = {
     TimeBarLineChart
   }
 })
-export default class NewPatientsChart extends Vue {
+export default class HospitalizedChart extends Vue {
   @Prop()
   public chartId?: string
 
@@ -83,10 +83,7 @@ export default class NewPatientsChart extends Vue {
   public date?: string
 
   @Prop()
-  public dailyData?: PatientsSummaryDaily[]
-
-  @Prop()
-  public weeklyData?: PatientsSummaryWeekly[]
+  public dailyData?: MainSummaryDataType[]
 
   @Prop()
   public titleId?: string
@@ -97,23 +94,15 @@ export default class NewPatientsChart extends Vue {
   @Prop()
   public remarks?: string[]
 
-  private showSelector = true
+  private showSelector = false
   private dataKind: DataKind = 'daily-transition'
   private readonly dataKinds = [
-    { key: 'weekly-transition', label: '週別' } as SelectorItem,
-    { key: 'daily-transition', label: '日別' } as SelectorItem,
-    { key: 'daily-cumulative', label: '累計' } as SelectorItem
+    { key: 'daily-transition', label: '日別' } as SelectorItem
   ]
 
   private readonly defaultSpan: number = 60
   private displaySpan: number[] = [0, 0]
   private readonly chartDataSet = new Map<DataKind, GraphData>()
-
-  private get displayTitle(): string {
-    return `${this.title}${
-      this.dataKind === 'weekly-transition' ? '(週別)' : ''
-    }`
-  }
 
   private formatDayBeforeRatio = (dayBeforeRatio: any) => {
     const dayBeforeRatioLocaleString = dayBeforeRatio.toLocaleString()
@@ -164,14 +153,6 @@ export default class NewPatientsChart extends Vue {
       'daily-transition',
       this.buildDailyTransitionGraphData()
     )
-    this.chartDataSet.set(
-      'weekly-transition',
-      this.buildWeeklyTransitionGraphData()
-    )
-    this.chartDataSet.set(
-      'daily-cumulative',
-      this.buildDailyCumulativeGraphData()
-    )
 
     this.displaySpan = [
       this.chartData.dates.length - this.defaultSpan,
@@ -213,12 +194,12 @@ export default class NewPatientsChart extends Vue {
   private buildDailyTransitionGraphData = (): GraphData => {
     const today = dayjs()
     const rows = (this.dailyData ?? [])
-      .filter(d => dayjs(d['日付']) < today)
+      .filter(d => dayjs(d['更新日時']) < today)
       .map(d => {
         return {
-          date: dayjs(d['日付']).format('YYYY-MM-DD'),
-          count: Number(d['小計']),
-          average: Number(d['平均'])
+          date: dayjs(d['更新日時']).format('YYYY-MM-DD'),
+          count: Number(d['入院中']),
+          average: Number(d['入院中平均'])
         }
       })
 
@@ -227,7 +208,7 @@ export default class NewPatientsChart extends Vue {
       datasets: [
         {
           type: 'bar',
-          title: '陽性者数',
+          title: '入院患者数',
           unit: '人',
           values: rows.map(d => d.count),
           order: 2
@@ -238,59 +219,6 @@ export default class NewPatientsChart extends Vue {
           unit: '人',
           values: rows.map(d => d.average),
           order: 1
-        }
-      ]
-    } as GraphData
-  }
-
-  private buildWeeklyTransitionGraphData = (): GraphData => {
-    const today = dayjs()
-    const rows = (this.weeklyData ?? [])
-      .filter(d => dayjs(d['開始日']) < today)
-      .map(d => {
-        return {
-          date: [
-            dayjs(d['開始日']).format('YYYY-MM-DD'),
-            dayjs(d['終了日']).format('YYYY-MM-DD')
-          ],
-          count: Number(d['小計'])
-        }
-      })
-
-    return {
-      dates: rows.map(d => d.date),
-      datasets: [
-        {
-          type: 'bar',
-          title: '陽性者数',
-          unit: '人',
-          values: rows.map(d => d.count)
-        }
-      ]
-    } as GraphData
-  }
-
-  private buildDailyCumulativeGraphData = (): GraphData => {
-    let subTotal = 0
-    const today = dayjs()
-    const rows = (this.dailyData ?? [])
-      .filter(d => dayjs(d['日付']) < today)
-      .map(d => {
-        subTotal += Number(d['小計'])
-        return {
-          date: dayjs(d['日付']).format('YYYY-MM-DD'),
-          total: subTotal
-        }
-      })
-
-    return {
-      dates: rows.map(d => d.date),
-      datasets: [
-        {
-          type: 'bar',
-          title: '陽性者累計数',
-          unit: '人',
-          values: rows.map(d => d.total)
         }
       ]
     } as GraphData

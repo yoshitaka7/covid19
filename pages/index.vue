@@ -39,8 +39,8 @@
       <v-col cols="12" md="6" class="DataCard">
         <new-patients-chart
           title="陽性患者数"
-          title-id="number-of-confirmed-cases"
-          chart-id="time-bar-chart-patients"
+          title-id="new-patients-chart"
+          chart-id="new-patients-chart"
           :date="Data.patients_summary.date"
           :daily-data="Data.patients_summary.data"
           :weekly-data="dataWeekly.patients_summary.data"
@@ -49,8 +49,28 @@
           "
           :remarks="[
             sanitize(
-              '「陽性患者数」とは、愛知県が発表する「<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html>愛知県内発生事例</a>」を日別または週別に集計した人数です。(参考:<a class=RemarksLink target=_blank href=https://github.com/code4nagoya/covid19/blob/development/data/patients.csv>当サイトでCSV形式に加工したデータ</a>)。'
+              '「陽性患者数」とは、愛知県が発表する「<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html>愛知県内発生事例</a>」を日別または週別に集計した人数です。(参考:<a class=RemarksLink target=_blank href=https://github.com/code4nagoya/covid19/blob/development/data/patients.csv>当サイトでCSV形式に加工したデータ</a>)。',
+              '移動平均は後方7日移動平均値です'
             )
+          ]"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <hospitalized-chart
+          title="入院患者数"
+          title-id="hospitalized-chart"
+          chart-id="hospitalized-chart"
+          :date="Data.main_summary_history.date"
+          :daily-data="Data.main_summary_history.data"
+          :url="
+            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
+          "
+          :remarks="[
+            '「入院患者数」とは、愛知県が発表した「検査陽性者の状況」のうち、「入院中」の人数です。',
+            '愛知県が発表した「検査陽性者の状況」を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
+            '感染症発生状況が取得できなかった日の値は表示していません',
+            '移動平均は後方7日移動平均値です'
           ]"
         />
       </v-col>
@@ -192,6 +212,7 @@ import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
 import NewPatientsChart from '@/components/NewPatientsChart.vue'
+import HospitalizedChart from '@/components/HospitalizedChart.vue'
 import weeklizer from '@/utils/weeklizer'
 import normalizer from '@/utils/normalizer'
 import {
@@ -210,7 +231,8 @@ export default {
     SvgCard,
     ConfirmedCasesTable,
     ColumnMap,
-    NewPatientsChart
+    NewPatientsChart,
+    HospitalizedChart
   },
   data() {
     // 日次データの補正
