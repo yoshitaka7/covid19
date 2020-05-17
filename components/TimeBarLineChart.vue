@@ -60,6 +60,9 @@ export default class TimeBarLineChart extends Vue {
   @Prop()
   public displaySpan!: number[]
 
+  @Prop()
+  public legendOrderDesc?: boolean
+
   private buildBarDataSets = (dataset: GraphDataSet): Chart.ChartDataSets => {
     return {
       type: 'bar',
@@ -158,7 +161,7 @@ export default class TimeBarLineChart extends Vue {
       legend: {
         display:
           this.chartData.datasets.filter(d => d.visible ?? true).length > 1,
-        reverse: true
+        reverse: this.legendOrderDesc ?? true
       },
       scales: {
         xAxes: [

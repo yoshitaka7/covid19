@@ -94,23 +94,13 @@
         />
       </v-col>
 
-      <v-col
-        v-if="confirmedCasesChart != null"
-        cols="12"
-        md="6"
-        class="DataCard"
-      >
-        <time-stacked-bar-chart
+      <v-col cols="12" md="6" class="DataCard">
+        <main-summary-chart
           title="検査陽性者状況の推移"
-          :title-id="'number-of-current-patients-history'"
-          :chart-id="'time-stacked-bar-chart-patients-history'"
-          :chart-data="confirmedCasesChart"
-          :chart-legends="confirmedCasesChartLegends"
+          title-id="new-patients-chart"
+          chart-id="new-patients-chart"
           :date="Data.main_summary_history.date"
-          :latest-value-field="'discharged'"
-          :latest-value-title="'退院'"
-          :default-span="60"
-          :unit="'人'"
+          :daily-data="Data.main_summary_history.data"
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
           :remarks="[
             '愛知県が発表した「検査陽性者の状況」を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
@@ -119,6 +109,7 @@
           ]"
         />
       </v-col>
+
       <v-col cols="12" md="6" class="DataCard">
         <time-bar-chart
           title="検査実施件数"
@@ -160,7 +151,6 @@
 <script>
 import PageHeader from '@/components/PageHeader.vue'
 import TimeBarChart from '@/components/TimeBarChart.vue'
-import TimeStackedBarChart from '@/components/TimeStackedBarChart.vue'
 import WhatsNew from '@/components/WhatsNew.vue'
 import Data from '@/data/data.json'
 import CityData from '@/data/city_data.json'
@@ -172,6 +162,7 @@ import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
 import NewPatientsChart from '@/components/NewPatientsChart.vue'
+import MainSummaryChart from '@/components/MainSummaryChart.vue'
 import HospitalizedChart from '@/components/HospitalizedChart.vue'
 import CriticallyChart from '@/components/CriticallyChart.vue'
 import weeklizer from '@/utils/weeklizer'
@@ -182,12 +173,12 @@ export default {
   components: {
     PageHeader,
     TimeBarChart,
-    TimeStackedBarChart,
     WhatsNew,
     SvgCard,
     ConfirmedCasesTable,
     ColumnMap,
     NewPatientsChart,
+    MainSummaryChart,
     HospitalizedChart,
     CriticallyChart
   },
