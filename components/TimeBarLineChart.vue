@@ -267,7 +267,7 @@ export default class TimeBarLineChart extends Vue {
   }
 
   public sliderUpdate(sliderValue: number[]) {
-    console.debug(`${this.constructor.name}:sliderUpdate.`, sliderValue)
+    // console.debug(`${this.constructor.name}:sliderUpdate.`, sliderValue)
     this.displaySpan = sliderValue
   }
 }

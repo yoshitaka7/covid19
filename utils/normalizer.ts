@@ -25,7 +25,7 @@ export default (Data: any): void => {
     .reverse()
     .toArray()
 
-  console.debug(list)
+  // console.debug(list)
 
   Data.patients_summary.data = list
 }

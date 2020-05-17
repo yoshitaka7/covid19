@@ -180,7 +180,7 @@ export default class NewPatientsChart extends Vue {
   }
 
   public sliderUpdate(sliderValue: number[]) {
-    console.debug(`${this.constructor.name}:sliderUpdate.`, sliderValue)
+    // console.debug(`${this.constructor.name}:sliderUpdate.`, sliderValue)
     this.displaySpan = sliderValue
   }
 
@@ -197,12 +197,12 @@ export default class NewPatientsChart extends Vue {
   }
 
   @Watch('dataKind')
-  onDataKindChanged(newValue: string, oldValue: string) {
-    console.debug(
-      `${this.constructor.name}:onDataKindChanged. new, old`,
-      newValue,
-      oldValue
-    )
+  onDataKindChanged(_: string, __: string) {
+    // console.debug(
+    //   `${this.constructor.name}:onDataKindChanged. new, old`,
+    //   newValue,
+    //   oldValue
+    // )
 
     this.displaySpan = [
       this.chartData.dates.length - this.defaultSpan,
