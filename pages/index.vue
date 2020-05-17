@@ -156,7 +156,6 @@ import Data from '@/data/data.json'
 import CityData from '@/data/city_data.json'
 
 import formatConfirmedCases from '@/utils/formatConfirmedCases'
-import formatConfirmedCasesGraph from '@/utils/formatConfirmedCasesGraph'
 import formatPatientsPerCities from '@/utils/formatPatientsPerCities'
 import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
@@ -198,25 +197,6 @@ export default {
     // 検査陽性者の状況
     const confirmedCases = formatConfirmedCases(Data.main_summary_history)
 
-    // 入院中患者数の推移
-    const confirmedCasesChart =
-      Data.main_summary_history != null
-        ? formatConfirmedCasesGraph(
-            Data.patients_summary.data,
-            Data.main_summary_history.data
-          )
-        : null
-
-    const confirmedCasesChartLegends = [
-      { field: 'discharged', label: '退院', backgroundColor: '#0070C0' },
-      { field: 'isolated', label: '施設入所', backgroundColor: '#92D050' },
-      { field: 'milds', label: '軽症中等症', backgroundColor: '#FCD5B5' },
-      { field: 'transfered', label: '転院', backgroundColor: '#7F7F7F' },
-      { field: 'severes', label: '重症', backgroundColor: '#D99694' },
-      { field: 'deaths', label: '死亡', backgroundColor: '#984807' },
-      { field: 'unknown', label: '不定', backgroundColor: '#dddddd' }
-    ]
-
     // 市区町村別の感染者数
     const patientsPerCitiesLegends = []
     const patientsPerCities = formatPatientsPerCities(
@@ -230,8 +210,6 @@ export default {
       dataWeekly,
       inspectionsChartSet,
       confirmedCases,
-      confirmedCasesChart,
-      confirmedCasesChartLegends,
       patientsPerCities,
       patientsPerCitiesLegends,
       headerItem: {
