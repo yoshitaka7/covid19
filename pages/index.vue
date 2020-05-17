@@ -56,21 +56,20 @@
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
-        <time-bar-chart
+        <critically-chart
           title="重症者数"
-          :title-id="'number-of-severe'"
-          :chart-id="'time-bar-chart-severe'"
-          :chart-data-set="severeChartSet"
+          title-id="critically-chart"
+          chart-id="critically-chart"
           :date="Data.main_summary_history.date"
-          :default-data-kind="'daily-transition'"
-          :default-span="60"
-          :unit="'人'"
+          :daily-data="Data.main_summary_history.data"
+          :url="
+            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
+          "
           :remarks="[
             '「重症者数」とは、愛知県が発表した「検査陽性者の状況」のうち、「重症」の人数です。',
             '愛知県が発表した「検査陽性者の状況」を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
             '感染症発生状況が取得できなかった日の値は表示していません'
           ]"
-          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
           :show="false"
         />
       </v-col>
@@ -174,12 +173,10 @@ import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
 import NewPatientsChart from '@/components/NewPatientsChart.vue'
 import HospitalizedChart from '@/components/HospitalizedChart.vue'
+import CriticallyChart from '@/components/CriticallyChart.vue'
 import weeklizer from '@/utils/weeklizer'
 import normalizer from '@/utils/normalizer'
-import {
-  buildInspectionsChartSet,
-  buildSevereChartSet
-} from '@/utils/chart-data-builder'
+import { buildInspectionsChartSet } from '@/utils/chart-data-builder'
 
 export default {
   components: {
@@ -191,7 +188,8 @@ export default {
     ConfirmedCasesTable,
     ColumnMap,
     NewPatientsChart,
-    HospitalizedChart
+    HospitalizedChart,
+    CriticallyChart
   },
   data() {
     // 日次データの補正
@@ -205,9 +203,6 @@ export default {
       Data.inspections_summary.data,
       dataWeekly.inspections_summary.data
     )
-
-    // 重症者数グラフ
-    const severeChartSet = buildSevereChartSet(Data.main_summary_history.data)
 
     // 検査陽性者の状況
     const confirmedCases = formatConfirmedCases(Data.main_summary_history)
@@ -243,7 +238,6 @@ export default {
       Data,
       dataWeekly,
       inspectionsChartSet,
-      severeChartSet,
       confirmedCases,
       confirmedCasesChart,
       confirmedCasesChartLegends,

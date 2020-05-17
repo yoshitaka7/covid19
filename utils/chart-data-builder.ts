@@ -1,8 +1,6 @@
 import formatGraph, { formatGraphWeekly } from './formatGraph'
-import formatSevereGraph from './formatSevereGraph'
 import {
   GraphDataType,
-  MainSummaryDataType,
   InspectionsSummaryDaily,
   InspectionsSummaryWeekly
 } from '@/utils/types'
@@ -62,27 +60,6 @@ export const buildInspectionsChartSet = (
     valueField: 'cumulative',
     valueUnit: '件',
     latestLabel: '累計値',
-    diffLabel: '前日比',
-    sliderLabelFormatter: (x, _) => x.label
-  })
-
-  return chartDataSet
-}
-
-export const buildSevereChartSet = (
-  dataDaily: MainSummaryDataType[]
-): Map<string, ChartData> => {
-  // 重症者数グラフ
-  const graphDataDaily = formatSevereGraph(dataDaily)
-
-  const chartDataSet = new Map<string, ChartData>()
-
-  chartDataSet.set('daily-transition', {
-    titlePostfix: '',
-    data: graphDataDaily,
-    valueField: 'transition',
-    valueUnit: '人',
-    latestLabel: '時点',
     diffLabel: '前日比',
     sliderLabelFormatter: (x, _) => x.label
   })
