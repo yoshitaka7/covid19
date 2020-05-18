@@ -21,7 +21,10 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import dayjs from 'dayjs'
+import Enumerable from 'linq'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
+
+export type LegendOrderKind = 'asc' | 'desc'
 
 export type GraphKind = 'bar' | 'line'
 
@@ -59,7 +62,7 @@ export default class TimeBarLineChart extends Vue {
   public chartData!: GraphData
 
   @Prop()
-  public legendOrderDesc?: boolean
+  public legendOrderKind?: LegendOrderKind
 
   private buildBarDataSets = (dataset: GraphDataSet): Chart.ChartDataSets => {
     return {
@@ -114,8 +117,8 @@ export default class TimeBarLineChart extends Vue {
               return ''
             }
 
-            return this.chartData.datasets
-              .map((dataset, index) => {
+            return Enumerable.from(this.chartData.datasets)
+              .select((dataset, index) => {
                 const toolTipValues =
                   this.chartData.datasets![index].tooltipValues ??
                   this.chartData.datasets![index].values
@@ -134,14 +137,17 @@ export default class TimeBarLineChart extends Vue {
                 })(value)
 
                 return {
-                  index,
+                  order: dataset?.order ?? 0,
                   label: `${label}: ${formatValue} ${unit}`,
                   visible: (dataset.visible ?? true) && !isNaN(value)
                 }
               })
-              .filter(d => d.visible)
-              .sort(d => (this.legendOrderDesc ?? true ? -d.index : d.index))
-              .map(d => d.label)
+              .where(d => d.visible)
+              .orderBy(d =>
+                (this.legendOrderKind ?? 'asc') === 'asc' ? d.order : -d.order
+              )
+              .select(d => d.label)
+              .toArray()
           },
           title: (tooltipItems: Chart.ChartTooltipItem[]) => {
             try {
@@ -163,7 +169,7 @@ export default class TimeBarLineChart extends Vue {
       legend: {
         display:
           this.chartData.datasets.filter(d => d.visible ?? true).length > 1,
-        reverse: this.legendOrderDesc ?? true
+        reverse: (this.legendOrderKind ?? 'asc') === 'desc'
       },
       scales: {
         xAxes: [

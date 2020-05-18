@@ -13,6 +13,7 @@
     <time-bar-line-chart
       chart-id="new-patients-chart"
       :chart-data="chartData"
+      legend-order-kind="desc"
     />
 
     <div>
@@ -267,15 +268,17 @@ export default class NewPatientsChart extends Vue {
   private buildDailyCumulativeGraphData = (): GraphData => {
     let subTotal = 0
     const now = dayjs()
-    const rows = Enumerable.from(this.dailyData ?? [])
-      .where(d => dayjs(d['日付']) < now)
-      .select(d => {
+    const arr = (this.dailyData ?? [])
+      .filter(d => dayjs(d['日付']) < now)
+      .map(d => {
         subTotal += Number(d['小計'])
         return {
           date: dayjs(d['日付']).format('YYYY-MM-DD'),
           total: subTotal
         }
       })
+
+    const rows = Enumerable.from(arr)
 
     return {
       dates: rows.select(d => d.date).toArray(),

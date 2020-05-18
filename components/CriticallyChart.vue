@@ -168,7 +168,7 @@ export default class CriticallyChart extends Vue {
       datasets: [
         {
           type: 'bar',
-          title: '重傷者数',
+          title: '重症者数',
           unit: '人',
           values: rows.select(d => d.count).toArray(),
           order: 2

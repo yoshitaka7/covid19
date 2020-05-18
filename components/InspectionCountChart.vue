@@ -227,7 +227,7 @@ export default class InspectionCountChart extends Vue {
       datasets: [
         {
           type: 'bar',
-          title: '陽性者数',
+          title: '検査実施件数',
           unit: '人',
           values: rows.select(d => d.count).toArray()
         }
@@ -238,9 +238,9 @@ export default class InspectionCountChart extends Vue {
   private buildDailyCumulativeGraphData = (): GraphData => {
     let subTotal = 0
     const now = dayjs()
-    const rows = Enumerable.from(this.dailyData ?? [])
-      .where(d => dayjs(d['日付']) < now)
-      .select(d => {
+    const arr = (this.dailyData ?? [])
+      .filter(d => dayjs(d['日付']) < now)
+      .map(d => {
         subTotal += Number(d['小計'])
         return {
           date: dayjs(d['日付']).format('YYYY-MM-DD'),
@@ -248,7 +248,8 @@ export default class InspectionCountChart extends Vue {
           summarize: d['合算']
         }
       })
-      .where(d => !d.summarize)
+
+    const rows = Enumerable.from(arr).where(d => !d.summarize)
 
     return {
       dates: rows.select(d => d.date).toArray(),
