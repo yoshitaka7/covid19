@@ -47,7 +47,6 @@ ul.remarks {
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import dayjs, { Dayjs } from 'dayjs'
 import * as Enumerable from 'linq'
-import { IEnumerable } from 'linq'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
@@ -159,7 +158,7 @@ export default class HospitalizedChart extends Vue {
 
   private makeAverageHospitalized = (
     data: MainSummaryDataType[]
-  ): IEnumerable<{
+  ): Enumerable.IEnumerable<{
     date: Dayjs
     count: number
     average: number | undefined
