@@ -10,11 +10,7 @@
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <time-bar-line-chart
-      :chart-id="chartId"
-      :chart-data="chartData"
-      :display-span="displaySpan"
-    />
+    <time-bar-line-chart :chart-id="chartId" :chart-data="chartData" />
 
     <div>
       <ul class="remarks">
@@ -46,7 +42,7 @@ ul.remarks {
 </style>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import dayjs from 'dayjs'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
@@ -100,8 +96,6 @@ export default class CriticallyChart extends Vue {
     { key: 'daily-transition', label: '日別' } as SelectorItem
   ]
 
-  private readonly defaultSpan: number = 60
-  private displaySpan: number[] = [0, 0]
   private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private formatDayBeforeRatio = (dayBeforeRatio: any) => {
@@ -153,16 +147,6 @@ export default class CriticallyChart extends Vue {
       'daily-transition',
       this.buildDailyTransitionGraphData()
     )
-
-    this.displaySpan = [
-      this.chartData.dates.length - this.defaultSpan,
-      this.chartData.dates.length - 1
-    ]
-  }
-
-  public sliderUpdate(sliderValue: number[]) {
-    // console.debug(`${this.constructor.name}:sliderUpdate.`, sliderValue)
-    this.displaySpan = sliderValue
   }
 
   private get chartData(): GraphData {
@@ -175,14 +159,6 @@ export default class CriticallyChart extends Vue {
         datasets: []
       } as GraphData
     }
-  }
-
-  @Watch('dataKind')
-  onDataKindChanged(_: string, __: string) {
-    this.displaySpan = [
-      this.chartData.dates.length - this.defaultSpan,
-      this.chartData.dates.length - 1
-    ]
   }
 
   private buildDailyTransitionGraphData = (): GraphData => {

@@ -101,7 +101,6 @@ export default class NewPatientsChart extends Vue {
     { key: 'daily-cumulative', label: '累計' } as SelectorItem
   ]
 
-  private readonly defaultSpan: number = 60
   private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private get displayTitle(): string {

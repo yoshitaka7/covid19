@@ -96,7 +96,6 @@ export default class HospitalizedChart extends Vue {
     { key: 'daily-transition', label: '日別' } as SelectorItem
   ]
 
-  private readonly defaultSpan: number = 60
   private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private formatDayBeforeRatio = (dayBeforeRatio: any) => {
