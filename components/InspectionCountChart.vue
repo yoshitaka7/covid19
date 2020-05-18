@@ -47,6 +47,7 @@ ul.remarks {
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import dayjs from 'dayjs'
+import * as Enumerable from 'linq'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
@@ -178,27 +179,26 @@ export default class InspectionCountChart extends Vue {
   }
 
   private buildDailyTransitionGraphData = (): GraphData => {
-    const today = dayjs()
-    const rows = (this.dailyData ?? [])
-      .filter(d => dayjs(d['日付']) < today)
-      .map(d => {
+    const now = dayjs()
+    const rows = Enumerable.from(this.dailyData ?? [])
+      .where(d => dayjs(d['日付']) < now)
+      .select(d => {
         return {
           date: dayjs(d['日付']).format('YYYY-MM-DD'),
           count: Number(d['小計']),
-          // average: Number(d['平均'])
           summarize: d['合算']
         }
       })
-      .filter(d => !d.summarize)
+      .where(d => !d.summarize)
 
     return {
-      dates: rows.map(d => d.date),
+      dates: rows.select(d => d.date).toArray(),
       datasets: [
         {
           type: 'bar',
           title: '件数',
           unit: '件',
-          values: rows.map(d => d.count),
+          values: rows.select(d => d.count).toArray(),
           order: 2
         }
       ]
@@ -206,14 +206,13 @@ export default class InspectionCountChart extends Vue {
   }
 
   private buildWeeklyTransitionGraphData = (): GraphData => {
-    const today = dayjs()
-    const rows = (this.weeklyData ?? [])
-      .filter(
+    const now = dayjs()
+    const rows = Enumerable.from(this.weeklyData ?? [])
+      .where(
         d =>
-          dayjs(d['開始日']) < today &&
-          dayjs(d['開始日']) >= dayjs('2020-03-02')
+          dayjs(d['開始日']) < now && dayjs(d['開始日']) >= dayjs('2020-03-02')
       )
-      .map(d => {
+      .select(d => {
         return {
           date: [
             dayjs(d['開始日']).format('YYYY-MM-DD'),
@@ -224,13 +223,13 @@ export default class InspectionCountChart extends Vue {
       })
 
     return {
-      dates: rows.map(d => d.date),
+      dates: rows.select(d => d.date).toArray(),
       datasets: [
         {
           type: 'bar',
           title: '陽性者数',
           unit: '人',
-          values: rows.map(d => d.count)
+          values: rows.select(d => d.count).toArray()
         }
       ]
     } as GraphData
@@ -238,10 +237,10 @@ export default class InspectionCountChart extends Vue {
 
   private buildDailyCumulativeGraphData = (): GraphData => {
     let subTotal = 0
-    const today = dayjs()
-    const rows = (this.dailyData ?? [])
-      .filter(d => dayjs(d['日付']) < today)
-      .map(d => {
+    const now = dayjs()
+    const rows = Enumerable.from(this.dailyData ?? [])
+      .where(d => dayjs(d['日付']) < now)
+      .select(d => {
         subTotal += Number(d['小計'])
         return {
           date: dayjs(d['日付']).format('YYYY-MM-DD'),
@@ -249,16 +248,16 @@ export default class InspectionCountChart extends Vue {
           summarize: d['合算']
         }
       })
-      .filter(d => !d.summarize)
+      .where(d => !d.summarize)
 
     return {
-      dates: rows.map(d => d.date),
+      dates: rows.select(d => d.date).toArray(),
       datasets: [
         {
           type: 'bar',
           title: '陽性者累計数',
           unit: '人',
-          values: rows.map(d => d.total)
+          values: rows.select(d => d.total).toArray()
         }
       ]
     } as GraphData

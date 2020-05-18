@@ -43,6 +43,7 @@ ul.remarks {
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import dayjs from 'dayjs'
+import * as Enumerable from 'linq'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
@@ -152,10 +153,10 @@ export default class CriticallyChart extends Vue {
   }
 
   private buildDailyTransitionGraphData = (): GraphData => {
-    const today = dayjs()
-    const rows = (this.dailyData ?? [])
-      .filter(d => dayjs(d['更新日時']) < today)
-      .map(d => {
+    const now = dayjs()
+    const rows = Enumerable.from(this.dailyData ?? [])
+      .where(d => dayjs(d['更新日時']) < now)
+      .select(d => {
         return {
           date: dayjs(d['更新日時']).format('YYYY-MM-DD'),
           count: Number(d['重症'])
@@ -163,13 +164,13 @@ export default class CriticallyChart extends Vue {
       })
 
     return {
-      dates: rows.map(d => d.date),
+      dates: rows.select(d => d.date).toArray(),
       datasets: [
         {
           type: 'bar',
           title: '重傷者数',
           unit: '人',
-          values: rows.map(d => d.count),
+          values: rows.select(d => d.count).toArray(),
           order: 2
         }
       ]

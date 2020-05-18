@@ -45,8 +45,9 @@ ul.remarks {
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import * as Enumerable from 'linq'
+import { IEnumerable } from 'linq'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
@@ -158,7 +159,11 @@ export default class HospitalizedChart extends Vue {
 
   private makeAverageHospitalized = (
     data: MainSummaryDataType[]
-  ): MainSummaryDataType[] => {
+  ): IEnumerable<{
+    date: Dayjs
+    count: number
+    average: number | undefined
+  }> => {
     const source = Enumerable.from(data).reverse()
     const startDate = dayjs('2020-03-31')
     return source
@@ -172,42 +177,43 @@ export default class HospitalizedChart extends Vue {
                 .where(d => d['入院中'] !== undefined)
                 .average(d => Number(d['入院中']))
             : undefined
-        const cloned = Object.assign({}, d.first())
-        cloned['入院中平均'] = ave
 
-        return cloned
+        return {
+          date: dayjs(dayjs(first['更新日時']).format('YYYY-MM-DD')), // 時刻を切り落とす
+          count: first['入院中'],
+          average: ave
+        }
       })
       .reverse()
-      .toArray()
   }
 
   private buildDailyTransitionGraphData = (): GraphData => {
-    const today = dayjs()
+    const now = dayjs()
     const rows = this.makeAverageHospitalized(this.dailyData ?? [])
-      .filter(d => dayjs(d['更新日時']) < today)
-      .map(d => {
+      .where(d => d.date < now)
+      .select(d => {
         return {
-          date: dayjs(d['更新日時']).format('YYYY-MM-DD'),
-          count: Number(d['入院中']),
-          average: Number(d['入院中平均'])
+          date: d.date.format('YYYY-MM-DD'),
+          count: d.count,
+          average: d.average
         }
       })
 
     return {
-      dates: rows.map(d => d.date),
+      dates: rows.select(d => d.date).toArray(),
       datasets: [
         {
           type: 'bar',
           title: '入院患者数',
           unit: '人',
-          values: rows.map(d => d.count),
+          values: rows.select(d => d.count).toArray(),
           order: 2
         },
         {
           type: 'line',
           title: '過去7日間の平均',
           unit: '人',
-          values: rows.map(d => d.average),
+          values: rows.select(d => d.average).toArray(),
           order: 1
         }
       ]

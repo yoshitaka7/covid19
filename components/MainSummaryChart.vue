@@ -48,6 +48,7 @@ ul.remarks {
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import dayjs from 'dayjs'
+import * as Enumerable from 'linq'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
@@ -161,9 +162,9 @@ export default class MainSummaryChart extends Vue {
 
   private buildDailyTransitionGraphData = (): GraphData => {
     const today = dayjs()
-    const rows = (this.dailyData ?? [])
-      .filter(d => dayjs(d['更新日時']) < today)
-      .map(d => {
+    const rows = Enumerable.from(this.dailyData ?? [])
+      .where(d => dayjs(d['更新日時']) < today)
+      .select(d => {
         return {
           date: dayjs(d['更新日時']).format('YYYY-MM-DD'),
           milds: Number(d['軽症中等症']),
@@ -176,14 +177,14 @@ export default class MainSummaryChart extends Vue {
       })
 
     return {
-      dates: rows.map(d => d.date),
+      dates: rows.select(d => d.date).toArray(),
       datasets: [
         {
           type: 'bar',
           title: '死亡',
           color: '#984807',
           unit: '人',
-          values: rows.map(d => d.deaths),
+          values: rows.select(d => d.deaths).toArray(),
           order: 6
         },
         {
@@ -191,7 +192,7 @@ export default class MainSummaryChart extends Vue {
           title: '退院',
           color: '#0070C0',
           unit: '人',
-          values: rows.map(d => d.discharged),
+          values: rows.select(d => d.discharged).toArray(),
           order: 1
         },
         {
@@ -199,7 +200,7 @@ export default class MainSummaryChart extends Vue {
           title: '転院',
           color: '#7F7F7F',
           unit: '人',
-          values: rows.map(d => d.transfered),
+          values: rows.select(d => d.transfered).toArray(),
           order: 4
         },
         {
@@ -207,7 +208,7 @@ export default class MainSummaryChart extends Vue {
           title: '施設入所',
           color: '#92D050',
           unit: '人',
-          values: rows.map(d => d.isolated),
+          values: rows.select(d => d.isolated).toArray(),
           order: 2
         },
         {
@@ -215,7 +216,7 @@ export default class MainSummaryChart extends Vue {
           title: '重症',
           color: '#D99694',
           unit: '人',
-          values: rows.map(d => d.severes),
+          values: rows.select(d => d.severes).toArray(),
           order: 5
         },
         {
@@ -223,7 +224,7 @@ export default class MainSummaryChart extends Vue {
           title: '軽症中等症',
           color: '#FCD5B5',
           unit: '人',
-          values: rows.map(d => d.milds),
+          values: rows.select(d => d.milds).toArray(),
           order: 3
         }
       ]
