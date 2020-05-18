@@ -142,7 +142,9 @@ export default class TimeBarLineChart extends Vue {
           },
           title: (tooltipItems: Chart.ChartTooltipItem[]) => {
             try {
-              const date = this.chartData.dates[tooltipItems[0].index!]
+              const date = this.chartData.dates[
+                tooltipItems[0].index! + this.displaySpan[0]
+              ]
 
               return (typeof date === 'string' ? [date] : date)
                 .map(d => dayjs(d).format('M月D日'))
