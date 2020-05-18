@@ -5,6 +5,9 @@ import { PatientsSummaryDaily, MainSummaryDataType } from './types'
 // data.json の補正を行う
 // 補正の必要がなくなったら削除する
 export default (Data: any): void => {
+  // 状況別のデータ無し日を補間（数値は undefined）
+  paddingMainSummaryHistoryDays(Data)
+
   // 陽性患者数の終了日の補正
   normalizePatientsSummaryEndDate(Data)
 
@@ -13,10 +16,6 @@ export default (Data: any): void => {
 
   // 状況別の移動平均を算出（現在は 入院中 のみ）
   makeAverageMainSummaryHistory(Data)
-
-  // 状況別のデータ無し日を補間（数値は undefined）
-  // 平均の算出は補間前に行うこと（データ無し日を飛ばして移動平均を計算させるため）
-  paddingMainSummaryHistoryDays(Data)
 }
 
 const paddingMainSummaryHistoryDays = (Data: any) => {
@@ -109,16 +108,20 @@ const makeAveragePatients = (Data: any) => {
 const makeAverageMainSummaryHistory = (Data: any) => {
   const source = Enumerable.from(
     Data.main_summary_history.data as MainSummaryDataType[]
-  )
-    .where(d => !!d['入院中'])
-    .reverse()
+  ).reverse()
+  const startDate = dayjs('2020-03-31')
   const list = source
     .select(d => d['更新日時'])
     .select((_, index) => source.skip(index).take(7))
     .select(d => {
+      const first = d.first()
+      const ave =
+        startDate <= dayjs(first['更新日時']) && d.count() === 7
+          ? d.where(d => !!d['入院中']).average(d => Number(d['入院中']))
+          : undefined
       const cloned = Object.assign({}, d.first())
-      cloned['入院中平均'] =
-        d.count() === 7 ? d.average(d => Number(d['入院中'])) : undefined
+      cloned['入院中平均'] = ave
+
       return cloned
     })
     .reverse()
