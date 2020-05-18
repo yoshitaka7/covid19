@@ -33,6 +33,7 @@ export type GraphDataSet = {
   title: string
   type: GraphKind
   values: number[]
+  tooltipValues?: number[]
   unit: string
   color?: string
   yAxisKind?: YAxisKind
@@ -108,19 +109,19 @@ export default class TimeBarLineChart extends Vue {
       tooltips: {
         displayColors: false,
         callbacks: {
-          label: (
-            tooltipItem: Chart.ChartTooltipItem,
-            chartData: Chart.ChartData
-          ) => {
+          label: (tooltipItem: Chart.ChartTooltipItem, _: Chart.ChartData) => {
             if (tooltipItem.index === undefined) {
               return ''
             }
 
             return this.chartData.datasets
               .map((dataset, index) => {
-                const value = (chartData.datasets![index].data as number[])[
-                  tooltipItem.index!
-                ]
+                const toolTipValues =
+                  this.chartData.datasets![index].tooltipValues ??
+                  this.chartData.datasets![index].values
+
+                const value =
+                  toolTipValues[tooltipItem.index! + this.displaySpan[0]]
                 const label = dataset.title
                 const unit = dataset.unit
 
@@ -133,11 +134,13 @@ export default class TimeBarLineChart extends Vue {
                 })(value)
 
                 return {
+                  index,
                   label: `${label}: ${formatValue} ${unit}`,
                   visible: (dataset.visible ?? true) && !isNaN(value)
                 }
               })
               .filter(d => d.visible)
+              .sort(d => (this.legendOrderDesc ?? true ? -d.index : d.index))
               .map(d => d.label)
           },
           title: (tooltipItems: Chart.ChartTooltipItem[]) => {

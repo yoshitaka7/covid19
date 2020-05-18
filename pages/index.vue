@@ -74,6 +74,14 @@
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
+        <inspection-persons-chart
+          :date="Data.inspection_persons_summary.date"
+          :daily-data="Data.inspection_persons_summary.data"
+          :weekly-data="dataWeekly.inspections_summary.data"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
         <column-map
           title="市町村別感染状況"
           :title-id="'patients-per-cities'"
@@ -105,6 +113,7 @@ import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
 import NewPatientsChart from '@/components/NewPatientsChart.vue'
 import InspectionCountChart from '@/components/InspectionCountChart.vue'
+import InspectionPersonsChart from '@/components/InspectionPersonsChart.vue'
 import MainSummaryChart from '@/components/MainSummaryChart.vue'
 import HospitalizedChart from '@/components/HospitalizedChart.vue'
 import CriticallyChart from '@/components/CriticallyChart.vue'
@@ -122,7 +131,8 @@ export default {
     MainSummaryChart,
     HospitalizedChart,
     CriticallyChart,
-    InspectionCountChart
+    InspectionCountChart,
+    InspectionPersonsChart
   },
   data() {
     // 日次データの補正

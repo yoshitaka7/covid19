@@ -18,6 +18,18 @@ export type DataDaily = {
     date: string
     data: PatientsSummaryDaily[]
   }
+
+  // eslint-disable-next-line camelcase
+  main_summary_history: {
+    date: string
+    data: MainSummaryDataType[]
+  }
+
+  // eslint-disable-next-line camelcase
+  inspection_persons_summary: {
+    date: string
+    data: InspectionPersonsSummaryDaily[]
+  }
 }
 
 export type InspectionsSummaryDaily = {
@@ -57,4 +69,10 @@ export type MainSummaryDataType = {
   施設入所: number
   死亡: number
   退院: number
+}
+
+export type InspectionPersonsSummaryDaily = {
+  日付: string
+  検査実施人数?: number
+  陽性者数?: number
 }

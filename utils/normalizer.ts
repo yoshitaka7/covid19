@@ -1,18 +1,54 @@
 import dayjs, { Dayjs } from 'dayjs'
 import * as Enumerable from 'linq'
-import { MainSummaryDataType } from './types'
+import {
+  MainSummaryDataType,
+  DataDaily,
+  InspectionPersonsSummaryDaily
+} from './types'
 
 // data.json の補正を行う
 // 補正の必要がなくなったら削除する
-export default (Data: any): void => {
+export default (Data: DataDaily): void => {
   // 状況別のデータ無し日を補間（数値は undefined）
   paddingMainSummaryHistoryDays(Data)
 
   // 陽性患者数の終了日の補正
   normalizePatientsSummaryEndDate(Data)
+
+  const data = Enumerable.from(Data.main_summary_history.data)
+    .scan([] as MainSummaryDataType[], (pre, cur) => {
+      pre.push(cur)
+      if (pre.length > 2) {
+        pre.shift()
+      }
+      return pre
+    })
+    .where(arr => arr.length > 1)
+    .select(arr => {
+      const persons = arr[1]['検査実施人数'] - arr[0]['検査実施人数']
+      const positives = arr[1]['陽性患者数'] - arr[0]['陽性患者数']
+      return {
+        日付: dayjs(arr[1]['更新日時']).format('YYYY-MM-DD'), // 時刻を切り落とす
+        検査実施人数: isNaN(persons)
+          ? undefined
+          : persons <= 0
+          ? undefined
+          : persons,
+        陽性者数: isNaN(positives)
+          ? undefined
+          : persons <= 0
+          ? undefined
+          : positives
+      } as InspectionPersonsSummaryDaily
+    })
+
+  Data.inspection_persons_summary = {
+    date: Data.main_summary_history.date,
+    data: data.toArray()
+  }
 }
 
-const paddingMainSummaryHistoryDays = (Data: any) => {
+const paddingMainSummaryHistoryDays = (Data: DataDaily) => {
   const arr = Data.main_summary_history.data as MainSummaryDataType[]
   const source = Enumerable.from(arr)
 
