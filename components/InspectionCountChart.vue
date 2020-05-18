@@ -1,16 +1,19 @@
 <template>
   <data-view
     :title="displayTitle"
-    :title-id="titleId"
+    title-id="inspection-count-chart"
     :date="date"
-    :url="url"
+    url="https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html"
     :remarks="remarks"
   >
     <template v-if="showSelector" v-slot:button>
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <time-bar-line-chart :chart-id="chartId" :chart-data="chartData" />
+    <time-bar-line-chart
+      chart-id="inspection-count-chart"
+      :chart-data="chartData"
+    />
 
     <div>
       <ul class="remarks">
@@ -73,12 +76,6 @@ type DisplayInfo = {
 })
 export default class InspectionCountChart extends Vue {
   @Prop()
-  public chartId?: string
-
-  @Prop()
-  public title?: string
-
-  @Prop()
   public date?: string
 
   @Prop()
@@ -87,16 +84,13 @@ export default class InspectionCountChart extends Vue {
   @Prop()
   public weeklyData?: InspectionsSummaryWeekly[]
 
-  @Prop()
-  public titleId?: string
+  private readonly remarks = [
+    '日別と累計では、日別データが公開されている期間のみ表示',
+    '愛知県分（愛知県衛生研究所等）及び保健所設置市分（名古屋市衛生研究所等）の合計',
+    '民間施設等の検査件数及び陽性者数を含んでいます（発表時点での把握数）'
+  ]
 
-  @Prop()
-  public url?: string
-
-  @Prop()
-  public remarks?: string[]
-
-  private showSelector = true
+  private readonly showSelector = true
   private dataKind: DataKind = 'weekly-transition'
   private readonly dataKinds = [
     { key: 'weekly-transition', label: '週別' } as SelectorItem,
@@ -107,7 +101,7 @@ export default class InspectionCountChart extends Vue {
   private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private get displayTitle(): string {
-    return `${this.title}${
+    return `検査実施件数${
       this.dataKind === 'weekly-transition' ? '(週別)' : ''
     }`
   }

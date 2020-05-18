@@ -1,16 +1,19 @@
 <template>
   <data-view
-    :title="title"
-    :title-id="titleId"
+    title="検査陽性者状況の推移"
+    title-id="new-patients-chart"
     :date="date"
-    :url="url"
+    url="https://www.pref.aichi.jp/site/covid19-aichi/"
     :remarks="remarks"
   >
     <template v-if="showSelector" v-slot:button>
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <time-bar-line-chart :chart-id="chartId" :chart-data="chartData" />
+    <time-bar-line-chart
+      chart-id="new-patients-chart"
+      :chart-data="chartData"
+    />
 
     <div>
       <ul class="remarks">
@@ -72,28 +75,19 @@ type DisplayInfo = {
 })
 export default class MainSummaryChart extends Vue {
   @Prop()
-  public chartId?: string
-
-  @Prop()
-  public title?: string
-
-  @Prop()
   public date?: string
 
   @Prop()
   public dailyData?: MainSummaryDataType[]
 
-  @Prop()
-  public titleId?: string
+  private readonly remarks = [
+    '愛知県が発表した「検査陽性者の状況」を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
+    '[不定]は、感染症発生状況が取得できなかった日です（陽性者数累計を表示します）',
+    '凡例をクリックするとその項目の[表示/非表示]が切り替えられます'
+  ]
 
-  @Prop()
-  public url?: string
-
-  @Prop()
-  public remarks?: string[]
-
-  private showSelector = true
-  private dataKind: DataKind = 'daily-transition'
+  private readonly showSelector = true
+  private readonly dataKind: DataKind = 'daily-transition'
   private readonly dataKinds = [
     { key: 'daily-transition', label: '日別' } as SelectorItem
   ]

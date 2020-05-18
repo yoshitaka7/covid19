@@ -1,16 +1,18 @@
 <template>
   <data-view
-    :title="title"
-    :title-id="titleId"
+    title="入院患者数"
+    title-id="hospitalized-chart"
     :date="date"
-    :url="url"
-    :remarks="remarks"
+    url="https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html"
   >
     <template v-if="showSelector" v-slot:button>
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <time-bar-line-chart :chart-id="chartId" :chart-data="chartData" />
+    <time-bar-line-chart
+      chart-id="hospitalized-chart"
+      :chart-data="chartData"
+    />
 
     <div>
       <ul class="remarks">
@@ -70,25 +72,17 @@ type DisplayInfo = {
 })
 export default class HospitalizedChart extends Vue {
   @Prop()
-  public chartId?: string
-
-  @Prop()
-  public title?: string
-
-  @Prop()
   public date?: string
 
   @Prop()
   public dailyData?: MainSummaryDataType[]
 
-  @Prop()
-  public titleId?: string
-
-  @Prop()
-  public url?: string
-
-  @Prop()
-  public remarks?: string[]
+  private remarks = [
+    '「入院患者数」とは、愛知県が発表した「検査陽性者の状況」のうち、「入院中」の人数です。',
+    '愛知県が発表した「検査陽性者の状況」を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
+    '感染症発生状況が取得できなかった日の値は表示していません',
+    '移動平均は後方7日移動平均値です'
+  ]
 
   private showSelector = false
   private dataKind: DataKind = 'daily-transition'
