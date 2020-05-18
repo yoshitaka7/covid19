@@ -46,7 +46,7 @@ ul.remarks {
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import * as Enumerable from 'linq'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
@@ -174,7 +174,11 @@ export default class NewPatientsChart extends Vue {
 
   private makeAveragePatients = (
     data: PatientsSummaryDaily[]
-  ): PatientsSummaryDaily[] => {
+  ): Enumerable.IEnumerable<{
+    date: Dayjs
+    count: number
+    average: number | undefined
+  }> => {
     const source = Enumerable.from(data).reverse()
     return source
       .select(d => d['日付'])
@@ -191,39 +195,42 @@ export default class NewPatientsChart extends Vue {
         const cloned = Object.assign({}, first)
         cloned['平均'] = ave
 
-        return cloned
+        return {
+          date: dayjs(dayjs(first['日付']).format('YYYY-MM-DD')), // 時刻を切り落とす
+          count: Number(first['小計']),
+          average: ave
+        }
       })
       .reverse()
-      .toArray()
   }
 
   private buildDailyTransitionGraphData = (): GraphData => {
-    const today = dayjs()
+    const now = dayjs()
     const rows = this.makeAveragePatients(this.dailyData ?? [])
-      .filter(d => dayjs(d['日付']) < today)
-      .map(d => {
+      .where(d => d.date < now)
+      .select(d => {
         return {
-          date: dayjs(d['日付']).format('YYYY-MM-DD'),
-          count: Number(d['小計']),
-          average: Number(d['平均'])
+          date: d.date.format('YYYY-MM-DD'),
+          count: d.count,
+          average: d.average
         }
       })
 
     return {
-      dates: rows.map(d => d.date),
+      dates: rows.select(d => d.date).toArray(),
       datasets: [
         {
           type: 'bar',
           title: '陽性者数',
           unit: '人',
-          values: rows.map(d => d.count),
+          values: rows.select(d => d.count).toArray(),
           order: 2
         },
         {
           type: 'line',
           title: '過去7日間の平均',
           unit: '人',
-          values: rows.map(d => d.average),
+          values: rows.select(d => d.average).toArray(),
           order: 1
         }
       ]
@@ -231,10 +238,10 @@ export default class NewPatientsChart extends Vue {
   }
 
   private buildWeeklyTransitionGraphData = (): GraphData => {
-    const today = dayjs()
-    const rows = (this.weeklyData ?? [])
-      .filter(d => dayjs(d['開始日']) < today)
-      .map(d => {
+    const now = dayjs()
+    const rows = Enumerable.from(this.weeklyData ?? [])
+      .where(d => dayjs(d['開始日']) < now)
+      .select(d => {
         return {
           date: [
             dayjs(d['開始日']).format('YYYY-MM-DD'),
@@ -245,13 +252,13 @@ export default class NewPatientsChart extends Vue {
       })
 
     return {
-      dates: rows.map(d => d.date),
+      dates: rows.select(d => d.date).toArray(),
       datasets: [
         {
           type: 'bar',
           title: '陽性者数',
           unit: '人',
-          values: rows.map(d => d.count)
+          values: rows.select(d => d.count).toArray()
         }
       ]
     } as GraphData
@@ -259,10 +266,10 @@ export default class NewPatientsChart extends Vue {
 
   private buildDailyCumulativeGraphData = (): GraphData => {
     let subTotal = 0
-    const today = dayjs()
-    const rows = (this.dailyData ?? [])
-      .filter(d => dayjs(d['日付']) < today)
-      .map(d => {
+    const now = dayjs()
+    const rows = Enumerable.from(this.dailyData ?? [])
+      .where(d => dayjs(d['日付']) < now)
+      .select(d => {
         subTotal += Number(d['小計'])
         return {
           date: dayjs(d['日付']).format('YYYY-MM-DD'),
@@ -271,13 +278,13 @@ export default class NewPatientsChart extends Vue {
       })
 
     return {
-      dates: rows.map(d => d.date),
+      dates: rows.select(d => d.date).toArray(),
       datasets: [
         {
           type: 'bar',
           title: '陽性者累計数',
           unit: '人',
-          values: rows.map(d => d.total)
+          values: rows.select(d => d.total).toArray()
         }
       ]
     } as GraphData
