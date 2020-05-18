@@ -21,7 +21,10 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import dayjs from 'dayjs'
+import Enumerable from 'linq'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
+
+export type LegendOrderKind = 'asc' | 'desc'
 
 export type GraphKind = 'bar' | 'line'
 
@@ -58,7 +61,7 @@ export default class TimeBarLineChart extends Vue {
   public chartData!: GraphData
 
   @Prop()
-  public legendOrderDesc?: boolean
+  public legendOrderKind?: LegendOrderKind
 
   private buildBarDataSets = (dataset: GraphDataSet): Chart.ChartDataSets => {
     return {
@@ -116,8 +119,8 @@ export default class TimeBarLineChart extends Vue {
               return ''
             }
 
-            return this.chartData.datasets
-              .map((dataset, index) => {
+            const tooltips = Enumerable.from(this.chartData.datasets)
+              .select((dataset, index) => {
                 const value = (chartData.datasets![index].data as number[])[
                   tooltipItem.index!
                 ]
@@ -133,12 +136,18 @@ export default class TimeBarLineChart extends Vue {
                 })(value)
 
                 return {
+                  order: dataset?.order ?? 0,
                   label: `${label}: ${formatValue} ${unit}`,
                   visible: (dataset.visible ?? true) && !isNaN(value)
                 }
               })
-              .filter(d => d.visible)
-              .map(d => d.label)
+              .where(d => d.visible)
+              .orderBy(d =>
+                (this.legendOrderKind ?? 'asc') === 'asc' ? d.order : -d.order
+              )
+              .select(d => d.label)
+              .toArray()
+            return tooltips
           },
           title: (tooltipItems: Chart.ChartTooltipItem[]) => {
             try {
@@ -160,7 +169,7 @@ export default class TimeBarLineChart extends Vue {
       legend: {
         display:
           this.chartData.datasets.filter(d => d.visible ?? true).length > 1,
-        reverse: this.legendOrderDesc ?? true
+        reverse: (this.legendOrderKind ?? 'asc') === 'desc'
       },
       scales: {
         xAxes: [

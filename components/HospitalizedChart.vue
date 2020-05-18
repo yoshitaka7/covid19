@@ -12,6 +12,7 @@
     <time-bar-line-chart
       chart-id="hospitalized-chart"
       :chart-data="chartData"
+      legend-order-kind="desc"
     />
 
     <div>
