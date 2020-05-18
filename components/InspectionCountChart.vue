@@ -227,7 +227,7 @@ export default class InspectionCountChart extends Vue {
       datasets: [
         {
           type: 'bar',
-          title: '検査実施件数',
+          title: '件数',
           unit: '人',
           values: rows.select(d => d.count).toArray()
         }
@@ -256,7 +256,7 @@ export default class InspectionCountChart extends Vue {
       datasets: [
         {
           type: 'bar',
-          title: '陽性者累計数',
+          title: '累計件数',
           unit: '人',
           values: rows.select(d => d.total).toArray()
         }
