@@ -7,8 +7,8 @@
     />
     <whats-new
       class="mb-1"
-      text="全国を対象区域とした緊急事態宣言が 5/31 まで延長されました。愛知県は引き続き「特定警戒都道府県」 に指定されています"
-      url="https://corona.go.jp/"
+      text="5/14、政府は愛知県の緊急事態宣言を解除しました。愛知県独自の「愛知県緊急事態措置」は 5/31 まで継続します。"
+      url="https://www.pref.aichi.jp/site/covid19-aichi/covid19-aichi.html"
     />
     <whats-new
       class="mb-1"
