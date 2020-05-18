@@ -1,6 +1,6 @@
 import dayjs, { Dayjs } from 'dayjs'
 import * as Enumerable from 'linq'
-import { PatientsSummaryDaily, MainSummaryDataType } from './types'
+import { MainSummaryDataType } from './types'
 
 // data.json の補正を行う
 // 補正の必要がなくなったら削除する
@@ -10,12 +10,6 @@ export default (Data: any): void => {
 
   // 陽性患者数の終了日の補正
   normalizePatientsSummaryEndDate(Data)
-
-  // 陽性患者数の移動平均を算出
-  makeAveragePatients(Data)
-
-  // 状況別の移動平均を算出（現在は 入院中 のみ）
-  makeAverageMainSummaryHistory(Data)
 }
 
 const paddingMainSummaryHistoryDays = (Data: any) => {
@@ -81,56 +75,4 @@ const normalizePatientsSummaryEndDate = (Data: any) => {
     }
   } finally {
   }
-}
-
-const makeAveragePatients = (Data: any) => {
-  const source = Enumerable.from(
-    Data.patients_summary.data as PatientsSummaryDaily[]
-  ).reverse()
-  const list = source
-    .select(d => d['日付'])
-    .select((_, index) => source.skip(index).take(7))
-    .select(d => {
-      const first = d.first()
-      const ave =
-        d.count() === 7
-          ? d.where(d => !!d['小計']).average(d => Number(d['小計']))
-          : undefined
-
-      return {
-        日付: first['日付'],
-        小計: first['小計'],
-        合算: first['合算'],
-        平均: ave
-      }
-    })
-    .reverse()
-    .toArray()
-
-  Data.patients_summary.data = list
-}
-
-const makeAverageMainSummaryHistory = (Data: any) => {
-  const source = Enumerable.from(
-    Data.main_summary_history.data as MainSummaryDataType[]
-  ).reverse()
-  const startDate = dayjs('2020-03-31')
-  const list = source
-    .select(d => d['更新日時'])
-    .select((_, index) => source.skip(index).take(7))
-    .select(d => {
-      const first = d.first()
-      const ave =
-        startDate <= dayjs(first['更新日時']) && d.count() === 7
-          ? d.where(d => !!d['入院中']).average(d => Number(d['入院中']))
-          : undefined
-      const cloned = Object.assign({}, d.first())
-      cloned['入院中平均'] = ave
-
-      return cloned
-    })
-    .reverse()
-    .toArray()
-
-  Data.main_summary_history.data = list
 }

@@ -47,6 +47,7 @@ ul.remarks {
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import dayjs from 'dayjs'
+import * as Enumerable from 'linq'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
@@ -171,9 +172,34 @@ export default class NewPatientsChart extends Vue {
     }
   }
 
+  private makeAveragePatients = (
+    data: PatientsSummaryDaily[]
+  ): PatientsSummaryDaily[] => {
+    const source = Enumerable.from(data).reverse()
+    return source
+      .select(d => d['日付'])
+      .select((_, index) => source.skip(index).take(7))
+      .select(d => {
+        const first = d.first()
+        const ave =
+          d.count() === 7
+            ? d
+                .where(d => d['小計'] !== undefined)
+                .average(d => Number(d['小計']))
+            : undefined
+
+        const cloned = Object.assign({}, first)
+        cloned['平均'] = ave
+
+        return cloned
+      })
+      .reverse()
+      .toArray()
+  }
+
   private buildDailyTransitionGraphData = (): GraphData => {
     const today = dayjs()
-    const rows = (this.dailyData ?? [])
+    const rows = this.makeAveragePatients(this.dailyData ?? [])
       .filter(d => dayjs(d['日付']) < today)
       .map(d => {
         return {

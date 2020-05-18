@@ -46,6 +46,7 @@ ul.remarks {
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import dayjs from 'dayjs'
+import * as Enumerable from 'linq'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
@@ -155,9 +156,34 @@ export default class HospitalizedChart extends Vue {
     }
   }
 
+  private makeAverageHospitalized = (
+    data: MainSummaryDataType[]
+  ): MainSummaryDataType[] => {
+    const source = Enumerable.from(data).reverse()
+    const startDate = dayjs('2020-03-31')
+    return source
+      .select(d => d['更新日時'])
+      .select((_, index) => source.skip(index).take(7))
+      .select(d => {
+        const first = d.first()
+        const ave =
+          startDate <= dayjs(first['更新日時']) && d.count() === 7
+            ? d
+                .where(d => d['入院中'] !== undefined)
+                .average(d => Number(d['入院中']))
+            : undefined
+        const cloned = Object.assign({}, d.first())
+        cloned['入院中平均'] = ave
+
+        return cloned
+      })
+      .reverse()
+      .toArray()
+  }
+
   private buildDailyTransitionGraphData = (): GraphData => {
     const today = dayjs()
-    const rows = (this.dailyData ?? [])
+    const rows = this.makeAverageHospitalized(this.dailyData ?? [])
       .filter(d => dayjs(d['更新日時']) < today)
       .map(d => {
         return {
