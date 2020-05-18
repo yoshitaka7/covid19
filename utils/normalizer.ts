@@ -30,8 +30,8 @@ const paddingMainSummaryHistoryDays = (Data: any) => {
 
   const paddedItems: MainSummaryDataType[] = []
 
-  console.debug('start', start)
-  console.debug('end', end)
+  // console.debug('start', start)
+  // console.debug('end', end)
   while (expectDate <= end) {
     const row = arr[i]
     const actualDate = makeDateOnly(dayjs(row['更新日時']))
