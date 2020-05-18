@@ -111,24 +111,24 @@
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
-        <time-bar-chart
+        <inspection-count-chart
           title="検査実施件数"
-          :title-id="'number-of-inspections'"
-          :chart-id="'time-bar-chart-inspections'"
-          :chart-data-set="inspectionsChartSet"
+          title-id="inspection-count-chart"
+          chart-id="inspection-count-chart"
           :date="Data.inspections_summary.date"
-          :default-data-kind="'weekly-transition'"
-          :default-span="60"
+          :daily-data="Data.inspections_summary.data"
+          :weekly-data="dataWeekly.inspections_summary.data"
+          :url="
+            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
+          "
           :remarks="[
             '日別と累計では、日別データが公開されている期間のみ表示',
             '愛知県分（愛知県衛生研究所等）及び保健所設置市分（名古屋市衛生研究所等）の合計',
             '民間施設等の検査件数及び陽性者数を含んでいます（発表時点での把握数）'
           ]"
-          :url="
-            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
-          "
         />
       </v-col>
+
       <v-col cols="12" md="6" class="DataCard">
         <column-map
           title="市町村別感染状況"
@@ -150,7 +150,6 @@
 
 <script>
 import PageHeader from '@/components/PageHeader.vue'
-import TimeBarChart from '@/components/TimeBarChart.vue'
 import WhatsNew from '@/components/WhatsNew.vue'
 import Data from '@/data/data.json'
 import CityData from '@/data/city_data.json'
@@ -161,17 +160,16 @@ import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
 import NewPatientsChart from '@/components/NewPatientsChart.vue'
+import InspectionCountChart from '@/components/InspectionCountChart.vue'
 import MainSummaryChart from '@/components/MainSummaryChart.vue'
 import HospitalizedChart from '@/components/HospitalizedChart.vue'
 import CriticallyChart from '@/components/CriticallyChart.vue'
 import weeklizer from '@/utils/weeklizer'
 import normalizer from '@/utils/normalizer'
-import { buildInspectionsChartSet } from '@/utils/chart-data-builder'
 
 export default {
   components: {
     PageHeader,
-    TimeBarChart,
     WhatsNew,
     SvgCard,
     ConfirmedCasesTable,
@@ -179,7 +177,8 @@ export default {
     NewPatientsChart,
     MainSummaryChart,
     HospitalizedChart,
-    CriticallyChart
+    CriticallyChart,
+    InspectionCountChart
   },
   data() {
     // 日次データの補正
@@ -187,12 +186,6 @@ export default {
 
     // 日次データを週次化
     const dataWeekly = weeklizer(Data) // Data_weekly.json 化までのつなぎ
-
-    // 検査数グラフ
-    const inspectionsChartSet = buildInspectionsChartSet(
-      Data.inspections_summary.data,
-      dataWeekly.inspections_summary.data
-    )
 
     // 検査陽性者の状況
     const confirmedCases = formatConfirmedCases(Data.main_summary_history)
@@ -208,7 +201,6 @@ export default {
     const data = {
       Data,
       dataWeekly,
-      inspectionsChartSet,
       confirmedCases,
       patientsPerCities,
       patientsPerCitiesLegends,

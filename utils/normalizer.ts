@@ -37,7 +37,6 @@ const paddingMainSummaryHistoryDays = (Data: any) => {
     const actualDate = makeDateOnly(dayjs(row['更新日時']))
 
     while (expectDate < actualDate) {
-      console.debug('padding date', expectDate.format('YYYY-MM-DD'))
       paddedItems.push({
         更新日時: expectDate.format('YYYY/MM/DD 00:00:00')
       } as MainSummaryDataType)
@@ -49,7 +48,6 @@ const paddingMainSummaryHistoryDays = (Data: any) => {
     i++
   }
 
-  console.debug('fin', paddedItems)
   Data.main_summary_history.data = paddedItems
 }
 
