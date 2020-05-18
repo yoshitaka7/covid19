@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import dayjs from 'dayjs'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
 
@@ -56,9 +56,6 @@ export default class TimeBarLineChart extends Vue {
 
   @Prop()
   public chartData!: GraphData
-
-  @Prop()
-  public displaySpan!: number[]
 
   @Prop()
   public legendOrderDesc?: boolean
@@ -203,7 +200,7 @@ export default class TimeBarLineChart extends Vue {
 
   private readonly defaultSpan: number = 60
 
-  // private displaySpan: number[] = [0, 0]
+  private displaySpan: number[] = [0, 0]
 
   private spanMin: number = 0
 
@@ -272,6 +269,20 @@ export default class TimeBarLineChart extends Vue {
   public sliderUpdate(sliderValue: number[]) {
     // console.debug(`${this.constructor.name}:sliderUpdate.`, sliderValue)
     this.displaySpan = sliderValue
+  }
+
+  @Watch('chartData')
+  onChartDataChanged(newValue: GraphData, _: GraphData) {
+    // console.debug(
+    //   `${this.constructor.name}:onDataKindChanged. new, old`,
+    //   newValue,
+    //   oldValue
+    // )
+
+    this.displaySpan = [
+      newValue.dates.length - this.defaultSpan,
+      newValue.dates.length - 1
+    ]
   }
 }
 </script>

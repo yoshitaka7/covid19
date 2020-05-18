@@ -61,9 +61,7 @@ export default class DataSelector extends Vue {
   public value!: string
 
   @Emit()
-  public input(value: string) {
-    this.value = value
-  }
+  public input(_: string) {}
 
   private get itemsInner(): SelectorItem[] {
     if (this.items) {
