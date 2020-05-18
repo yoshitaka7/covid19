@@ -81,7 +81,7 @@ export default class TimeBarLineChart extends Vue {
       borderColor: dataset.color ?? '#0070C0',
       borderWidth: 3,
       pointRadius: 0,
-      pointHitRadius: 1,
+      pointHitRadius: 2,
       fill: false,
       order: dataset.order ?? 0,
       lineTension: 0
@@ -134,7 +134,7 @@ export default class TimeBarLineChart extends Vue {
 
                 return {
                   label: `${label}: ${formatValue} ${unit}`,
-                  visible: dataset.visible ?? true
+                  visible: (dataset.visible ?? true) && !isNaN(value)
                 }
               })
               .filter(d => d.visible)

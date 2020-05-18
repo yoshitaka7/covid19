@@ -92,11 +92,16 @@ const makeAveragePatients = (Data: any) => {
     .select((_, index) => source.skip(index).take(7))
     .select(d => {
       const first = d.first()
+      const ave =
+        d.count() === 7
+          ? d.where(d => !!d['小計']).average(d => Number(d['小計']))
+          : undefined
+
       return {
         日付: first['日付'],
         小計: first['小計'],
         合算: first['合算'],
-        平均: d.count() === 7 ? d.average(d => Number(d['小計'])) : undefined
+        平均: ave
       }
     })
     .reverse()

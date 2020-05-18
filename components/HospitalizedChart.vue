@@ -81,7 +81,7 @@ export default class HospitalizedChart extends Vue {
     '「入院患者数」とは、愛知県が発表した「検査陽性者の状況」のうち、「入院中」の人数です。',
     '愛知県が発表した「検査陽性者の状況」を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
     '感染症発生状況が取得できなかった日の値は表示していません',
-    '移動平均は後方7日移動平均値です'
+    '過去7日間の平均は、入院患者数の後方7日移動平均値です'
   ]
 
   private showSelector = false
@@ -179,7 +179,7 @@ export default class HospitalizedChart extends Vue {
         },
         {
           type: 'line',
-          title: '移動平均',
+          title: '過去7日間の平均',
           unit: '人',
           values: rows.map(d => d.average),
           order: 1
