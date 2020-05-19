@@ -29,7 +29,7 @@ export default (Data: DataDaily): void => {
       const positives = arr[1]['陽性患者数'] - arr[0]['陽性患者数']
       return {
         日付: dayjs(arr[1]['更新日時']).format('YYYY-MM-DD'), // 時刻を切り落とす
-        検査実施人数: isNaN(persons)
+        検査人数: isNaN(persons)
           ? undefined
           : persons <= 0
           ? undefined

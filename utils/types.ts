@@ -73,6 +73,6 @@ export type MainSummaryDataType = {
 
 export type InspectionPersonsSummaryDaily = {
   日付: string
-  検査実施人数?: number
+  検査人数?: number
   陽性者数?: number
 }

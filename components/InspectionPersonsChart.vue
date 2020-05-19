@@ -180,13 +180,13 @@ export default class InspectionPersonsChart extends Vue {
       .where(d => dayjs(d['日付']) < now)
       .select(d => {
         let negatives: number | undefined
-        if (d['検査実施人数'] !== undefined && d['陽性者数'] !== undefined) {
-          negatives = d['検査実施人数'] - d['陽性者数']
+        if (d['検査人数'] !== undefined && d['陽性者数'] !== undefined) {
+          negatives = d['検査人数'] - d['陽性者数']
         }
 
         return {
           date: dayjs(d['日付']).format('YYYY-MM-DD'),
-          persons: d['検査実施人数'],
+          persons: d['検査人数'],
           positives: d['陽性者数'],
           negatives
         }
@@ -204,7 +204,7 @@ export default class InspectionPersonsChart extends Vue {
         },
         {
           type: 'bar',
-          title: '検査実施人数',
+          title: '検査人数',
           unit: '人',
           values: rows.select(d => d.negatives).toArray(),
           tooltipValues: rows.select(d => d.persons).toArray(),
