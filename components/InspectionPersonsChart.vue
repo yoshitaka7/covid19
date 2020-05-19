@@ -13,7 +13,7 @@
     <time-bar-line-chart
       chart-id="inspection-count-chart"
       :chart-data="chartData"
-      :legend-order-desc="true"
+      legend-order-kind="desc"
     />
 
     <div>
@@ -119,6 +119,9 @@ export default class InspectionPersonsChart extends Vue {
     }
     const lastDay = this.chartData.datasets[0].values.slice(-1)[0]
     const lastDayBefore = this.chartData.datasets[0].values.slice(-2)[0]
+    if (lastDay == null || lastDayBefore == null) {
+      return '-'
+    }
     return this.formatDayBeforeRatio(lastDay - lastDayBefore)
   }
 
@@ -198,18 +201,35 @@ export default class InspectionPersonsChart extends Vue {
         {
           type: 'bar',
           title: '陽性者数',
+          yAxisKind: 'y-axis-left',
           unit: '人',
           values: rows.select(d => d.positives).toArray(),
-          order: 1
+          order: 2
         },
         {
           type: 'bar',
           title: '検査人数',
+          yAxisKind: 'y-axis-left',
           unit: '人',
           values: rows.select(d => d.negatives).toArray(),
           tooltipValues: rows.select(d => d.persons).toArray(),
           color: '#D99694',
-          order: 2
+          order: 3
+        },
+        {
+          type: 'line',
+          title: '陽性率',
+          yAxisKind: 'y-axis-right',
+          unit: '%',
+          values: rows
+            .select(d => {
+              if (d.positives == null || d.persons == null) {
+                return Number.NaN
+              }
+              return (d.positives / d.persons) * 100
+            })
+            .toArray(),
+          order: 1
         }
       ]
     } as GraphData

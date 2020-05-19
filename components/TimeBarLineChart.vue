@@ -203,6 +203,16 @@ export default class TimeBarLineChart extends Vue {
                 return value
               }
             }
+          },
+          {
+            id: 'y-axis-right',
+            type: 'linear',
+            position: 'right',
+            ticks: {
+              suggestedMin: 0,
+              max: 100,
+              stepSize: 10
+            }
           }
         ]
       }
