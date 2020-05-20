@@ -2,6 +2,7 @@ export type PatientsSummaryDaily = {
   日付: string
   小計: number
   合算?: string
+  平均?: number
 }
 
 export type PatientsSummaryWeekly = {
@@ -46,7 +47,7 @@ export type DataWeekly = {
 }
 
 export type MainSummaryDataType = {
-  更新日時: Date
+  更新日時: string
   検査実施人数: number
   陽性患者数: number
   入院中: number
@@ -56,13 +57,4 @@ export type MainSummaryDataType = {
   施設入所: number
   死亡: number
   退院: number
-}
-
-export type GraphDataType = {
-  date: Date
-  label: string
-  transition: number
-  cumulative?: number
-  summarized?: boolean
-  novalue?: boolean
 }

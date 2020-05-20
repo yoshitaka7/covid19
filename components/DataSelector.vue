@@ -1,33 +1,14 @@
 <template>
-  <v-btn-toggle
-    :value="value"
-    class="DataSelector"
-    mandatory
-    @change="$emit('input', $event)"
-  >
+  <v-btn-toggle v-model="valueInner" class="DataSelector" mandatory>
     <v-btn
+      v-for="item in itemsInner"
+      :key="item.key"
       v-ripple="false"
-      value="weekly-transition"
+      :value="item.key"
       class="DataSelector-Button"
       :x-small="true"
     >
-      週別
-    </v-btn>
-    <v-btn
-      v-ripple="false"
-      value="daily-transition"
-      class="DataSelector-Button"
-      :x-small="true"
-    >
-      日別
-    </v-btn>
-    <v-btn
-      v-ripple="false"
-      value="daily-cumulative"
-      class="DataSelector-Button"
-      :x-small="true"
-    >
-      累計
+      {{ item.label }}
     </v-btn>
   </v-btn-toggle>
 </template>
@@ -58,15 +39,43 @@
 }
 </style>
 
-<script>
-export default {
-  name: 'DataSelector',
-  props: {
-    value: {
-      type: String,
-      required: false,
-      default: ''
+<script lang="ts">
+import { Component, Vue, Prop, Emit } from 'vue-property-decorator'
+
+export type SelectorItem = {
+  key: string
+  label: string
+}
+
+@Component
+export default class DataSelector extends Vue {
+  private get valueInner(): string {
+    return this.value
+  }
+
+  private set valueInner(value: string) {
+    this.input(value)
+  }
+
+  @Prop()
+  public value!: string
+
+  @Emit()
+  public input(_: string) {}
+
+  private get itemsInner(): SelectorItem[] {
+    if (this.items) {
+      return this.items
+    } else {
+      return [
+        { key: 'weekly-transition', label: '週別' } as SelectorItem,
+        { key: 'daily-transition', label: '日別' } as SelectorItem,
+        { key: 'daily-cumulative', label: '累計' } as SelectorItem
+      ]
     }
   }
+
+  @Prop()
+  public items!: SelectorItem[]
 }
 </script>
