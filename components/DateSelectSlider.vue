@@ -66,7 +66,7 @@ export default {
         )
         // return this.chartData[index].label
       }
-      return this.chartData[this.chartData.length - 1].label
+      return this.chartData[this.chartData.length - 1]?.label ?? ''
     }
   }
 }
