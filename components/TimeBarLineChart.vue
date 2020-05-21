@@ -48,7 +48,7 @@ export type GraphDataSet = {
   values: number[]
   tooltipValues?: number[]
   unit: string
-  color?: string
+  color?: string | string[]
   yAxisKind?: YAxisKind
   visible?: boolean
   order?: number
@@ -338,6 +338,12 @@ export default class TimeBarLineChart extends Vue {
       .map(dataset => {
         const cloned = Object.assign({}, dataset)
         cloned.values = dataset.values.slice(lower, upper + 1)
+        if (dataset.color != null) {
+          cloned.color =
+            typeof dataset.color === 'string'
+              ? dataset.color
+              : dataset.color.slice(lower, upper + 1)
+        }
         return cloned
       })
   }

@@ -203,6 +203,7 @@ export default class InspectionPersonsChart extends Vue {
     positives: number
     persons: number
     average: number | undefined
+    uncertain: boolean
   }> => {
     const source = Enumerable.from(data).reverse()
     return source
@@ -213,18 +214,25 @@ export default class InspectionPersonsChart extends Vue {
         let ave
         if (d.count() === 7) {
           const grp = d.where(
-            d => d['陽性者数'] !== undefined && d['検査人数'] !== undefined
+            d =>
+              d['陽性者数'] !== undefined &&
+              d['検査人数'] !== undefined &&
+              d['非確定'] === ''
           )
           const sumPositives = grp.sum(e => Number(e['陽性者数']))
           const sumTotal = grp.sum(e => Number(e['検査人数']))
-          ave = Math.round((sumPositives / sumTotal) * 1000) / 10
+          ave =
+            sumTotal === 0
+              ? undefined
+              : Math.round((sumPositives / sumTotal) * 1000) / 10
         }
 
         return {
           date: dayjs(dayjs(first['日付']).format('YYYY-MM-DD')), // 時刻を切り落とす
           positives: Number(first['陽性者数']),
           persons: Number(first['検査人数']),
-          average: ave
+          average: ave,
+          uncertain: first['非確定'] !== ''
         }
       })
       .reverse()
@@ -245,7 +253,8 @@ export default class InspectionPersonsChart extends Vue {
           persons: d.persons,
           positives: d.positives,
           negatives,
-          average: d.average
+          average: d.average,
+          uncertain: d.uncertain
         }
       })
 
@@ -267,7 +276,10 @@ export default class InspectionPersonsChart extends Vue {
           unit: '人',
           values: rows.select(d => d.negatives).toArray(),
           tooltipValues: rows.select(d => d.persons).toArray(),
-          color: '#D99694',
+          // color: '#D99694',
+          color: rows
+            .select(d => (d.uncertain ? '#d3d3d3' : '#D99694'))
+            .toArray(),
           order: 3
         },
         {
