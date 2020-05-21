@@ -30,6 +30,16 @@ export type GraphKind = 'bar' | 'line'
 
 export type YAxisKind = 'y-axis-left' | 'y-axis-right'
 
+export type YAxisSetting = {
+  min?: number
+  max?: number
+  suggestedMin?: number
+  suggestedMax?: number
+  step?: number
+  unit: string
+  visible: boolean
+}
+
 export type DateRange = string | string[]
 
 export type GraphDataSet = {
@@ -63,6 +73,38 @@ export default class TimeBarLineChart extends Vue {
 
   @Prop()
   public legendOrderKind?: LegendOrderKind
+
+  @Prop()
+  public yAxisLeftSetting?: YAxisSetting
+
+  private defaultYAxisLeftSetting: YAxisSetting = {
+    suggestedMin: 0,
+    unit: '人',
+    visible: true
+  } as YAxisSetting
+
+  private get displayYAxisLeftSetting(): YAxisSetting {
+    return this.yAxisLeftSetting ?? this.defaultYAxisLeftSetting
+  }
+
+  private get displayYAxisSettings(): Map<YAxisKind, YAxisSetting> {
+    return new Map<YAxisKind, YAxisSetting>([
+      ['y-axis-left', this.displayYAxisLeftSetting],
+      ['y-axis-right', this.displayYAxisRightSetting]
+    ])
+  }
+
+  @Prop()
+  public yAxisRightSetting?: YAxisSetting
+
+  private readonly defaultYAxisRightSetting: YAxisSetting = {
+    visible: false
+  } as YAxisSetting
+
+  private get displayYAxisRightSetting(): YAxisSetting {
+    const setting = this.yAxisRightSetting ?? this.defaultYAxisRightSetting
+    return setting
+  }
 
   private buildBarDataSets = (dataset: GraphDataSet): Chart.ChartDataSets => {
     return {
@@ -195,23 +237,36 @@ export default class TimeBarLineChart extends Vue {
               color: '#E5E5E5'
             },
             ticks: {
-              suggestedMin: 0,
-              maxTicksLimit: 8,
               fontColor: '#808080',
+              min: this.displayYAxisLeftSetting.min,
+              max: this.displayYAxisLeftSetting.max,
+              suggestedMin: this.displayYAxisLeftSetting.suggestedMin,
+              suggestedMax: this.displayYAxisLeftSetting.suggestedMax,
+              stepSize: this.displayYAxisLeftSetting.step,
               callback: (value: any) => {
-                // console.debug('value: any, index: any, values: any', value, index, values)
-                return value
+                return `${value}${this.displayYAxisLeftSetting.unit}`
               }
             }
           },
           {
             id: 'y-axis-right',
+            display:
+              this.displayYAxisRightSetting.visible &&
+              this.chartData.datasets.find(
+                ds => ds.yAxisKind === 'y-axis-right' && (ds.visible ?? true)
+              ) != null,
             type: 'linear',
             position: 'right',
             ticks: {
-              suggestedMin: 0,
-              max: 100,
-              stepSize: 10
+              fontColor: '#808080',
+              min: this.displayYAxisRightSetting.min,
+              max: this.displayYAxisRightSetting.max,
+              suggestedMin: this.displayYAxisRightSetting.suggestedMin,
+              suggestedMax: this.displayYAxisRightSetting.suggestedMax,
+              stepSize: this.displayYAxisRightSetting.step,
+              callback: (value: any) => {
+                return `${value}${this.displayYAxisRightSetting.unit}`
+              }
             }
           }
         ]

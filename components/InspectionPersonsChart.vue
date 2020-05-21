@@ -14,6 +14,8 @@
       chart-id="inspection-count-chart"
       :chart-data="chartData"
       legend-order-kind="desc"
+      :y-axis-left-setting="yAxisLeftSetting"
+      :y-axis-right-setting="yAxisRightSetting"
     />
 
     <div>
@@ -47,13 +49,16 @@ ul.remarks {
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import * as Enumerable from 'linq'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
-import TimeBarLineChart, { GraphData } from '@/components/TimeBarLineChart.vue'
+import TimeBarLineChart, {
+  GraphData,
+  YAxisSetting
+} from '@/components/TimeBarLineChart.vue'
 import {
   InspectionsSummaryWeekly,
   InspectionPersonsSummaryDaily
@@ -85,6 +90,20 @@ export default class InspectionPersonsChart extends Vue {
 
   @Prop()
   public weeklyData?: InspectionsSummaryWeekly[]
+
+  private readonly yAxisLeftSetting: YAxisSetting = {
+    min: 0,
+    unit: '人',
+    visible: true
+  } as YAxisSetting
+
+  private readonly yAxisRightSetting: YAxisSetting = {
+    suggestedMin: 0,
+    suggestedMax: 20,
+    step: 5,
+    unit: '%',
+    visible: true
+  } as YAxisSetting
 
   private readonly remarks = [
     '日別と累計では、日別データが公開されている期間のみ表示',
@@ -177,21 +196,56 @@ export default class InspectionPersonsChart extends Vue {
     }
   }
 
-  private buildDailyTransitionGraphData = (): GraphData => {
-    const now = dayjs()
-    const rows = Enumerable.from(this.dailyData ?? [])
-      .where(d => dayjs(d['日付']) < now)
+  private makeAveragePositivePerPatients = (
+    data: InspectionPersonsSummaryDaily[]
+  ): Enumerable.IEnumerable<{
+    date: Dayjs
+    positives: number
+    persons: number
+    average: number | undefined
+  }> => {
+    const source = Enumerable.from(data).reverse()
+    return source
+      .select(d => d['日付'])
+      .select((_, index) => source.skip(index).take(7))
       .select(d => {
-        let negatives: number | undefined
-        if (d['検査人数'] !== undefined && d['陽性者数'] !== undefined) {
-          negatives = d['検査人数'] - d['陽性者数']
+        const first = d.first()
+        let ave
+        if (d.count() === 7) {
+          const grp = d.where(
+            d => d['陽性者数'] !== undefined && d['検査人数'] !== undefined
+          )
+          const sumPositives = grp.sum(e => Number(e['陽性者数']))
+          const sumTotal = grp.sum(e => Number(e['検査人数']))
+          ave = Math.round((sumPositives / sumTotal) * 1000) / 10
         }
 
         return {
-          date: dayjs(d['日付']).format('YYYY-MM-DD'),
-          persons: d['検査人数'],
-          positives: d['陽性者数'],
-          negatives
+          date: dayjs(dayjs(first['日付']).format('YYYY-MM-DD')), // 時刻を切り落とす
+          positives: Number(first['陽性者数']),
+          persons: Number(first['検査人数']),
+          average: ave
+        }
+      })
+      .reverse()
+  }
+
+  private buildDailyTransitionGraphData = (): GraphData => {
+    const now = dayjs()
+    const rows = this.makeAveragePositivePerPatients(this.dailyData ?? [])
+      .where(d => d.date < now)
+      .select(d => {
+        let negatives: number | undefined
+        if (d.persons !== undefined && d.positives !== undefined) {
+          negatives = d.persons - d.positives
+        }
+
+        return {
+          date: d.date.format('YYYY-MM-DD'),
+          persons: d.persons,
+          positives: d.positives,
+          negatives,
+          average: d.average
         }
       })
 
@@ -218,17 +272,10 @@ export default class InspectionPersonsChart extends Vue {
         },
         {
           type: 'line',
-          title: '陽性率',
+          title: '過去7日間の陽性率',
           yAxisKind: 'y-axis-right',
           unit: '%',
-          values: rows
-            .select(d => {
-              if (d.positives == null || d.persons == null) {
-                return Number.NaN
-              }
-              return (d.positives / d.persons) * 100
-            })
-            .toArray(),
+          values: rows.select(d => d.average).toArray(),
           order: 1
         }
       ]

@@ -3,7 +3,8 @@ import * as Enumerable from 'linq'
 import {
   MainSummaryDataType,
   DataDaily,
-  InspectionPersonsSummaryDaily
+  InspectionPersonsSummaryDaily,
+  PatientsSummaryDaily
 } from './types'
 
 // data.json の補正を行う
@@ -15,37 +16,8 @@ export default (Data: DataDaily): void => {
   // 陽性患者数の終了日の補正
   normalizePatientsSummaryEndDate(Data)
 
-  const data = Enumerable.from(Data.main_summary_history.data)
-    .scan([] as MainSummaryDataType[], (pre, cur) => {
-      pre.push(cur)
-      if (pre.length > 2) {
-        pre.shift()
-      }
-      return pre
-    })
-    .where(arr => arr.length > 1)
-    .select(arr => {
-      const persons = arr[1]['検査実施人数'] - arr[0]['検査実施人数']
-      const positives = arr[1]['陽性患者数'] - arr[0]['陽性患者数']
-      return {
-        日付: dayjs(arr[1]['更新日時']).format('YYYY-MM-DD'), // 時刻を切り落とす
-        検査人数: isNaN(persons)
-          ? undefined
-          : persons <= 0
-          ? undefined
-          : persons,
-        陽性者数: isNaN(positives)
-          ? undefined
-          : persons <= 0
-          ? undefined
-          : positives
-      } as InspectionPersonsSummaryDaily
-    })
-
-  Data.inspection_persons_summary = {
-    date: Data.main_summary_history.date,
-    data: data.toArray()
-  }
+  // 検査陽性者数の補間
+  paddingInspectionPersonsSummaryDays(Data)
 }
 
 const paddingMainSummaryHistoryDays = (Data: DataDaily) => {
@@ -80,11 +52,70 @@ const paddingMainSummaryHistoryDays = (Data: DataDaily) => {
   Data.main_summary_history.data = paddedItems
 }
 
-const makeDateOnly = (date: Dayjs): Dayjs => {
-  return date
+const paddingInspectionPersonsSummaryDays = (Data: DataDaily) => {
+  const arr = Data.inspection_persons_summary
+    .data as InspectionPersonsSummaryDaily[]
+  const source = Enumerable.from(arr)
+
+  const start = makeDateOnly(dayjs(source.first()['日付']))
+  const end = makeDateOnly(dayjs(source.last()['日付']))
+  let expectDate = start
+  let i = 0
+
+  const paddedItems: InspectionPersonsSummaryDaily[] = []
+
+  // console.debug('start', start)
+  // console.debug('end', end)
+  while (expectDate <= end) {
+    const row = arr[i]
+    const actualDate = makeDateOnly(dayjs(row['日付']))
+
+    while (expectDate < actualDate) {
+      paddedItems.push({
+        日付: expectDate.format('YYYY/MM/DD 00:00:00')
+      } as InspectionPersonsSummaryDaily)
+      expectDate = expectDate.add(1, 'day')
+    }
+
+    paddedItems.push(row)
+    expectDate = expectDate.add(1, 'day')
+    i++
+  }
+
+  // inspection_persons_summary の陽性者数が未入力ならば、
+  // patients_summary の同日の陽性者数（小計）を使用する
+  // NOTE find が linear-search なので件数増えると遅さが際立つ恐れ
+  const ptArr = Data.patients_summary.data as PatientsSummaryDaily[]
+  for (const item of paddedItems) {
+    if (Number.isInteger(item['陽性者数'] as number)) {
+      continue
+    }
+
+    const hit = ptArr.find(
+      d => makeDateOnlyStr(d['日付']) === makeDateOnlyStr(item['日付'])
+    )
+    if (hit) {
+      item['陽性者数'] = hit['小計']
+    }
+  }
+
+  Data.inspection_persons_summary.data = paddedItems
+}
+
+const makeDateOnly = (date: Dayjs | string): Dayjs => {
+  let dt = date
+  if (typeof dt === 'string') {
+    dt = dayjs(dt)
+  }
+
+  return dt
     .set('hour', 0) // 時刻が入ってるので消す
     .set('minute', 0)
     .set('second', 0)
+}
+
+const makeDateOnlyStr = (date: Dayjs | string): string => {
+  return makeDateOnly(date).format('YYYY-MM-DD')
 }
 
 const normalizePatientsSummaryEndDate = (Data: any) => {
