@@ -1,7 +1,7 @@
 <template>
   <data-view
     :title="displayTitle"
-    title-id="new-patients-chart"
+    title-id="inspection-count-chart"
     :date="date"
     url="https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html"
     :remarks="remarks"
@@ -11,9 +11,11 @@
     </template>
 
     <time-bar-line-chart
-      chart-id="new-patients-chart"
+      chart-id="inspection-count-chart"
       :chart-data="chartData"
       legend-order-kind="desc"
+      :y-axis-left-setting="yAxisLeftSetting"
+      :y-axis-right-setting="yAxisRightSetting"
     />
 
     <div>
@@ -53,8 +55,14 @@ import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
-import TimeBarLineChart, { GraphData } from '@/components/TimeBarLineChart.vue'
-import { PatientsSummaryDaily, PatientsSummaryWeekly } from '~/utils/types'
+import TimeBarLineChart, {
+  GraphData,
+  YAxisSetting
+} from '@/components/TimeBarLineChart.vue'
+import {
+  InspectionsSummaryWeekly,
+  InspectionPersonsSummaryDaily
+} from '~/utils/types'
 
 type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
 
@@ -73,37 +81,53 @@ type DisplayInfo = {
     TimeBarLineChart
   }
 })
-export default class NewPatientsChart extends Vue {
+export default class InspectionPersonsChart extends Vue {
   @Prop()
   public date?: string
 
   @Prop()
-  public dailyData?: PatientsSummaryDaily[]
+  public dailyData?: InspectionPersonsSummaryDaily[]
 
   @Prop()
-  public weeklyData?: PatientsSummaryWeekly[]
+  public weeklyData?: InspectionsSummaryWeekly[]
+
+  private readonly yAxisLeftSetting: YAxisSetting = {
+    min: 0,
+    unit: '人',
+    visible: true
+  } as YAxisSetting
+
+  private readonly yAxisRightSetting: YAxisSetting = {
+    suggestedMin: 0,
+    suggestedMax: 20,
+    step: 5,
+    unit: '%',
+    visible: true
+  } as YAxisSetting
 
   private readonly remarks = [
-    '「陽性患者数」とは、愛知県が発表する「<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html>愛知県内発生事例</a>」を日別または週別に集計した人数です。(参考:<a class=RemarksLink target=_blank href=https://github.com/code4nagoya/covid19/blob/development/data/patients.csv>当サイトでCSV形式に加工したデータ</a>)。',
-    '過去7日間の平均は、陽性患者数の後方7日移動平均値です'
+    '日別と累計では、日別データが公開されている期間のみ表示',
+    '愛知県分（愛知県衛生研究所等）及び保健所設置市分（名古屋市衛生研究所等）の合計',
+    '民間施設等の検査件数及び陽性者数を含んでいます（発表時点での把握数）'
   ]
 
   private readonly showSelector = true
   private dataKind: DataKind = 'daily-transition'
   private readonly dataKinds = [
     { key: 'weekly-transition', label: '週別' } as SelectorItem,
-    { key: 'daily-transition', label: '日別' } as SelectorItem,
-    { key: 'daily-cumulative', label: '累計' } as SelectorItem
+    { key: 'daily-transition', label: '日別' } as SelectorItem
   ]
 
   private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private get displayTitle(): string {
-    return `陽性患者数${this.dataKind === 'weekly-transition' ? '(週別)' : ''}`
+    return `検査実施人数${
+      this.dataKind === 'weekly-transition' ? '(週別)' : ''
+    }`
   }
 
   private formatDayBeforeRatio = (dayBeforeRatio: any) => {
-    const dayBeforeRatioLocaleString = dayBeforeRatio.toLocaleString()
+    const dayBeforeRatioLocaleString = dayBeforeRatio?.toLocaleString() ?? '-'
     const prefix = Math.sign(dayBeforeRatio) === 1 ? '+' : ''
     return `${prefix}${dayBeforeRatioLocaleString}`
   }
@@ -114,6 +138,9 @@ export default class NewPatientsChart extends Vue {
     }
     const lastDay = this.chartData.datasets[0].values.slice(-1)[0]
     const lastDayBefore = this.chartData.datasets[0].values.slice(-2)[0]
+    if (lastDay == null || lastDayBefore == null) {
+      return '-'
+    }
     return this.formatDayBeforeRatio(lastDay - lastDayBefore)
   }
 
@@ -127,7 +154,7 @@ export default class NewPatientsChart extends Vue {
     }
 
     const dataset = this.chartData.datasets[0]
-    const latestValueText = dataset.values.slice(-1)[0].toLocaleString()
+    const latestValueText = dataset.values.slice(-1)[0]?.toLocaleString() ?? '-'
     const diffLabel =
       this.dataKind === 'weekly-transition' ? '前週比' : '前日比'
     const latestDate = this.formatDateLabel(this.chartData.dates.slice(-1)[0])
@@ -155,10 +182,6 @@ export default class NewPatientsChart extends Vue {
       'weekly-transition',
       this.buildWeeklyTransitionGraphData()
     )
-    this.chartDataSet.set(
-      'daily-cumulative',
-      this.buildDailyCumulativeGraphData()
-    )
   }
 
   private get chartData(): GraphData {
@@ -173,12 +196,14 @@ export default class NewPatientsChart extends Vue {
     }
   }
 
-  private makeAveragePatients = (
-    data: PatientsSummaryDaily[]
+  private makeAveragePositivePerPatients = (
+    data: InspectionPersonsSummaryDaily[]
   ): Enumerable.IEnumerable<{
     date: Dayjs
-    count: number
+    positives: number
+    persons: number
     average: number | undefined
+    uncertain: boolean
   }> => {
     const source = Enumerable.from(data).reverse()
     return source
@@ -186,17 +211,28 @@ export default class NewPatientsChart extends Vue {
       .select((_, index) => source.skip(index).take(7))
       .select(d => {
         const first = d.first()
-        const ave =
-          d.count() === 7
-            ? d
-                .where(d => d['小計'] !== undefined)
-                .average(d => Number(d['小計']))
-            : undefined
+        let ave
+        if (d.count() === 7) {
+          const grp = d.where(
+            d =>
+              d['陽性者数'] !== undefined &&
+              d['検査人数'] !== undefined &&
+              d['非確定'] === ''
+          )
+          const sumPositives = grp.sum(e => Number(e['陽性者数']))
+          const sumTotal = grp.sum(e => Number(e['検査人数']))
+          ave =
+            sumTotal === 0
+              ? undefined
+              : Math.round((sumPositives / sumTotal) * 1000) / 10
+        }
 
         return {
           date: dayjs(dayjs(first['日付']).format('YYYY-MM-DD')), // 時刻を切り落とす
-          count: Number(first['小計']),
-          average: ave
+          positives: Number(first['陽性者数']),
+          persons: Number(first['検査人数']),
+          average: ave,
+          uncertain: first['非確定'] !== ''
         }
       })
       .reverse()
@@ -204,13 +240,21 @@ export default class NewPatientsChart extends Vue {
 
   private buildDailyTransitionGraphData = (): GraphData => {
     const now = dayjs()
-    const rows = this.makeAveragePatients(this.dailyData ?? [])
+    const rows = this.makeAveragePositivePerPatients(this.dailyData ?? [])
       .where(d => d.date < now)
       .select(d => {
+        let negatives: number | undefined
+        if (d.persons !== undefined && d.positives !== undefined) {
+          negatives = d.persons - d.positives
+        }
+
         return {
           date: d.date.format('YYYY-MM-DD'),
-          count: d.count,
-          average: d.average
+          persons: d.persons,
+          positives: d.positives,
+          negatives,
+          average: d.average,
+          uncertain: d.uncertain
         }
       })
 
@@ -220,14 +264,29 @@ export default class NewPatientsChart extends Vue {
         {
           type: 'bar',
           title: '陽性者数',
+          yAxisKind: 'y-axis-left',
           unit: '人',
-          values: rows.select(d => d.count).toArray(),
+          values: rows.select(d => d.positives).toArray(),
           order: 2
         },
         {
-          type: 'line',
-          title: '過去7日間の平均',
+          type: 'bar',
+          title: '検査人数',
+          yAxisKind: 'y-axis-left',
           unit: '人',
+          values: rows.select(d => d.negatives).toArray(),
+          tooltipValues: rows.select(d => d.persons).toArray(),
+          color: '#D99694',
+          colors: rows
+            .select(d => (d.uncertain ? '#d3d3d3' : '#D99694'))
+            .toArray(),
+          order: 3
+        },
+        {
+          type: 'line',
+          title: '過去7日間の陽性率',
+          yAxisKind: 'y-axis-right',
+          unit: '%',
           values: rows.select(d => d.average).toArray(),
           order: 1
         }
@@ -238,7 +297,10 @@ export default class NewPatientsChart extends Vue {
   private buildWeeklyTransitionGraphData = (): GraphData => {
     const now = dayjs()
     const rows = Enumerable.from(this.weeklyData ?? [])
-      .where(d => dayjs(d['開始日']) < now)
+      .where(
+        d =>
+          dayjs(d['開始日']) < now && dayjs(d['開始日']) >= dayjs('2020-03-02')
+      )
       .select(d => {
         return {
           date: [
@@ -257,34 +319,6 @@ export default class NewPatientsChart extends Vue {
           title: '陽性者数',
           unit: '人',
           values: rows.select(d => d.count).toArray()
-        }
-      ]
-    } as GraphData
-  }
-
-  private buildDailyCumulativeGraphData = (): GraphData => {
-    let subTotal = 0
-    const now = dayjs()
-    const arr = (this.dailyData ?? [])
-      .filter(d => dayjs(d['日付']) < now)
-      .map(d => {
-        subTotal += Number(d['小計'])
-        return {
-          date: dayjs(d['日付']).format('YYYY-MM-DD'),
-          total: subTotal
-        }
-      })
-
-    const rows = Enumerable.from(arr)
-
-    return {
-      dates: rows.select(d => d.date).toArray(),
-      datasets: [
-        {
-          type: 'bar',
-          title: '陽性者累計数',
-          unit: '人',
-          values: rows.select(d => d.total).toArray()
         }
       ]
     } as GraphData

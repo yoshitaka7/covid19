@@ -5,6 +5,7 @@
       :chart-data="displayData"
       :options="displayOption"
       :height="240"
+      :plugins="plugins"
     />
 
     <date-select-slider
@@ -30,14 +31,26 @@ export type GraphKind = 'bar' | 'line'
 
 export type YAxisKind = 'y-axis-left' | 'y-axis-right'
 
+export type YAxisSetting = {
+  min?: number
+  max?: number
+  suggestedMin?: number
+  suggestedMax?: number
+  step?: number
+  unit: string
+  visible: boolean
+}
+
 export type DateRange = string | string[]
 
 export type GraphDataSet = {
   title: string
   type: GraphKind
   values: number[]
+  tooltipValues?: number[]
   unit: string
   color?: string
+  colors?: string[]
   yAxisKind?: YAxisKind
   visible?: boolean
   order?: number
@@ -63,13 +76,78 @@ export default class TimeBarLineChart extends Vue {
   @Prop()
   public legendOrderKind?: LegendOrderKind
 
+  @Prop()
+  public yAxisLeftSetting?: YAxisSetting
+
+  private defaultYAxisLeftSetting: YAxisSetting = {
+    suggestedMin: 0,
+    unit: '人',
+    visible: true
+  } as YAxisSetting
+
+  private get displayYAxisLeftSetting(): YAxisSetting {
+    return this.yAxisLeftSetting ?? this.defaultYAxisLeftSetting
+  }
+
+  private get displayYAxisSettings(): Map<YAxisKind, YAxisSetting> {
+    return new Map<YAxisKind, YAxisSetting>([
+      ['y-axis-left', this.displayYAxisLeftSetting],
+      ['y-axis-right', this.displayYAxisRightSetting]
+    ])
+  }
+
+  @Prop()
+  public yAxisRightSetting?: YAxisSetting
+
+  private readonly defaultYAxisRightSetting: YAxisSetting = {
+    visible: false
+  } as YAxisSetting
+
+  private get displayYAxisRightSetting(): YAxisSetting {
+    const setting = this.yAxisRightSetting ?? this.defaultYAxisRightSetting
+    return setting
+  }
+
+  private readonly defaultBarColor = '#bd3f4c'
+  private readonly defaultLineColor = '#0070C0'
+
+  private readonly plugins = [
+    {
+      // 日付ごとに色が変化する(GraphDataSet.colors が設定されている)場合、
+      // 凡例色が同調してしまうのでそれを回避（固定化）
+      beforeDraw: (c: any) => {
+        const legends: Chart.ChartLegendLabelItem[] = c.legend.legendItems
+
+        for (const legend of legends) {
+          if (legend.datasetIndex == null) {
+            continue
+          }
+          const ds = this.chartData.datasets[legend.datasetIndex]
+          if (ds.colors == null) {
+            continue
+          }
+          if (ds.type === 'bar') {
+            legend.fillStyle = ds.color ?? this.defaultBarColor
+            legend.strokeStyle = undefined
+          } else if (ds.type === 'line') {
+            legend.fillStyle = ds.color ?? this.defaultLineColor
+            legend.strokeStyle = undefined
+          }
+        }
+      }
+    }
+  ]
+
   private buildBarDataSets = (dataset: GraphDataSet): Chart.ChartDataSets => {
     return {
       type: 'bar',
       yAxisID: dataset.yAxisKind ?? 'y-axis-left',
       label: dataset.title, // 凡例名
       data: dataset.values,
-      backgroundColor: dataset.color ?? '#bd3f4c',
+      backgroundColor:
+        dataset.colors != null
+          ? dataset.colors
+          : dataset.color ?? this.defaultBarColor,
       order: dataset.order ?? 0,
       lineTension: 0
     }
@@ -81,7 +159,7 @@ export default class TimeBarLineChart extends Vue {
       yAxisID: dataset.yAxisKind ?? 'y-axis-left',
       label: dataset.title, // 凡例名
       data: dataset.values,
-      borderColor: dataset.color ?? '#0070C0',
+      borderColor: dataset.color ?? this.defaultLineColor,
       borderWidth: 3,
       pointRadius: 0,
       pointHitRadius: 2,
@@ -111,19 +189,19 @@ export default class TimeBarLineChart extends Vue {
       tooltips: {
         displayColors: false,
         callbacks: {
-          label: (
-            tooltipItem: Chart.ChartTooltipItem,
-            chartData: Chart.ChartData
-          ) => {
+          label: (tooltipItem: Chart.ChartTooltipItem, _: Chart.ChartData) => {
             if (tooltipItem.index === undefined) {
               return ''
             }
 
-            const tooltips = Enumerable.from(this.chartData.datasets)
+            return Enumerable.from(this.chartData.datasets)
               .select((dataset, index) => {
-                const value = (chartData.datasets![index].data as number[])[
-                  tooltipItem.index!
-                ]
+                const toolTipValues =
+                  this.chartData.datasets![index].tooltipValues ??
+                  this.chartData.datasets![index].values
+
+                const value =
+                  toolTipValues[tooltipItem.index! + this.displaySpan[0]]
                 const label = dataset.title
                 const unit = dataset.unit
 
@@ -147,7 +225,6 @@ export default class TimeBarLineChart extends Vue {
               )
               .select(d => d.label)
               .toArray()
-            return tooltips
           },
           title: (tooltipItems: Chart.ChartTooltipItem[]) => {
             try {
@@ -195,12 +272,35 @@ export default class TimeBarLineChart extends Vue {
               color: '#E5E5E5'
             },
             ticks: {
-              suggestedMin: 0,
-              maxTicksLimit: 8,
               fontColor: '#808080',
+              min: this.displayYAxisLeftSetting.min,
+              max: this.displayYAxisLeftSetting.max,
+              suggestedMin: this.displayYAxisLeftSetting.suggestedMin,
+              suggestedMax: this.displayYAxisLeftSetting.suggestedMax,
+              stepSize: this.displayYAxisLeftSetting.step,
               callback: (value: any) => {
-                // console.debug('value: any, index: any, values: any', value, index, values)
-                return value
+                return `${value}${this.displayYAxisLeftSetting.unit}`
+              }
+            }
+          },
+          {
+            id: 'y-axis-right',
+            display:
+              this.displayYAxisRightSetting.visible &&
+              this.chartData.datasets.find(
+                ds => ds.yAxisKind === 'y-axis-right' && (ds.visible ?? true)
+              ) != null,
+            type: 'linear',
+            position: 'right',
+            ticks: {
+              fontColor: '#808080',
+              min: this.displayYAxisRightSetting.min,
+              max: this.displayYAxisRightSetting.max,
+              suggestedMin: this.displayYAxisRightSetting.suggestedMin,
+              suggestedMax: this.displayYAxisRightSetting.suggestedMax,
+              stepSize: this.displayYAxisRightSetting.step,
+              callback: (value: any) => {
+                return `${value}${this.displayYAxisRightSetting.unit}`
               }
             }
           }
@@ -273,6 +373,9 @@ export default class TimeBarLineChart extends Vue {
       .map(dataset => {
         const cloned = Object.assign({}, dataset)
         cloned.values = dataset.values.slice(lower, upper + 1)
+        if (dataset.colors != null) {
+          cloned.colors = dataset.colors.slice(lower, upper + 1)
+        }
         return cloned
       })
   }

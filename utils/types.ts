@@ -1,15 +1,12 @@
 export type PatientsSummaryDaily = {
   日付: string
   小計: number
-  合算?: string
-  平均?: number
 }
 
 export type PatientsSummaryWeekly = {
   開始日: string
   終了日: string
   小計: number
-  合算?: string
 }
 
 export type DataDaily = {
@@ -17,6 +14,18 @@ export type DataDaily = {
   patients_summary: {
     date: string
     data: PatientsSummaryDaily[]
+  }
+
+  // eslint-disable-next-line camelcase
+  main_summary_history: {
+    date: string
+    data: MainSummaryDataType[]
+  }
+
+  // eslint-disable-next-line camelcase
+  inspection_persons_summary: {
+    date: string
+    data: InspectionPersonsSummaryDaily[]
   }
 }
 
@@ -57,4 +66,11 @@ export type MainSummaryDataType = {
   施設入所: number
   死亡: number
   退院: number
+}
+
+export type InspectionPersonsSummaryDaily = {
+  日付: string
+  検査人数?: number
+  陽性者数?: number
+  非確定?: string
 }

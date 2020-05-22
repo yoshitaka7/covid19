@@ -13,6 +13,7 @@
     <time-bar-line-chart
       chart-id="new-patients-chart"
       :chart-data="chartData"
+      legend-order-kind="asc"
     />
 
     <div>
