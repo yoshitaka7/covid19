@@ -276,8 +276,8 @@ export default class InspectionPersonsChart extends Vue {
           unit: '人',
           values: rows.select(d => d.negatives).toArray(),
           tooltipValues: rows.select(d => d.persons).toArray(),
-          // color: '#D99694',
-          color: rows
+          color: '#D99694',
+          colors: rows
             .select(d => (d.uncertain ? '#d3d3d3' : '#D99694'))
             .toArray(),
           order: 3

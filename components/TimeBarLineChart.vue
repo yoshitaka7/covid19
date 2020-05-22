@@ -5,6 +5,7 @@
       :chart-data="displayData"
       :options="displayOption"
       :height="240"
+      :plugins="plugins"
     />
 
     <date-select-slider
@@ -48,7 +49,8 @@ export type GraphDataSet = {
   values: number[]
   tooltipValues?: number[]
   unit: string
-  color?: string | string[]
+  color?: string
+  colors?: string[]
   yAxisKind?: YAxisKind
   visible?: boolean
   order?: number
@@ -106,13 +108,46 @@ export default class TimeBarLineChart extends Vue {
     return setting
   }
 
+  private readonly defaultBarColor = '#bd3f4c'
+  private readonly defaultLineColor = '#0070C0'
+
+  private readonly plugins = [
+    {
+      // 日付ごとに色が変化する(GraphDataSet.colors が設定されている)場合、
+      // 凡例色が同調してしまうのでそれを回避（固定化）
+      beforeDraw: (c: any) => {
+        const legends: Chart.ChartLegendLabelItem[] = c.legend.legendItems
+
+        for (const legend of legends) {
+          if (legend.datasetIndex == null) {
+            continue
+          }
+          const ds = this.chartData.datasets[legend.datasetIndex]
+          if (ds.colors == null) {
+            continue
+          }
+          if (ds.type === 'bar') {
+            legend.fillStyle = ds.color ?? this.defaultBarColor
+            legend.strokeStyle = undefined
+          } else if (ds.type === 'line') {
+            legend.fillStyle = ds.color ?? this.defaultLineColor
+            legend.strokeStyle = undefined
+          }
+        }
+      }
+    }
+  ]
+
   private buildBarDataSets = (dataset: GraphDataSet): Chart.ChartDataSets => {
     return {
       type: 'bar',
       yAxisID: dataset.yAxisKind ?? 'y-axis-left',
       label: dataset.title, // 凡例名
       data: dataset.values,
-      backgroundColor: dataset.color ?? '#bd3f4c',
+      backgroundColor:
+        dataset.colors != null
+          ? dataset.colors
+          : dataset.color ?? this.defaultBarColor,
       order: dataset.order ?? 0,
       lineTension: 0
     }
@@ -124,7 +159,7 @@ export default class TimeBarLineChart extends Vue {
       yAxisID: dataset.yAxisKind ?? 'y-axis-left',
       label: dataset.title, // 凡例名
       data: dataset.values,
-      borderColor: dataset.color ?? '#0070C0',
+      borderColor: dataset.color ?? this.defaultLineColor,
       borderWidth: 3,
       pointRadius: 0,
       pointHitRadius: 2,
@@ -338,11 +373,8 @@ export default class TimeBarLineChart extends Vue {
       .map(dataset => {
         const cloned = Object.assign({}, dataset)
         cloned.values = dataset.values.slice(lower, upper + 1)
-        if (dataset.color != null) {
-          cloned.color =
-            typeof dataset.color === 'string'
-              ? dataset.color
-              : dataset.color.slice(lower, upper + 1)
+        if (dataset.colors != null) {
+          cloned.colors = dataset.colors.slice(lower, upper + 1)
         }
         return cloned
       })
