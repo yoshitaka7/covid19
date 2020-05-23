@@ -77,7 +77,7 @@
         <inspection-persons-chart
           :date="Data.inspection_persons_summary.date"
           :daily-data="Data.inspection_persons_summary.data"
-          :weekly-data="dataWeekly.inspections_summary.data"
+          :weekly-data="dataWeekly.inspection_persons_summary.data"
         />
       </v-col>
 
