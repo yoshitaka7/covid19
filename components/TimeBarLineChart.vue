@@ -23,6 +23,7 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import dayjs from 'dayjs'
 import Enumerable from 'linq'
+import { ChartLegendLabelItem, ChartLegendOptions } from 'chart.js'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
 
 export type LegendOrderKind = 'asc' | 'desc'
@@ -30,6 +31,8 @@ export type LegendOrderKind = 'asc' | 'desc'
 export type GraphKind = 'bar' | 'line'
 
 export type YAxisKind = 'y-axis-left' | 'y-axis-right'
+
+export type LineStyleKind = 'solid' | 'dashed'
 
 export type YAxisSetting = {
   min?: number
@@ -51,9 +54,12 @@ export type GraphDataSet = {
   unit: string
   color?: string
   colors?: string[]
+  lineStyle?: LineStyleKind
   yAxisKind?: YAxisKind
   visible?: boolean
+  legendVisible?: boolean
   order?: number
+  tags?: any[]
 }
 
 export type GraphData = {
@@ -79,6 +85,12 @@ export default class TimeBarLineChart extends Vue {
   @Prop()
   public yAxisLeftSetting?: YAxisSetting
 
+  @Prop()
+  public yAxisRightSetting?: YAxisSetting
+
+  @Prop()
+  public disableLegendClick?: boolean
+
   private defaultYAxisLeftSetting: YAxisSetting = {
     suggestedMin: 0,
     unit: '人',
@@ -95,9 +107,6 @@ export default class TimeBarLineChart extends Vue {
       ['y-axis-right', this.displayYAxisRightSetting]
     ])
   }
-
-  @Prop()
-  public yAxisRightSetting?: YAxisSetting
 
   private readonly defaultYAxisRightSetting: YAxisSetting = {
     visible: false
@@ -161,6 +170,7 @@ export default class TimeBarLineChart extends Vue {
       data: dataset.values,
       borderColor: dataset.color ?? this.defaultLineColor,
       borderWidth: 3,
+      borderDash: dataset.lineStyle === 'dashed' ? [4, 3] : [],
       pointRadius: 0,
       pointHitRadius: 2,
       fill: false,
@@ -185,7 +195,7 @@ export default class TimeBarLineChart extends Vue {
   }
 
   private get displayOption(): Chart.ChartOptions {
-    return {
+    const option = {
       tooltips: {
         displayColors: false,
         callbacks: {
@@ -246,7 +256,16 @@ export default class TimeBarLineChart extends Vue {
       legend: {
         display:
           this.chartData.datasets.filter(d => d.visible ?? true).length > 1,
-        reverse: (this.legendOrderKind ?? 'asc') === 'desc'
+        reverse: (this.legendOrderKind ?? 'asc') === 'desc',
+        labels: {
+          filter: (item: ChartLegendLabelItem) => {
+            if (item.datasetIndex == null) {
+              return false
+            }
+            const ds = this.chartData.datasets[item.datasetIndex]
+            return ds.legendVisible ?? true
+          }
+        }
       },
       scales: {
         xAxes: [
@@ -307,6 +326,13 @@ export default class TimeBarLineChart extends Vue {
         ]
       }
     }
+
+    if (this.disableLegendClick ?? false) {
+      const legendOpt: ChartLegendOptions = option.legend
+      legendOpt.onClick = undefined
+    }
+
+    return option
   }
 
   private readonly defaultSpan: number = 60
@@ -381,7 +407,6 @@ export default class TimeBarLineChart extends Vue {
   }
 
   public sliderUpdate(sliderValue: number[]) {
-    // console.debug(`${this.constructor.name}:sliderUpdate.`, sliderValue)
     this.displaySpan = sliderValue
   }
 
