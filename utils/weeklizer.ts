@@ -7,7 +7,7 @@ import {
   InspectionsSummaryDaily,
   InspectionsSummaryWeekly,
   InspectionPersonsSummaryDaily,
-  InspectionPersonsSummaryWeelky
+  InspectionPersonsSummaryWeelky as InspectionPersonsSummaryWeekly
 } from '../utils/types'
 
 // 週次化の週の開始日と終了日
@@ -169,7 +169,7 @@ const weeklizeInspectionsSummary = (
 const weeklizeInspectionPersonsSummary = (
   inspectionPersonsSummaryDaily: InspectionPersonsSummaryDaily[],
   chunkStartYoubi: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
-): InspectionPersonsSummaryWeelky[] => {
+): InspectionPersonsSummaryWeekly[] => {
   const firstData = inspectionPersonsSummaryDaily[0]
   const beginDate = dayjs(firstData['日付']) // dayjs('2020-01-25')
   const lastDate = dayjs(
@@ -212,7 +212,7 @@ const weeklizeInspectionPersonsSummary = (
       検査人数: sumPersons,
       陽性者数: sumPositives,
       非確定: hasUncertain ? '1' : ''
-    } as InspectionPersonsSummaryWeelky
+    } as InspectionPersonsSummaryWeekly
   })
 
   // 開始日、終了日の調整
