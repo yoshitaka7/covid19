@@ -66,7 +66,7 @@ export type GraphDataSet = {
   tooltipValues?: number[] // ツールチップへの表示値（既定値は values と同じ）
   unit: string // 単位（右上の情報表示に使用）
   color?: string // グラフの色（既定値は棒、折れ線それぞれの標準色）
-  colors?: string[] // 日付毎の固有色（未指定時は color またはそれぞれの標準色使）
+  colors?: string[] // 日付毎の固有色。棒グラフのみ有効。（未指定時は color またはそれぞれの標準色）
   lineStyle?: LineStyleKind // 折れ線グラフの線種（既定値は solid）
   yAxisKind?: YAxisKind // Y軸の位置（既定値は左）
   visible?: boolean // 表示 or 非表示（既定値は表示）

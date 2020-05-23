@@ -279,6 +279,10 @@ export default class InspectionPersonsChart extends Vue {
           change: false
         }
       })
+      // 公式値と参考値の折れ線グラフをつなげるために、公式→参考または参考→公式に切り替わる直前日を change=true にする処理
+      // リストを逆転させて日付１と２（次は２と３…）のペアを作り、
+      // 非確定フラグの XOR で変更を取得して change に設定
+      // 最後にリストを再逆転させて日付昇順に戻して完成
       .reverse()
       .scan((pre, cur) => {
         cur.change = ((pre?.uncertain ?? 0) ^ cur.uncertain) === 1
@@ -288,12 +292,20 @@ export default class InspectionPersonsChart extends Vue {
 
     return {
       dates: rows.select(d => d.date).toArray(),
+      // 検査人数と陽性率は、公式値と参考値で色の異なる２つの dataset を用意
+      // 公式値側は公式値のみ（!d.uncertain）が格納された values, tooltipValues を作成し、
+      // 参考値側は参考値のみ（d.uncertain）が格納された values, tooltipValues を作成。
+      // 参考値側の凡例は非表示に設定。凡例クリックを無効にしている理由１
       datasets: [
         {
           type: 'bar',
           title: '検査人数', // 参考値
           yAxisKind: 'y-axis-left',
           unit: '人',
+          // 検査人数ｎ人中、陽性者数ｍ人、という表現にしたいため、
+          // 棒グラフには、陰性者数(negatives)を積み上げるが、
+          // 凡例やツールチップでは検査人数(persons)として振る舞う
+          // 凡例クリックを無効にしている理由２
           values: rows
             .select(d => (d.uncertain ? d.negatives : undefined))
             .toArray(),
@@ -380,14 +392,23 @@ export default class InspectionPersonsChart extends Vue {
           change: false
         }
       })
+      // 公式値と参考値の折れ線グラフをつなげるために、公式→参考または参考→公式に切り替わる直前日を change=true にする処理
+      // リストを逆転させて日付１と２（次は２と３…）のペアを作り、
+      // 非確定フラグの XOR で変更を取得して change に設定
+      // 最後にリストを再逆転させて日付昇順に戻して完成
       .reverse()
       .scan((pre, cur) => {
         cur.change = ((pre?.uncertain ?? 0) ^ cur.uncertain) === 1
         return cur
       })
+      .reverse()
 
     return {
       dates: rows.select(d => d.date).toArray(),
+      // 検査人数と陽性率は、公式値と参考値で色の異なる２つの dataset を用意
+      // 公式値側は公式値のみ（!d.uncertain）が格納された values, tooltipValues を作成し、
+      // 参考値側は参考値のみ（d.uncertain）が格納された values, tooltipValues を作成。
+      // 参考値側の凡例は非表示に設定。
       datasets: [
         {
           type: 'bar',
