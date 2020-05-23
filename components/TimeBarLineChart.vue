@@ -26,45 +26,53 @@ import Enumerable from 'linq'
 import { ChartLegendLabelItem, ChartLegendOptions } from 'chart.js'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
 
-export type LegendOrderKind = 'asc' | 'desc'
-
+// グラフの種類
 export type GraphKind = 'bar' | 'line'
 
+// 凡例の並び順
+export type LegendOrderKind = 'asc' | 'desc'
+
+// Y軸の種類（左 or 右）
 export type YAxisKind = 'y-axis-left' | 'y-axis-right'
 
+// 折れ線グラフの線種（実践 or 点線）
 export type LineStyleKind = 'solid' | 'dashed'
 
+// Y軸の設定
 export type YAxisSetting = {
-  min?: number
-  max?: number
-  suggestedMin?: number
-  suggestedMax?: number
-  step?: number
-  unit: string
-  visible: boolean
+  min?: number // 最小値（既定値は自動）
+  max?: number // 最大値（既定値は自動）
+  suggestedMin?: number // 推奨最小値（既定値は自動）
+  suggestedMax?: number // 推奨最大値（既定値は自動）
+  step?: number // グリッド線刻み値（既定値は自動）
+  unit: string // 単位
+  visible: boolean // 表示 or 非表示
 }
 
+// X軸の日付（日次は string, 週次は [開始日, 終了日] の配列
 export type DateRange = string | string[]
 
-export type GraphDataSet = {
-  title: string
-  type: GraphKind
-  values: number[]
-  tooltipValues?: number[]
-  unit: string
-  color?: string
-  colors?: string[]
-  lineStyle?: LineStyleKind
-  yAxisKind?: YAxisKind
-  visible?: boolean
-  legendVisible?: boolean
-  order?: number
-  tags?: any[]
+// グラフデータ群
+export type GraphData = {
+  dates: DateRange[] // 日付群
+  datasets: GraphDataSet[] // グラフ群
 }
 
-export type GraphData = {
-  dates: DateRange[]
-  datasets: GraphDataSet[]
+// グラフデータセット
+export type GraphDataSet = {
+  title: string // グラフタイトル（パネルタイトル）
+  type: GraphKind // グラフ種別
+  values: number[] // グラフ値の配列（X軸の日付分）
+  tooltipValues?: number[] // ツールチップへの表示値（既定値は values と同じ）
+  unit: string // 単位（右上の情報表示に使用）
+  color?: string // グラフの色（既定値は棒、折れ線それぞれの標準色）
+  colors?: string[] // 日付毎の固有色（未指定時は color またはそれぞれの標準色使）
+  lineStyle?: LineStyleKind // 折れ線グラフの線種（既定値は solid）
+  yAxisKind?: YAxisKind // Y軸の位置（既定値は左）
+  visible?: boolean // 表示 or 非表示（既定値は表示）
+  legendVisible?: boolean // 凡例の表示（既定値は表示）
+  order?: number // グラフの表示順（値が小さい方が手前）
+  tags?: any[] // values 以外に日付ごとに保持したい値はここに
 }
 
 @Component({
@@ -73,21 +81,27 @@ export type GraphData = {
   }
 })
 export default class TimeBarLineChart extends Vue {
+  // グラフID 何に使われる？
   @Prop()
   public chartId?: string
 
+  // グラフデータ
   @Prop()
   public chartData!: GraphData
 
+  // 凡例の並び順（既定値は昇順＜datasets の order 順＞）
   @Prop()
   public legendOrderKind?: LegendOrderKind
 
+  // 左のY軸設定（既定値は標準＜人＞の設定）
   @Prop()
   public yAxisLeftSetting?: YAxisSetting
 
+  // 右のY軸設定（既定値はなし）
   @Prop()
   public yAxisRightSetting?: YAxisSetting
 
+  // 凡例クリックでグラフON/OFFの無効化（既定値は false）
   @Prop()
   public disableLegendClick?: boolean
 
