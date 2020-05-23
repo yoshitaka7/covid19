@@ -1,10 +1,13 @@
 import dayjs, { Dayjs } from 'dayjs'
+import Enumerable from 'linq'
 import {
   PatientsSummaryDaily,
   DataWeekly,
   PatientsSummaryWeekly,
   InspectionsSummaryDaily,
-  InspectionsSummaryWeekly
+  InspectionsSummaryWeekly,
+  InspectionPersonsSummaryDaily,
+  InspectionPersonsSummaryWeelky
 } from '../utils/types'
 
 // 週次化の週の開始日と終了日
@@ -20,11 +23,18 @@ type WeeklizedPatientsSummary = {
   data: PatientsSummaryDaily[]
 }
 
-// 週次化された検査データ群
+// 週次化された検査件数データ群
 type WeeklizedInspectionsSummary = {
   from: Dayjs
   to: Dayjs
   data: InspectionsSummaryDaily[]
+}
+
+// 週次化された検査人数データ群
+type WeeklizedInspectionPersonsSummary = {
+  from: Dayjs
+  to: Dayjs
+  data: InspectionPersonsSummaryDaily[]
 }
 
 export default (Data: any): DataWeekly => {
@@ -40,6 +50,11 @@ export default (Data: any): DataWeekly => {
     chunkStartYoubi
   )
 
+  const inspectionPersonsSummaryWeekly = weeklizeInspectionPersonsSummary(
+    Data.inspection_persons_summary.data as InspectionPersonsSummaryDaily[],
+    chunkStartYoubi
+  )
+
   return {
     patients_summary: {
       date: Data.patients_summary.date,
@@ -48,6 +63,10 @@ export default (Data: any): DataWeekly => {
     inspections_summary: {
       date: Data.inspections_summary.date,
       data: inspectionsSummaryWeekly
+    },
+    inspection_persons_summary: {
+      date: Data.inspection_persons_summary.date,
+      data: inspectionPersonsSummaryWeekly
     }
   } as DataWeekly
 }
@@ -142,6 +161,67 @@ const weeklizeInspectionsSummary = (
   inspectionsSummaryWeekly[0]['開始日'] = '2020-01-30' // 初回データは 1月30日（木曜日）～3月1日（日曜日） の合算
   inspectionsSummaryWeekly[inspectionsSummaryWeekly.length - 1]['終了日'] =
     inspectionsSummaryDaily[inspectionsSummaryDaily.length - 1]['日付']
+
+  return inspectionsSummaryWeekly
+}
+
+// 検査人数を週次化する
+const weeklizeInspectionPersonsSummary = (
+  inspectionPersonsSummaryDaily: InspectionPersonsSummaryDaily[],
+  chunkStartYoubi: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+): InspectionPersonsSummaryWeelky[] => {
+  const firstData = inspectionPersonsSummaryDaily[0]
+  const beginDate = dayjs(firstData['日付']) // dayjs('2020-01-25')
+  const lastDate = dayjs(
+    inspectionPersonsSummaryDaily[inspectionPersonsSummaryDaily.length - 1][
+      '日付'
+    ]
+  ) // dayjs('2020-05-04')
+
+  const weekRanges = makeWeekRanges(beginDate, lastDate, chunkStartYoubi)
+
+  const weeklizedInspectionsSummaries: WeeklizedInspectionPersonsSummary[] = weekRanges.map(
+    x => ({ from: x.from, to: x.to, data: [] })
+  )
+
+  for (const cur of inspectionPersonsSummaryDaily) {
+    const dt = dayjs(cur['日付'])
+    const foundIndex = weeklizedInspectionsSummaries.findIndex(
+      x => x.from <= dt && dt < x.to
+    )
+
+    if (foundIndex >= 0) {
+      weeklizedInspectionsSummaries[foundIndex].data.push(cur)
+    }
+  }
+
+  const inspectionsSummaryWeekly = weeklizedInspectionsSummaries.map(week => {
+    const sumPersons = Enumerable.from(week.data).sum(x =>
+      Number(x['検査人数'])
+    )
+    const sumPositives = Enumerable.from(week.data).sum(x =>
+      Number(x['陽性者数'])
+    )
+    const hasUncertain = Enumerable.from(week.data).any(
+      x => x['非確定'] === '1'
+    )
+
+    return {
+      開始日: week.from.format('YYYY-MM-DD'),
+      終了日: week.to.format('YYYY-MM-DD'),
+      検査人数: sumPersons,
+      陽性者数: sumPositives,
+      非確定: hasUncertain ? '1' : ''
+    } as InspectionPersonsSummaryWeelky
+  })
+
+  // 開始日、終了日の調整
+  inspectionsSummaryWeekly[0]['開始日'] =
+    inspectionPersonsSummaryDaily[0]['日付']
+  inspectionsSummaryWeekly[inspectionsSummaryWeekly.length - 1]['終了日'] =
+    inspectionPersonsSummaryDaily[inspectionPersonsSummaryDaily.length - 1][
+      '日付'
+    ]
 
   return inspectionsSummaryWeekly
 }
