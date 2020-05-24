@@ -306,6 +306,20 @@ export default class InspectionPersonsChart extends Vue {
       datasets: [
         {
           type: 'bar',
+          title: '検査人数',
+          yAxisKind: 'y-axis-left',
+          unit: '人',
+          values: rows
+            .select(d => (!d.uncertain ? d.negatives : undefined))
+            .toArray(),
+          tooltipValues: rows
+            .select(d => (!d.uncertain ? d.persons : undefined))
+            .toArray(),
+          color: '#D99694',
+          order: 5
+        },
+        {
+          type: 'bar',
           title: '検査人数', // 参考値
           yAxisKind: 'y-axis-left',
           unit: '人',
@@ -320,22 +334,8 @@ export default class InspectionPersonsChart extends Vue {
             .select(d => (d.uncertain ? d.persons : undefined))
             .toArray(),
           color: '#d3d3d3',
-          order: 5,
+          order: 4,
           legendVisible: false
-        },
-        {
-          type: 'bar',
-          title: '検査人数',
-          yAxisKind: 'y-axis-left',
-          unit: '人',
-          values: rows
-            .select(d => (!d.uncertain ? d.negatives : undefined))
-            .toArray(),
-          tooltipValues: rows
-            .select(d => (!d.uncertain ? d.persons : undefined))
-            .toArray(),
-          color: '#D99694',
-          order: 4
         },
         {
           type: 'bar',
