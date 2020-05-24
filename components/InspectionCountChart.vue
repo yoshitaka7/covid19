@@ -13,6 +13,7 @@
     <time-bar-line-chart
       chart-id="inspection-count-chart"
       :chart-data="chartData"
+      :y-axis-left-setting="yAxisLeftSetting"
     />
 
     <div>
@@ -237,7 +238,7 @@ export default class InspectionCountChart extends Vue {
         {
           type: 'bar',
           title: '件数',
-          unit: '人',
+          unit: '件',
           values: rows.select(d => d.count).toArray()
         }
       ]
@@ -266,7 +267,7 @@ export default class InspectionCountChart extends Vue {
         {
           type: 'bar',
           title: '累計件数',
-          unit: '人',
+          unit: '件',
           values: rows.select(d => d.total).toArray()
         }
       ]
