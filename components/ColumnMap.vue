@@ -56,7 +56,7 @@
         <div class="ColumnMap-LegendMapCell">
           <div class="ColumnMap-LegendMapText">
             <span>居住地</span>
-            <span>感染者数</span>
+            <span>累計感染者数</span>
             <span>感染率※</span>
           </div>
         </div>
@@ -146,7 +146,7 @@
     flex-direction: column;
   }
   &-LegendMapCell {
-    width: 60px;
+    width: calc(11px * 7);
     height: 60px;
     border: 1px solid #333;
     border-radius: 5px;
@@ -174,7 +174,7 @@
     justify-content: center;
     font-size: 11px;
     line-height: 1.3;
-    width: calc(11px * 4);
+    width: calc(11px * 7);
     margin: 0 auto;
     white-space: nowrap;
     overflow: hidden;
