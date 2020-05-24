@@ -253,7 +253,7 @@ export default class InspectionPersonsChart extends Vue {
           positives: Number(first['陽性者数']),
           persons: Number(first['検査人数']),
           average: ave,
-          uncertain: first['非確定'] !== ''
+          uncertain: d.any(x => x['非確定'] !== '')
         }
       })
       .reverse()
