@@ -16,6 +16,9 @@ type WeekRange = {
   to: Dayjs
 }
 
+// 週の各曜日（0:日曜日 ～ 6:土曜日）
+type YoubiKind = 0 | 1 | 2 | 3 | 4 | 5 | 6
+
 // 週次化された感染者群
 type WeeklizedPatientsSummary = {
   from: Dayjs
@@ -74,7 +77,7 @@ export default (Data: any): DataWeekly => {
 // 感染者一覧を週次化する
 const weeklizePatientsSummary = (
   patientsSummaryDaily: PatientsSummaryDaily[],
-  chunkStartYoubi: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+  chunkStartYoubi: YoubiKind
 ): PatientsSummaryWeekly[] => {
   const beginDate = dayjs(patientsSummaryDaily[0]['日付']) // dayjs('2020-01-25')
   const lastDate = dayjs(
@@ -119,7 +122,7 @@ const weeklizePatientsSummary = (
 // 検査数を週次化する
 const weeklizeInspectionsSummary = (
   inspectionsSummaryDaily: InspectionsSummaryDaily[],
-  chunkStartYoubi: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+  chunkStartYoubi: YoubiKind
 ): PatientsSummaryWeekly[] => {
   const firstData = inspectionsSummaryDaily[0]
   let beginDate = dayjs(firstData['日付']) // dayjs('2020-01-25')
@@ -168,7 +171,7 @@ const weeklizeInspectionsSummary = (
 // 検査人数を週次化する
 const weeklizeInspectionPersonsSummary = (
   inspectionPersonsSummaryDaily: InspectionPersonsSummaryDaily[],
-  chunkStartYoubi: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+  chunkStartYoubi: YoubiKind
 ): InspectionPersonsSummaryWeekly[] => {
   const firstData = inspectionPersonsSummaryDaily[0]
   const beginDate = dayjs(firstData['日付']) // dayjs('2020-01-25')
@@ -236,9 +239,16 @@ const weeklizeInspectionPersonsSummary = (
 const makeWeekRanges = (
   beginDate: Dayjs,
   lastDate: Dayjs,
-  chunkStartYoubi: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+  chunkStartYoubi: YoubiKind
 ): WeekRange[] => {
-  const beginYoubiOffset = 7 - beginDate.day() - chunkStartYoubi
+  const beginYoubiOffset = (7 - (chunkStartYoubi - beginDate.day())) % 7
+  // 例 chunkStartYoubi, beginDate -> offset
+  //    1(月), 0(日) -> 6
+  //    1(月), 1(月) -> 0
+  //    1(月), 2(火) -> 1
+  //    3(水), 2(火) -> 6
+  //    3(水), 3(水) -> 0
+  //    3(水), 4(水) -> 1
   const beginStartWeekDate = beginDate.subtract(beginYoubiOffset, 'day')
   const diffWeeks = lastDate.diff(beginStartWeekDate, 'week')
 
