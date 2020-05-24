@@ -108,12 +108,19 @@ export default class InspectionPersonsChart extends Vue {
     visible: true
   } as YAxisSetting
 
-  private readonly remarks = [
-    '「検査人数」は、陰性確認の検査を除いた人数です',
-    '愛知県分(愛知県衛生研究所等)、保健所設置市分(名古屋市衛生研究所等)及び民間施設等の検査の合計',
-    '灰色の検査人数と点線の陽性率は、愛知県の公式発表値がなく、当プロジェクトが記録した累積値から算出するなどした参考値です',
-    '「陽性率」とは、陽性者数(過去7日間)／検査人数(過去7日間)です'
-  ]
+  private get remarks(): string[] {
+    const youseiritsu =
+      this.dataKind === 'weekly-transition'
+        ? '「陽性率」とは、週の陽性者数／週の検査人数です'
+        : '「陽性率」とは、陽性者数(過去7日間)／検査人数(過去7日間)です'
+
+    return [
+      '「検査人数」は、陰性確認の検査を除いた人数です',
+      '愛知県分(愛知県衛生研究所等)、保健所設置市分(名古屋市衛生研究所等)及び民間施設等の検査の合計',
+      '灰色の検査人数と点線の陽性率は、愛知県の公式発表値がなく、当プロジェクトが記録した累積値から算出するなどした参考値です',
+      youseiritsu
+    ]
+  }
 
   private readonly showSelector = true
   private dataKind: DataKind = 'daily-transition'
