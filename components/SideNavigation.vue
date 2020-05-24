@@ -87,18 +87,11 @@
     "Aichi Prefecture Government": "愛知県",
     "Tokyo COVID-19 Task Force": "新型コロナウイルス感染症対策本部",
     "The latest updates": "県内の最新感染動向",
-    "If you have any symptoms": "新型コロナウイルス感染症が心配なときに",
-    "for Families with children": "お子様をお持ちの皆様へ",
-    "for Citizens": "県民の皆様へ",
-    "for Enterprises and Employees": "企業の皆様・はたらく皆様へ",
-    "Official statements from Task Force": "愛知県新型コロナウイルス感染症対策本部会議報",
-    "Cancelled public events": "愛知労働局主催等 中止又は延期するイベント等",
-    "Government official website": "愛知県公式ホームページ",
+    "COVID-19 Countermeasures Site": "愛知県 新型コロナウイルス感染症対策サイト",
     "Government official LINE": "愛知県-新型コロナ対策パーソナルサポート(LINE)",
-    "Government official Twitter": "愛知県庁公式Twitter",
-    "Message from Governor Omura": "知事からのメッセージ",
     "About us": "当サイトについて",
-    "Other local Government": "他自治体の対策サイト",
+    "Do not Lose To COVID-19, Nagoya(Twitter)": "コロナに負けるなナゴヤ(Twitter)",
+    "Other Areas Countermeasure Site": "他地域の対策サイト",
     "Powered by:": "Powered by:",
     "SAKURA internet Inc.": "さくらインターネット",
     "Nagoya COVID-19 Special Site": "名古屋市新型コロナウイルス感染症対策特設サイト"
@@ -129,67 +122,30 @@ export default {
           divider: true
         },
         {
-          icon: 'covid',
-          title: this.$t('If you have any symptoms'),
-          link: '/flow',
-          divider: true
-        },
-        {
-          icon: 'parent',
-          title: this.$t('for Families with children'),
-          link: '/parent'
-        },
-        {
-          icon: 'mdi-account-multiple',
-          title: this.$t('for Citizens'),
-          link:
-            'https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html'
-        },
-        {
-          icon: 'mdi-domain',
-          title: this.$t('for Enterprises and Employees'),
-          link: '/worker',
-          divider: true
-        },
-        {
-          title: this.$t('Official statements from Task Force'),
-          link:
-            'https://www.pref.aichi.jp/site/covid19-aichi/novel-coronavirus-taisakuhonbu.html'
-        },
-        {
-          title: this.$t('Cancelled public events'),
-          link:
-            'https://jsite.mhlw.go.jp/aichi-roudoukyoku/news_topics/2019_covid-19_event.html'
-        },
-        {
-          title: this.$t('Message from Governor Omura'),
-          link: 'https://www.pref.aichi.jp/chiji/message/index00.html'
-        },
-        {
           title: this.$t('About us'),
-          link: '/about'
+          link: '/about',
+          divider: true
         },
         {
-          title: this.$t('Government official website'),
-          link: 'https://www.pref.aichi.jp/'
+          title: this.$t('COVID-19 Countermeasures Site'),
+          link: 'https://www.pref.aichi.jp/site/covid19-aichi/'
         },
         {
           title: this.$t('Government official LINE'),
           link: 'https://liny.link/r/1653954481-KA3xJl9g?lp=8Zhyvz'
         },
         {
-          title: this.$t('Government official Twitter'),
-          link: 'https://twitter.com/pref_aichi',
-          divider: true
-        },
-        {
           title: this.$t('Nagoya COVID-19 Special Site'),
           link:
-            'https://nagoyabousai.maps.arcgis.com/apps/Cascade/index.html?appid=04c0250edfe54ae4af7f1c8755d275b5',
+            'https://nagoyabousai.maps.arcgis.com/apps/Cascade/index.html?appid=04c0250edfe54ae4af7f1c8755d275b5'
+        },
+        {
+          title: this.$t('Do not Lose To COVID-19, Nagoya(Twitter)'),
+          link: 'http://twitter.com/corona_nagoya',
           divider: true
         },
         {
-          title: this.$t('Other local Government'),
+          title: this.$t('Other Areas Countermeasure Site'),
           link: 'https://stopcovid19.code4japan.org/'
         }
       ]

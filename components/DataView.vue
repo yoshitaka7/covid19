@@ -1,6 +1,6 @@
 <template>
   <v-card class="DataView pa-1">
-    <v-toolbar flat class="DataView-content">
+    <div class="DataView-content">
       <div class="DataView-TitleContainer">
         <h3 :id="titleId" class="DataView-ToolbarTitle">
           {{ title }}
@@ -10,9 +10,8 @@
         </div>
         <slot name="button" />
       </div>
-      <v-spacer />
       <slot name="infoPanel" />
-    </v-toolbar>
+    </div>
     <v-card-text
       :class="
         $vuetify.breakpoint.xs ? 'DataView-CardTextForXS' : 'DataView-CardText'
@@ -62,6 +61,12 @@ export default class DataView extends Vue {
 </script>
 
 <style lang="scss">
+.RemarksLink {
+  text-decoration: none;
+  .ExternalLinkIcon {
+    vertical-align: text-bottom;
+  }
+}
 .DataView {
   &-DataInfo {
     &-summary {
@@ -89,6 +94,8 @@ export default class DataView extends Vue {
   @include card-container();
   height: 100%;
   &-content {
+    display: flex;
+    padding: 4px 16px;
     height: auto !important;
     .v-toolbar__content {
       align-items: start;
@@ -99,8 +106,8 @@ export default class DataView extends Vue {
     height: auto !important;
   }
   &-TitleContainer {
-    width: 100%;
-    padding: 14px 0 8px;
+    flex-grow: 1;
+    padding-right: 4px;
     color: $gray-2;
   }
   &-Title {
