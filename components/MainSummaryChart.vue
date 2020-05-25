@@ -13,6 +13,7 @@
     <time-bar-line-chart
       chart-id="new-patients-chart"
       :chart-data="chartData"
+      legend-order-kind="asc"
     />
 
     <div>
@@ -87,7 +88,7 @@ export default class MainSummaryChart extends Vue {
     '凡例をクリックするとその項目の[表示/非表示]が切り替えられます'
   ]
 
-  private readonly showSelector = true
+  private readonly showSelector = false
   private readonly dataKind: DataKind = 'daily-transition'
   private readonly dataKinds = [
     { key: 'daily-transition', label: '日別' } as SelectorItem
