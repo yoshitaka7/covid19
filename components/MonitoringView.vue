@@ -188,7 +188,7 @@ export default class MonitoringView extends Vue {
 
   private readonly remarks = [
     '愛知県が<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/novel-coronavirus-taisakuhonbu.html>5月15日に発表した「指標」</a>に基き、当プロジェクトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
-    '陽性率とは、過去7日間の 陽性者数／検査者数です。尚、検査者数に陰性確認の検査数は含みません。',
+    '各項目の定義は「新規感染者数」「陽性率・検査実施人数グラフ」「入院患者数」の各グラフを参照',
     '陽性率は参考値である場合があります。「陽性率・検査実施人数グラフ」を参照。'
   ]
 
