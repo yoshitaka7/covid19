@@ -16,7 +16,7 @@
       :date="newsItem.date"
       :url="newsItem.url"
     />
-    <whats-new
+    <whats-new-about
       class="mb-4"
       text="当サイトは有志が作成したものです。お問い合わせは愛知県ではなく、当サイト運営まで。"
       url="/about"
@@ -44,9 +44,10 @@
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
-        <critically-chart
-          :date="Data.main_summary_history.date"
-          :daily-data="Data.main_summary_history.data"
+        <inspection-persons-chart
+          :date="Data.inspection_persons_summary.date"
+          :daily-data="Data.inspection_persons_summary.data"
+          :weekly-data="dataWeekly.inspection_persons_summary.data"
         />
       </v-col>
 
@@ -88,6 +89,13 @@
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
         />
       </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <critically-chart
+          :date="Data.main_summary_history.date"
+          :daily-data="Data.main_summary_history.data"
+        />
+      </v-col>
     </v-row>
   </div>
 </template>
@@ -95,6 +103,7 @@
 <script>
 import PageHeader from '@/components/PageHeader.vue'
 import WhatsNew from '@/components/WhatsNew.vue'
+import WhatsNewAbout from '@/components/WhatsNewAbout.vue'
 import Data from '@/data/data.json'
 import CityData from '@/data/city_data.json'
 
@@ -105,6 +114,7 @@ import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
 import NewPatientsChart from '@/components/NewPatientsChart.vue'
 import InspectionCountChart from '@/components/InspectionCountChart.vue'
+import InspectionPersonsChart from '@/components/InspectionPersonsChart.vue'
 import MainSummaryChart from '@/components/MainSummaryChart.vue'
 import HospitalizedChart from '@/components/HospitalizedChart.vue'
 import CriticallyChart from '@/components/CriticallyChart.vue'
@@ -115,6 +125,7 @@ export default {
   components: {
     PageHeader,
     WhatsNew,
+    WhatsNewAbout,
     SvgCard,
     ConfirmedCasesTable,
     ColumnMap,
@@ -122,7 +133,8 @@ export default {
     MainSummaryChart,
     HospitalizedChart,
     CriticallyChart,
-    InspectionCountChart
+    InspectionCountChart,
+    InspectionPersonsChart
   },
   data() {
     // 日次データの補正

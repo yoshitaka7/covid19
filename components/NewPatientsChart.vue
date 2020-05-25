@@ -193,9 +193,6 @@ export default class NewPatientsChart extends Vue {
                 .average(d => Number(d['小計']))
             : undefined
 
-        const cloned = Object.assign({}, first)
-        cloned['平均'] = ave
-
         return {
           date: dayjs(dayjs(first['日付']).format('YYYY-MM-DD')), // 時刻を切り落とす
           count: Number(first['小計']),
