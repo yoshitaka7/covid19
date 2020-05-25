@@ -132,7 +132,7 @@ export default class InspectionPersonsChart extends Vue {
   private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private get displayTitle(): string {
-    return `検査実施人数・陽性率${
+    return `陽性率・検査実施人数${
       this.dataKind === 'weekly-transition' ? '(週別)' : ''
     }`
   }
@@ -227,7 +227,7 @@ export default class InspectionPersonsChart extends Vue {
     }
   }
 
-  private makeAveragePositivePerPatients = (
+  public static makeAveragePositivePerPatients = (
     data: InspectionPersonsSummaryDaily[]
   ): Enumerable.IEnumerable<{
     date: Dayjs
@@ -268,7 +268,9 @@ export default class InspectionPersonsChart extends Vue {
 
   private buildDailyTransitionGraphData = (): GraphData => {
     const now = dayjs()
-    const rows = this.makeAveragePositivePerPatients(this.dailyData ?? [])
+    const rows = InspectionPersonsChart.makeAveragePositivePerPatients(
+      this.dailyData ?? []
+    )
       .where(d => d.date < now)
       .select(d => {
         let negatives: number | undefined

@@ -157,7 +157,7 @@ export default class HospitalizedChart extends Vue {
     }
   }
 
-  private makeAverageHospitalized = (
+  public static makeAverageHospitalized = (
     data: MainSummaryDataType[]
   ): Enumerable.IEnumerable<{
     date: Dayjs
@@ -189,7 +189,7 @@ export default class HospitalizedChart extends Vue {
 
   private buildDailyTransitionGraphData = (): GraphData => {
     const now = dayjs()
-    const rows = this.makeAverageHospitalized(this.dailyData ?? [])
+    const rows = HospitalizedChart.makeAverageHospitalized(this.dailyData ?? [])
       .where(d => d.date < now)
       .select(d => {
         return {
