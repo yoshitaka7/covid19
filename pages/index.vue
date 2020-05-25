@@ -7,16 +7,11 @@
     />
     <whats-new
       class="mb-1"
-      text="5/14、政府は愛知県の緊急事態宣言を解除しました。愛知県独自の「愛知県緊急事態措置」は 5/31 まで継続します。"
-      url="https://www.pref.aichi.jp/site/covid19-aichi/covid19-aichi.html"
-    />
-    <whats-new
-      class="mb-1"
       :text="newsItem.text"
       :date="newsItem.date"
       :url="newsItem.url"
     />
-    <whats-new
+    <whats-new-about
       class="mb-4"
       text="当サイトは有志が作成したものです。お問い合わせは愛知県ではなく、当サイト運営まで。"
       url="/about"
@@ -111,6 +106,7 @@
 <script>
 import PageHeader from '@/components/PageHeader.vue'
 import WhatsNew from '@/components/WhatsNew.vue'
+import WhatsNewAbout from '@/components/WhatsNewAbout.vue'
 import Data from '@/data/data.json'
 import CityData from '@/data/city_data.json'
 
@@ -133,6 +129,7 @@ export default {
   components: {
     PageHeader,
     WhatsNew,
+    WhatsNewAbout,
     SvgCard,
     ConfirmedCasesTable,
     ColumnMap,
