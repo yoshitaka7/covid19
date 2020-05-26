@@ -5,7 +5,7 @@
     url="https://www.pref.aichi.jp/site/covid19-aichi/"
     :remarks="remarks"
   >
-    <table border="3" bordercolor="#a83945" class="table_3HAQd">
+    <table class="table_3HAQd">
       <thead>
         <tr>
           <th scope="col" class="col-header">
@@ -66,7 +66,7 @@
             {{ rateCell.label }}%
           </td>
         </tr>
-        <tr>
+        <tr style="border: 3px solid #a83945; border-top-style:none;">
           <th scope="row" class="row-header">
             入院患者数
           </th>
@@ -79,6 +79,15 @@
           >
             {{ hospitalCell.label }}人
           </td>
+        </tr>
+        <tr style="height: 20px" />
+        <tr style="border: 3px solid #a83945">
+          <th scope="row" class="row-header">
+            感染率
+          </th>
+          <td class="col-caution">0.5人</td>
+          <td class="col-danger" />
+          <td class="col-actual">{{ youseiritsuCell.label }}人</td>
         </tr>
       </tbody>
     </table>
@@ -108,29 +117,35 @@ ul.remarks {
   width: 100%;
   color: #a83945;
   border-collapse: collapse;
+  border: 3px solid #a83945;
   font-size: 1.2rem;
   margin-bottom: 20px;
 }
 
 .col-header {
   padding: 10px;
+  border: 1px solid #a83945;
 }
 
 .row-header {
   text-align: left;
   padding: 10px;
+  border: 1px solid #a83945;
 }
 
 .col-caution {
   text-align: center;
+  border: 1px solid #a83945;
 }
 
 .col-danger {
   text-align: center;
+  border: 1px solid #a83945;
 }
 
 .col-actual {
   text-align: center;
+  border: 1px solid #a83945;
 }
 </style>
 
@@ -199,7 +214,8 @@ export default class MonitoringView extends Vue {
   private readonly remarks = [
     '<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/taisakusisin.html>愛知県新型コロナウイルス感染拡大予防対策指針</a>の「指標」に基き、当プロジェクトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
     '「新規感染者数」「入院患者数」は、過去7日間の平均です。定義詳細は「新規感染者数」「入院患者数」の各グラフを参照',
-    '「陽性率」は参考値の場合があります。定義詳細は「陽性率・検査実施人数」のグラフを参照'
+    '「陽性率」は参考値の場合があります。定義詳細は「陽性率・検査実施人数」のグラフを参照',
+    '「感染率」とは、直近1週間の10万人あたり感染者数です。その算出には、推計人口(2020年3月1日時点)を使用'
   ]
 
   @Prop()
@@ -216,6 +232,7 @@ export default class MonitoringView extends Vue {
   private rateCell: CellInfo
   private hospitalCell: CellInfo
   private totalCell: CellInfo
+  private youseiritsuCell: CellInfo
 
   constructor() {
     super()
@@ -233,8 +250,9 @@ export default class MonitoringView extends Vue {
 
     this.displayDate = latestMinDate.format('M/D')
 
-    const format = (x: number) => {
-      return String(Math.round(x * 10) / 10)
+    const format = (x: number, digits: number = 1) => {
+      const per = 10 ** digits
+      return String(Math.round(x * per) / per)
     }
 
     const emptyCell = {} as CellInfo
@@ -314,11 +332,26 @@ export default class MonitoringView extends Vue {
     )
 
     this.totalCell = Object.assign({}, emptyCell) as CellInfo
-    const maxStatus = items.maxBy(d => d.cell.status)
-    if (maxStatus?.cell?.status ?? 0 > 1) {
-      this.totalCell.bgColor = maxStatus?.cell.bgColor
-      this.totalCell.textColor = maxStatus?.cell.textColor
+    if (items.all(d => d.cell.status === 2)) {
+      // 全て危険ならその日は赤
+      this.totalCell.bgColor = this.indicator.colors.danger.bgColor
+      this.totalCell.textColor = this.indicator.colors.danger.textColor
+    } else if (items.any(d => d.cell.status >= 1)) {
+      // 一つでも注意以上ならその日は黄色
+      this.totalCell.bgColor = this.indicator.colors.caution.bgColor
+      this.totalCell.textColor = this.indicator.colors.caution.textColor
     }
+
+    // 現状日から７日前までの陽性者数合計
+    const numPatients7days = Enumerable.from(this.inspectionPersonsData)
+      .reverse()
+      .where(d => dayjs(d['日付']) <= latestMinDate)
+      .take(7)
+      .sum(d => d['陽性者数'] ?? 0)
+
+    this.youseiritsuCell = Object.assign({}, emptyCell) as CellInfo
+    const youseiritsu = (numPatients7days / 7549422) * 100000 // 愛知県の10万人あたり陽性者数
+    this.youseiritsuCell.label = format(youseiritsu, 2)
   }
 }
 </script>
