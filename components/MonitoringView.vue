@@ -27,13 +27,20 @@
           >
             危険<br />領域
           </th>
-          <th scope="col" class="col-header">{{ displayDate }}<br />の状況</th>
+          <th
+            scope="col"
+            class="col-header"
+            :bgcolor="totalCell.bgColor"
+            :style="'color: ' + totalCell.textColor"
+          >
+            {{ displayDate }}<br />の状況
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <th scope="row" class="row-header">
-            1.新規感染者数<br /><small>(過去7日間の平均)</small>
+            新規感染者数
           </th>
           <td class="col-caution">{{ indicator.patients.caution }}人</td>
           <td class="col-danger">{{ indicator.patients.danger }}人</td>
@@ -47,7 +54,7 @@
         </tr>
         <tr>
           <th scope="row" class="row-header">
-            2.陽性率<br /><small>(過去7日間)</small>
+            陽性率
           </th>
           <td class="col-caution">{{ indicator.rate.caution }}%</td>
           <td class="col-danger">{{ indicator.rate.danger }}%</td>
@@ -61,7 +68,7 @@
         </tr>
         <tr>
           <th scope="row" class="row-header">
-            3.入院患者数<br /><small>(過去7日間の平均)</small>
+            入院患者数
           </th>
           <td class="col-caution">{{ indicator.hospitals.caution }}人</td>
           <td class="col-danger">{{ indicator.hospitals.danger }}人</td>
@@ -141,6 +148,8 @@ import {
 } from '~/utils/types'
 import DataView from '@/components/DataView.vue'
 
+type StatusKind = 0 | 1 | 2 // 0:基準値未満, 1:注意, 2:危険
+
 type Colors = {
   bgColor: string
   textColor: string
@@ -153,6 +162,7 @@ type Values = {
 
 type CellInfo = Colors & {
   label: string
+  status: StatusKind
 }
 
 @Component({
@@ -187,9 +197,9 @@ export default class MonitoringView extends Vue {
   }
 
   private readonly remarks = [
-    '愛知県が<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/novel-coronavirus-taisakuhonbu.html>5月15日に発表した「指標」</a>に基き、当プロジェクトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
-    '各項目の定義は「新規感染者数」「陽性率・検査実施人数グラフ」「入院患者数」の各グラフを参照',
-    '陽性率は参考値である場合があります。「陽性率・検査実施人数グラフ」を参照。'
+    '<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/taisakusisin.html>愛知県新型コロナウイルス感染拡大予防対策指針</a>の「指標」に基き、当プロジェクトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
+    '「新規感染者数」「入院患者数」は、過去7日間の平均です。定義詳細は「新規感染者数」「入院患者数」の各グラフを参照',
+    '「陽性率」は参考値の場合があります。定義詳細は「陽性率・検査実施人数」のグラフを参照'
   ]
 
   @Prop()
@@ -205,6 +215,7 @@ export default class MonitoringView extends Vue {
   private patientCell: CellInfo
   private rateCell: CellInfo
   private hospitalCell: CellInfo
+  private totalCell: CellInfo
 
   constructor() {
     super()
@@ -220,7 +231,7 @@ export default class MonitoringView extends Vue {
       ) // 時刻を切り落とす
     ]).minBy(x => x)
 
-    this.displayDate = latestMinDate.format('M月D日')
+    this.displayDate = latestMinDate.format('M/D')
 
     const format = (x: number) => {
       return String(Math.round(x * 10) / 10)
@@ -235,35 +246,12 @@ export default class MonitoringView extends Vue {
       .reverse()
       .firstOrDefault(d => d.date <= latestMinDate)
 
-    this.patientCell = Object.assign({}, emptyCell) as CellInfo
-    if (latestPatient?.average != null) {
-      this.patientCell.label = format(latestPatient.average)
-      if (latestPatient.average >= this.indicator.patients.danger) {
-        this.patientCell.bgColor = this.indicator.colors.danger.bgColor
-        this.patientCell.textColor = this.indicator.colors.danger.textColor
-      } else if (latestPatient.average >= this.indicator.patients.caution) {
-        this.patientCell.bgColor = this.indicator.colors.caution.bgColor
-        this.patientCell.textColor = this.indicator.colors.caution.textColor
-      }
-    }
-
     // 現状日の陽性率
     const latestInspection = InspectionPersonsChart.makeAveragePositivePerPatients(
       this.inspectionPersonsData
     )
       .reverse()
       .firstOrDefault(d => d.date <= latestMinDate)
-    this.rateCell = Object.assign({}, emptyCell) as CellInfo
-    if (latestInspection?.average != null) {
-      this.rateCell.label = format(latestInspection.average)
-      if (latestInspection.average >= this.indicator.rate.danger) {
-        this.rateCell.bgColor = this.indicator.colors.danger.bgColor
-        this.rateCell.textColor = this.indicator.colors.danger.textColor
-      } else if (latestInspection.average >= this.indicator.rate.caution) {
-        this.rateCell.bgColor = this.indicator.colors.caution.bgColor
-        this.rateCell.textColor = this.indicator.colors.caution.textColor
-      }
-    }
 
     // 現状日の入院者数の後方７日間平均
     const latestMainSummary = HospitalizedChart.makeAverageHospitalized(
@@ -271,18 +259,65 @@ export default class MonitoringView extends Vue {
     )
       .reverse()
       .firstOrDefault(d => d.date <= latestMinDate)
+
+    this.patientCell = Object.assign({}, emptyCell) as CellInfo
+    this.rateCell = Object.assign({}, emptyCell) as CellInfo
     this.hospitalCell = Object.assign({}, emptyCell) as CellInfo
-    if (latestMainSummary?.average != null) {
-      this.hospitalCell.label = format(latestMainSummary.average)
-      if (latestMainSummary.average >= this.indicator.hospitals.danger) {
-        this.hospitalCell.bgColor = this.indicator.colors.danger.bgColor
-        this.hospitalCell.textColor = this.indicator.colors.danger.textColor
-      } else if (
-        latestMainSummary.average >= this.indicator.hospitals.caution
-      ) {
-        this.hospitalCell.bgColor = this.indicator.colors.caution.bgColor
-        this.hospitalCell.textColor = this.indicator.colors.caution.textColor
+
+    const applyStyle = (
+      average: number | undefined,
+      indicators: Values,
+      cautionColors: Colors,
+      dangerColors: Colors,
+      cell: CellInfo
+    ) => {
+      if (average != null) {
+        cell.label = format(average)
+        if (average >= indicators.danger) {
+          cell.bgColor = dangerColors.bgColor
+          cell.textColor = dangerColors.textColor
+          cell.status = 2
+        } else if (average >= indicators.caution) {
+          cell.bgColor = cautionColors.bgColor
+          cell.textColor = cautionColors.textColor
+          cell.status = 1
+        }
       }
+    }
+
+    const items = Enumerable.from([
+      {
+        value: latestPatient?.average,
+        indicator: this.indicator.patients,
+        cell: this.patientCell
+      },
+      {
+        value: latestInspection?.average,
+        indicator: this.indicator.rate,
+        cell: this.rateCell
+      },
+      {
+        value: latestMainSummary?.average,
+        indicator: this.indicator.hospitals,
+        cell: this.hospitalCell
+      }
+    ])
+
+    items.forEach(item =>
+      applyStyle(
+        item.value,
+        item.indicator,
+        this.indicator.colors.caution,
+        this.indicator.colors.danger,
+        item.cell
+      )
+    )
+
+    this.totalCell = Object.assign({}, emptyCell) as CellInfo
+    const maxStatus = items.maxBy(d => d.cell.status)
+    if (maxStatus?.cell?.status ?? 0 > 1) {
+      this.totalCell.bgColor = maxStatus?.cell.bgColor
+      this.totalCell.textColor = maxStatus?.cell.textColor
     }
   }
 }
