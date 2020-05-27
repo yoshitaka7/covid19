@@ -3,9 +3,10 @@
     title="判断指標と達成状況"
     title-id="new-patients-chart"
     url="https://www.pref.aichi.jp/site/covid19-aichi/"
+    :date="updateAt"
     :remarks="remarks"
   >
-    <table class="table_3HAQd">
+    <table class="table">
       <thead>
         <tr>
           <th scope="col" class="col-header">
@@ -109,10 +110,11 @@
 
 <style lang="scss" scoped>
 ul.remarks {
+  font-size: 0.75rem;
   list-style-type: '※ ';
 }
 
-.table_3HAQd {
+.table {
   height: 0;
   width: 100%;
   color: #a83945;
@@ -219,14 +221,24 @@ export default class MonitoringView extends Vue {
   ]
 
   @Prop()
+  public parientsDate!: string
+
+  @Prop()
   public parientsData!: PatientsSummaryDaily[]
+
+  @Prop()
+  public inspectionPersonsDate!: string
 
   @Prop()
   public inspectionPersonsData!: InspectionPersonsSummaryDaily[]
 
   @Prop()
+  public mainSummaryDate!: string
+
+  @Prop()
   public mainSummaryData!: MainSummaryDataType[]
 
+  private updateAt = '-'
   private displayDate = '-'
   private patientCell: CellInfo
   private rateCell: CellInfo
@@ -236,6 +248,13 @@ export default class MonitoringView extends Vue {
 
   constructor() {
     super()
+
+    // 3つのデータのもっとも最新の更新日をこのパネルの更新日とする
+    this.updateAt = Enumerable.from([
+      this.parientsDate,
+      this.inspectionPersonsDate,
+      this.mainSummaryDate
+    ]).maxBy(d => d)
 
     // 3つのデータそれぞれの最新日付の中で、最も古い日を現状日とする
     const latestMinDate = Enumerable.from([

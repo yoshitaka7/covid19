@@ -19,8 +19,11 @@
     <v-row class="DataBlock">
       <v-col cols="12" md="6" class="DataCard">
         <monitoring-view
+          :parients-date="Data.patients_summary.date"
           :parients-data="Data.patients_summary.data"
+          :inspection-persons-date="Data.inspection_persons_summary.date"
           :inspection-persons-data="Data.inspection_persons_summary.data"
+          :main-summary-date="Data.main_summary_history.date"
           :main-summary-data="Data.main_summary_history.data"
         />
       </v-col>
