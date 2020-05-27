@@ -3,7 +3,7 @@
     title="入院患者数"
     title-id="hospitalized-chart"
     :date="date"
-    url="https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html"
+    url="https://www.pref.aichi.jp/site/covid19-aichi/"
   >
     <template v-if="showSelector" v-slot:button>
       <data-selector v-model="dataKind" :items="dataKinds" />
@@ -158,7 +158,7 @@ export default class HospitalizedChart extends Vue {
     }
   }
 
-  private makeAverageHospitalized = (
+  public static makeAverageHospitalized = (
     data: MainSummaryDataType[]
   ): Enumerable.IEnumerable<{
     date: Dayjs
@@ -190,7 +190,7 @@ export default class HospitalizedChart extends Vue {
 
   private buildDailyTransitionGraphData = (): GraphData => {
     const now = dayjs()
-    const rows = this.makeAverageHospitalized(this.dailyData ?? [])
+    const rows = HospitalizedChart.makeAverageHospitalized(this.dailyData ?? [])
       .where(d => d.date < now)
       .select(d => {
         return {

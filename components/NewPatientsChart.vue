@@ -85,8 +85,8 @@ export default class NewPatientsChart extends Vue {
   public weeklyData?: PatientsSummaryWeekly[]
 
   private readonly remarks = [
-    '「陽性患者数」とは、愛知県が発表する「<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html>愛知県内発生事例</a>」を日別または週別に集計した人数です。(参考:<a class=RemarksLink target=_blank href=https://github.com/code4nagoya/covid19/blob/development/data/patients.csv>当サイトでCSV形式に加工したデータ</a>)。',
-    '過去7日間の平均は、陽性患者数の後方7日移動平均値です'
+    '「新規感染者数」とは、愛知県が発表する「<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html>愛知県内発生事例</a>」を日別または週別に集計した人数です。(参考:<a class=RemarksLink target=_blank href=https://github.com/code4nagoya/covid19/blob/development/data/patients.csv>当サイトでCSV形式に加工したデータ</a>)。',
+    '過去7日間の平均は、新規感染者数の後方7日移動平均値です'
   ]
 
   private readonly showSelector = true
@@ -100,7 +100,9 @@ export default class NewPatientsChart extends Vue {
   private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private get displayTitle(): string {
-    return `陽性患者数${this.dataKind === 'weekly-transition' ? '(週別)' : ''}`
+    return `新規感染者数${
+      this.dataKind === 'weekly-transition' ? '(週別)' : ''
+    }`
   }
 
   private formatDayBeforeRatio = (dayBeforeRatio: any) => {
@@ -174,7 +176,7 @@ export default class NewPatientsChart extends Vue {
     }
   }
 
-  private makeAveragePatients = (
+  public static makeAveragePatients = (
     data: PatientsSummaryDaily[]
   ): Enumerable.IEnumerable<{
     date: Dayjs
@@ -205,7 +207,7 @@ export default class NewPatientsChart extends Vue {
 
   private buildDailyTransitionGraphData = (): GraphData => {
     const now = dayjs()
-    const rows = this.makeAveragePatients(this.dailyData ?? [])
+    const rows = NewPatientsChart.makeAveragePatients(this.dailyData ?? [])
       .where(d => d.date < now)
       .select(d => {
         return {
