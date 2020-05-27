@@ -36,6 +36,7 @@
 
 <style lang="scss" scoped>
 ul.remarks {
+  font-size: 0.75rem;
   list-style-type: '※ ';
 }
 </style>
