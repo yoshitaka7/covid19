@@ -3,7 +3,7 @@
     title="重症者数"
     title-id="critically-chart"
     :date="date"
-    url="https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html"
+    url="https://www.pref.aichi.jp/site/covid19-aichi/"
   >
     <template v-if="showSelector" v-slot:button>
       <data-selector v-model="dataKind" :items="dataKinds" />
