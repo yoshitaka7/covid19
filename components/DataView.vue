@@ -62,6 +62,7 @@ export default class DataView extends Vue {
 
 <style lang="scss">
 .RemarksLink {
+  font-size: 0.75rem;
   text-decoration: none;
   .ExternalLinkIcon {
     vertical-align: text-bottom;
