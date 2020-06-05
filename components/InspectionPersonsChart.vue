@@ -16,6 +16,7 @@
       legend-order-kind="desc"
       :y-axis-left-setting="yAxisLeftSetting"
       :y-axis-right-setting="yAxisRightSetting"
+      disable-legend-click="true"
     />
 
     <div>
@@ -33,6 +34,7 @@
 
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
+        :l-title="displayInfo.lTitle"
         :l-text="displayInfo.lText"
         :s-text="displayInfo.sText"
         :unit="displayInfo.unit"
@@ -43,6 +45,7 @@
 
 <style lang="scss" scoped>
 ul.remarks {
+  font-size: 0.75rem;
   list-style-type: '※ ';
 }
 </style>
@@ -60,13 +63,14 @@ import TimeBarLineChart, {
   YAxisSetting
 } from '@/components/TimeBarLineChart.vue'
 import {
-  InspectionsSummaryWeekly,
-  InspectionPersonsSummaryDaily
+  InspectionPersonsSummaryDaily,
+  InspectionPersonsSummaryWeelky
 } from '~/utils/types'
 
 type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
 
 type DisplayInfo = {
+  lTitle: string
   lText: string
   sText: string
   unit: string
@@ -89,7 +93,7 @@ export default class InspectionPersonsChart extends Vue {
   public dailyData?: InspectionPersonsSummaryDaily[]
 
   @Prop()
-  public weeklyData?: InspectionsSummaryWeekly[]
+  public weeklyData?: InspectionPersonsSummaryWeelky[]
 
   private readonly yAxisLeftSetting: YAxisSetting = {
     min: 0,
@@ -105,11 +109,19 @@ export default class InspectionPersonsChart extends Vue {
     visible: true
   } as YAxisSetting
 
-  private readonly remarks = [
-    '日別と累計では、日別データが公開されている期間のみ表示',
-    '愛知県分（愛知県衛生研究所等）及び保健所設置市分（名古屋市衛生研究所等）の合計',
-    '民間施設等の検査件数及び陽性者数を含んでいます（発表時点での把握数）'
-  ]
+  private get remarks(): string[] {
+    const youseiritsu =
+      this.dataKind === 'weekly-transition'
+        ? '「陽性率」とは、週の陽性者数／週の検査人数です'
+        : '「陽性率」とは、陽性者数(過去7日間)／検査人数(過去7日間)です'
+
+    return [
+      '「検査人数」は、陰性確認の検査を除いた人数です',
+      '愛知県分(愛知県衛生研究所等)、保健所設置市分(名古屋市衛生研究所等)及び民間施設等の検査の合計',
+      '灰色の検査人数と点線の陽性率は、愛知県の公式発表値がなく、当プロジェクトが記録した累積値から算出するなどした参考値です',
+      youseiritsu
+    ]
+  }
 
   private readonly showSelector = true
   private dataKind: DataKind = 'daily-transition'
@@ -121,7 +133,7 @@ export default class InspectionPersonsChart extends Vue {
   private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private get displayTitle(): string {
-    return `検査実施人数${
+    return `陽性率・検査実施人数${
       this.dataKind === 'weekly-transition' ? '(週別)' : ''
     }`
   }
@@ -133,11 +145,23 @@ export default class InspectionPersonsChart extends Vue {
   }
 
   private get displayDiffValue(): string {
-    if (this.chartData.datasets[0].values.slice(-2)[0] === undefined) {
+    const dataset1 = this.chartData.datasets[3]
+    const dataset2 = this.chartData.datasets[4]
+    if (
+      dataset1.values.slice(-2)[0] === undefined &&
+      dataset2.values.slice(-2)[0] === undefined
+    ) {
       return '-'
     }
-    const lastDay = this.chartData.datasets[0].values.slice(-1)[0]
-    const lastDayBefore = this.chartData.datasets[0].values.slice(-2)[0]
+    const lastDay =
+      Math.round(
+        (dataset1.values.slice(-1)[0] ?? dataset2.values.slice(-1)[0]) * 10
+      ) / 10
+    const lastDayBefore =
+      Math.round(
+        (dataset1.values.slice(-2)[0] ?? dataset2.values.slice(-2)[0]) * 10
+      ) / 10
+
     if (lastDay == null || lastDayBefore == null) {
       return '-'
     }
@@ -153,15 +177,23 @@ export default class InspectionPersonsChart extends Vue {
       } as DisplayInfo
     }
 
-    const dataset = this.chartData.datasets[0]
-    const latestValueText = dataset.values.slice(-1)[0]?.toLocaleString() ?? '-'
+    const dataset1 = this.chartData.datasets[3]
+    const dataset2 = this.chartData.datasets[4]
+    const latestValue =
+      Math.round(
+        (dataset1.values.slice(-1)[0] ?? dataset2.values.slice(-1)[0]) * 10
+      ) / 10
+    const latestValueText = latestValue.toLocaleString() ?? '-'
+    const latestValueAppend =
+      dataset1.tags == null ? '' : dataset1.tags.slice(-1)[0] ? '参考値' : ''
     const diffLabel =
       this.dataKind === 'weekly-transition' ? '前週比' : '前日比'
     const latestDate = this.formatDateLabel(this.chartData.dates.slice(-1)[0])
     return {
-      lText: latestValueText,
-      sText: `${latestDate} 時点（${diffLabel}：${this.displayDiffValue} ${dataset.unit}）`,
-      unit: dataset.unit
+      lTitle: '陽性率',
+      lText: `${latestValueText}`,
+      sText: `${latestDate} 時点${latestValueAppend}（${diffLabel}：${this.displayDiffValue} ポイント）`,
+      unit: `${dataset1.unit}`
     }
   }
 
@@ -196,7 +228,7 @@ export default class InspectionPersonsChart extends Vue {
     }
   }
 
-  private makeAveragePositivePerPatients = (
+  public static makeAveragePositivePerPatients = (
     data: InspectionPersonsSummaryDaily[]
   ): Enumerable.IEnumerable<{
     date: Dayjs
@@ -214,10 +246,7 @@ export default class InspectionPersonsChart extends Vue {
         let ave
         if (d.count() === 7) {
           const grp = d.where(
-            d =>
-              d['陽性者数'] !== undefined &&
-              d['検査人数'] !== undefined &&
-              d['非確定'] === ''
+            d => d['陽性者数'] !== undefined && d['検査人数'] !== undefined
           )
           const sumPositives = grp.sum(e => Number(e['陽性者数']))
           const sumTotal = grp.sum(e => Number(e['検査人数']))
@@ -232,7 +261,7 @@ export default class InspectionPersonsChart extends Vue {
           positives: Number(first['陽性者数']),
           persons: Number(first['検査人数']),
           average: ave,
-          uncertain: first['非確定'] !== ''
+          uncertain: d.any(x => x['非確定'] !== '')
         }
       })
       .reverse()
@@ -240,7 +269,9 @@ export default class InspectionPersonsChart extends Vue {
 
   private buildDailyTransitionGraphData = (): GraphData => {
     const now = dayjs()
-    const rows = this.makeAveragePositivePerPatients(this.dailyData ?? [])
+    const rows = InspectionPersonsChart.makeAveragePositivePerPatients(
+      this.dailyData ?? []
+    )
       .where(d => d.date < now)
       .select(d => {
         let negatives: number | undefined
@@ -254,41 +285,97 @@ export default class InspectionPersonsChart extends Vue {
           positives: d.positives,
           negatives,
           average: d.average,
-          uncertain: d.uncertain
+          uncertain: d.uncertain ? 1 : 0,
+          change: false
         }
       })
+      // 公式値と参考値の折れ線グラフをつなげるために、公式→参考または参考→公式に切り替わる直前日を change=true にする処理
+      // リストを逆転させて日付１と２（次は２と３…）のペアを作り、
+      // 非確定フラグの XOR で変更を取得して change に設定
+      // 最後にリストを再逆転させて日付昇順に戻して完成
+      .reverse()
+      .scan((pre, cur) => {
+        cur.change = ((pre?.uncertain ?? 0) ^ cur.uncertain) === 1
+        return cur
+      })
+      .reverse()
 
     return {
       dates: rows.select(d => d.date).toArray(),
+      // 検査人数と陽性率は、公式値と参考値で色の異なる２つの dataset を用意
+      // 公式値側は公式値のみ（!d.uncertain）が格納された values, tooltipValues を作成し、
+      // 参考値側は参考値のみ（d.uncertain）が格納された values, tooltipValues を作成。
+      // 参考値側の凡例は非表示に設定。凡例クリックを無効にしている理由１
       datasets: [
+        {
+          type: 'bar',
+          title: '検査人数',
+          yAxisKind: 'y-axis-left',
+          unit: '人',
+          values: rows
+            .select(d => (!d.uncertain ? d.negatives : undefined))
+            .toArray(),
+          tooltipValues: rows
+            .select(d => (!d.uncertain ? d.persons : undefined))
+            .toArray(),
+          color: '#D99694',
+          order: 5
+        },
+        {
+          type: 'bar',
+          title: '検査人数', // 参考値
+          yAxisKind: 'y-axis-left',
+          unit: '人',
+          // 検査人数ｎ人中、陽性者数ｍ人、という表現にしたいため、
+          // 棒グラフには、陰性者数(negatives)を積み上げるが、
+          // 凡例やツールチップでは検査人数(persons)として振る舞う
+          // 凡例クリックを無効にしている理由２
+          values: rows
+            .select(d => (d.uncertain ? d.negatives : undefined))
+            .toArray(),
+          tooltipValues: rows
+            .select(d => (d.uncertain ? d.persons : undefined))
+            .toArray(),
+          color: '#d3d3d3',
+          order: 4,
+          legendVisible: false
+        },
         {
           type: 'bar',
           title: '陽性者数',
           yAxisKind: 'y-axis-left',
           unit: '人',
           values: rows.select(d => d.positives).toArray(),
-          order: 2
-        },
-        {
-          type: 'bar',
-          title: '検査人数',
-          yAxisKind: 'y-axis-left',
-          unit: '人',
-          values: rows.select(d => d.negatives).toArray(),
-          tooltipValues: rows.select(d => d.persons).toArray(),
-          color: '#D99694',
-          colors: rows
-            .select(d => (d.uncertain ? '#d3d3d3' : '#D99694'))
-            .toArray(),
           order: 3
         },
         {
           type: 'line',
-          title: '過去7日間の陽性率',
+          title: '陽性率',
           yAxisKind: 'y-axis-right',
           unit: '%',
-          values: rows.select(d => d.average).toArray(),
-          order: 1
+          values: rows
+            .select(d => (!d.uncertain || d.change ? d.average : undefined))
+            .toArray(),
+          tooltipValues: rows
+            .select(d => (!d.uncertain ? d.average : undefined))
+            .toArray(),
+          tags: rows.select(d => d.uncertain).toArray(),
+          order: 2
+        },
+        {
+          type: 'line',
+          title: '陽性率', // 参考値
+          yAxisKind: 'y-axis-right',
+          unit: '%',
+          values: rows
+            .select(d => (d.uncertain || d.change ? d.average : undefined))
+            .toArray(),
+          tooltipValues: rows
+            .select(d => (d.uncertain ? d.average : undefined))
+            .toArray(),
+          lineStyle: 'dashed',
+          order: 1,
+          legendVisible: false
         }
       ]
     } as GraphData
@@ -307,18 +394,97 @@ export default class InspectionPersonsChart extends Vue {
             dayjs(d['開始日']).format('YYYY-MM-DD'),
             dayjs(d['終了日']).format('YYYY-MM-DD')
           ],
-          count: Number(d['小計'])
+          persons: d['検査人数'],
+          positives: d['陽性者数'],
+          negatives: (d['検査人数'] ?? 0) - (d['陽性者数'] ?? 0),
+          average: ((d['陽性者数'] ?? 0) / (d['検査人数'] ?? 0)) * 100, // FIXME 0除算未考慮
+          uncertain: d['非確定'] !== '' ? 1 : 0,
+          change: false
         }
       })
+      // 公式値と参考値の折れ線グラフをつなげるために、公式→参考または参考→公式に切り替わる直前日を change=true にする処理
+      // リストを逆転させて日付１と２（次は２と３…）のペアを作り、
+      // 非確定フラグの XOR で変更を取得して change に設定
+      // 最後にリストを再逆転させて日付昇順に戻して完成
+      .reverse()
+      .scan((pre, cur) => {
+        cur.change = ((pre?.uncertain ?? 0) ^ cur.uncertain) === 1
+        return cur
+      })
+      .reverse()
 
     return {
       dates: rows.select(d => d.date).toArray(),
+      // 検査人数と陽性率は、公式値と参考値で色の異なる２つの dataset を用意
+      // 公式値側は公式値のみ（!d.uncertain）が格納された values, tooltipValues を作成し、
+      // 参考値側は参考値のみ（d.uncertain）が格納された values, tooltipValues を作成。
+      // 参考値側の凡例は非表示に設定。
       datasets: [
         {
           type: 'bar',
-          title: '陽性者数',
+          title: '検査人数',
+          yAxisKind: 'y-axis-left',
           unit: '人',
-          values: rows.select(d => d.count).toArray()
+          values: rows
+            .select(d => (d.uncertain ? undefined : d.negatives))
+            .toArray(),
+          tooltipValues: rows
+            .select(d => (d.uncertain ? undefined : d.persons))
+            .toArray(),
+          color: '#D99694',
+          order: 5
+        },
+        {
+          type: 'bar',
+          title: '検査人数', // 参考値
+          yAxisKind: 'y-axis-left',
+          unit: '人',
+          values: rows
+            .select(d => (!d.uncertain ? undefined : d.negatives))
+            .toArray(),
+          tooltipValues: rows
+            .select(d => (!d.uncertain ? undefined : d.persons))
+            .toArray(),
+          color: '#d3d3d3',
+          order: 4,
+          legendVisible: false
+        },
+        {
+          type: 'bar',
+          title: '陽性者数',
+          yAxisKind: 'y-axis-left',
+          unit: '人',
+          values: rows.select(d => d.positives).toArray(),
+          order: 3
+        },
+        {
+          type: 'line',
+          title: '陽性率',
+          yAxisKind: 'y-axis-right',
+          unit: '%',
+          values: rows
+            .select(d => (!d.uncertain || d.change ? d.average : undefined))
+            .toArray(),
+          tooltipValues: rows
+            .select(d => (!d.uncertain ? d.average : undefined))
+            .toArray(),
+          tags: rows.select(d => d.uncertain).toArray(),
+          order: 2
+        },
+        {
+          type: 'line',
+          title: '陽性率', // 参考値
+          yAxisKind: 'y-axis-right',
+          unit: '%',
+          values: rows
+            .select(d => (d.uncertain || d.change ? d.average : undefined))
+            .toArray(),
+          tooltipValues: rows
+            .select(d => (d.uncertain ? d.average : undefined))
+            .toArray(),
+          lineStyle: 'dashed',
+          order: 1,
+          legendVisible: false
         }
       ]
     } as GraphData

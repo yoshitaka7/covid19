@@ -7,21 +7,57 @@
     />
     <whats-new
       class="mb-1"
-      text="5/14、政府は愛知県の緊急事態宣言を解除しました。愛知県独自の「愛知県緊急事態措置」は 5/31 まで継続します。"
-      url="https://www.pref.aichi.jp/site/covid19-aichi/covid19-aichi.html"
-    />
-    <whats-new
-      class="mb-1"
       :text="newsItem.text"
       :date="newsItem.date"
       :url="newsItem.url"
     />
-    <whats-new
+    <whats-new-about
       class="mb-4"
       text="当サイトは有志が作成したものです。お問い合わせは愛知県ではなく、当サイト運営まで。"
       url="/about"
     />
     <v-row class="DataBlock">
+      <v-col cols="12" md="6" class="DataCard">
+        <monitoring-view
+          :parients-date="Data.patients_summary.date"
+          :parients-data="Data.patients_summary.data"
+          :inspection-persons-date="Data.inspection_persons_summary.date"
+          :inspection-persons-data="Data.inspection_persons_summary.data"
+          :main-summary-date="Data.main_summary_history.date"
+          :main-summary-data="Data.main_summary_history.data"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <new-patients-chart
+          :date="Data.patients_summary.date"
+          :daily-data="Data.patients_summary.data"
+          :weekly-data="dataWeekly.patients_summary.data"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <inspection-persons-chart
+          :date="Data.inspection_persons_summary.date"
+          :daily-data="Data.inspection_persons_summary.data"
+          :weekly-data="dataWeekly.inspection_persons_summary.data"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <hospitalized-chart
+          :date="Data.main_summary_history.date"
+          :daily-data="Data.main_summary_history.data"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <main-summary-chart
+          :date="Data.main_summary_history.date"
+          :daily-data="Data.main_summary_history.data"
+        />
+      </v-col>
+
       <v-col cols="12" md="6" class="DataCard">
         <svg-card
           title="検査陽性者の状況"
@@ -37,53 +73,8 @@
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
-        <hospitalized-chart
-          :date="Data.main_summary_history.date"
-          :daily-data="Data.main_summary_history.data"
-        />
-      </v-col>
-
-      <v-col cols="12" md="6" class="DataCard">
-        <critically-chart
-          :date="Data.main_summary_history.date"
-          :daily-data="Data.main_summary_history.data"
-        />
-      </v-col>
-
-      <v-col cols="12" md="6" class="DataCard">
-        <new-patients-chart
-          :date="Data.patients_summary.date"
-          :daily-data="Data.patients_summary.data"
-          :weekly-data="dataWeekly.patients_summary.data"
-        />
-      </v-col>
-
-      <v-col cols="12" md="6" class="DataCard">
-        <main-summary-chart
-          :date="Data.main_summary_history.date"
-          :daily-data="Data.main_summary_history.data"
-        />
-      </v-col>
-
-      <v-col cols="12" md="6" class="DataCard">
-        <inspection-count-chart
-          :date="Data.inspections_summary.date"
-          :daily-data="Data.inspections_summary.data"
-          :weekly-data="dataWeekly.inspections_summary.data"
-        />
-      </v-col>
-
-      <v-col cols="12" md="6" class="DataCard">
-        <inspection-persons-chart
-          :date="Data.inspection_persons_summary.date"
-          :daily-data="Data.inspection_persons_summary.data"
-          :weekly-data="dataWeekly.inspections_summary.data"
-        />
-      </v-col>
-
-      <v-col cols="12" md="6" class="DataCard">
         <column-map
-          title="市町村別感染状況"
+          title="市町村別感染者数"
           :title-id="'patients-per-cities'"
           :date="Data.patients.date"
           :data="patientsPerCities"
@@ -96,6 +87,21 @@
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
         />
       </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <critically-chart
+          :date="Data.main_summary_history.date"
+          :daily-data="Data.main_summary_history.data"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <inspection-count-chart
+          :date="Data.inspections_summary.date"
+          :daily-data="Data.inspections_summary.data"
+          :weekly-data="dataWeekly.inspections_summary.data"
+        />
+      </v-col>
     </v-row>
   </div>
 </template>
@@ -103,6 +109,7 @@
 <script>
 import PageHeader from '@/components/PageHeader.vue'
 import WhatsNew from '@/components/WhatsNew.vue'
+import WhatsNewAbout from '@/components/WhatsNewAbout.vue'
 import Data from '@/data/data.json'
 import CityData from '@/data/city_data.json'
 
@@ -117,6 +124,7 @@ import InspectionPersonsChart from '@/components/InspectionPersonsChart.vue'
 import MainSummaryChart from '@/components/MainSummaryChart.vue'
 import HospitalizedChart from '@/components/HospitalizedChart.vue'
 import CriticallyChart from '@/components/CriticallyChart.vue'
+import MonitoringView from '@/components/MonitoringView.vue'
 import weeklizer from '@/utils/weeklizer'
 import normalizer from '@/utils/normalizer'
 
@@ -124,6 +132,7 @@ export default {
   components: {
     PageHeader,
     WhatsNew,
+    WhatsNewAbout,
     SvgCard,
     ConfirmedCasesTable,
     ColumnMap,
@@ -132,7 +141,8 @@ export default {
     HospitalizedChart,
     CriticallyChart,
     InspectionCountChart,
-    InspectionPersonsChart
+    InspectionPersonsChart,
+    MonitoringView
   },
   data() {
     // 日次データの補正

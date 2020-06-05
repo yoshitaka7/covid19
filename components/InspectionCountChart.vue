@@ -13,6 +13,7 @@
     <time-bar-line-chart
       chart-id="inspection-count-chart"
       :chart-data="chartData"
+      :y-axis-left-setting="yAxisLeftSetting"
     />
 
     <div>
@@ -40,6 +41,7 @@
 
 <style lang="scss" scoped>
 ul.remarks {
+  font-size: 0.75rem;
   list-style-type: '※ ';
 }
 </style>
@@ -52,7 +54,10 @@ import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
-import TimeBarLineChart, { GraphData } from '@/components/TimeBarLineChart.vue'
+import TimeBarLineChart, {
+  GraphData,
+  YAxisSetting
+} from '@/components/TimeBarLineChart.vue'
 import {
   InspectionsSummaryDaily,
   InspectionsSummaryWeekly
@@ -84,6 +89,12 @@ export default class InspectionCountChart extends Vue {
 
   @Prop()
   public weeklyData?: InspectionsSummaryWeekly[]
+
+  private readonly yAxisLeftSetting: YAxisSetting = {
+    min: 0,
+    unit: '件',
+    visible: true
+  } as YAxisSetting
 
   private readonly remarks = [
     '日別と累計では、日別データが公開されている期間のみ表示',
@@ -228,7 +239,7 @@ export default class InspectionCountChart extends Vue {
         {
           type: 'bar',
           title: '件数',
-          unit: '人',
+          unit: '件',
           values: rows.select(d => d.count).toArray()
         }
       ]
@@ -257,7 +268,7 @@ export default class InspectionCountChart extends Vue {
         {
           type: 'bar',
           title: '累計件数',
-          unit: '人',
+          unit: '件',
           values: rows.select(d => d.total).toArray()
         }
       ]

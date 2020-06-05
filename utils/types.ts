@@ -74,3 +74,11 @@ export type InspectionPersonsSummaryDaily = {
   陽性者数?: number
   非確定?: string
 }
+
+export type InspectionPersonsSummaryWeelky = {
+  開始日: string
+  終了日: string
+  検査人数?: number
+  陽性者数?: number
+  非確定?: string
+}
