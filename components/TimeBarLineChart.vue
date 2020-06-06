@@ -47,6 +47,7 @@ export type YAxisSetting = {
   step?: number // グリッド線刻み値（既定値は自動）
   unit: string // 単位
   visible: boolean // 表示 or 非表示
+  stacked: boolean // 積み上げるか？（既定値は true）
 }
 
 // X軸の日付（日次は string, 週次は [開始日, 終了日] の配列
@@ -146,15 +147,14 @@ export default class TimeBarLineChart extends Vue {
             continue
           }
           const ds = this.chartData.datasets[legend.datasetIndex]
-          if (ds.colors == null) {
-            continue
-          }
           if (ds.type === 'bar') {
             legend.fillStyle = ds.color ?? this.defaultBarColor
             legend.strokeStyle = undefined
+            legend.pointStyle = 'rect'
           } else if (ds.type === 'line') {
-            legend.fillStyle = ds.color ?? this.defaultLineColor
-            legend.strokeStyle = undefined
+            legend.fillStyle = undefined
+            legend.strokeStyle = ds.color ?? this.defaultLineColor
+            legend.pointStyle = 'line'
           }
         }
       }
@@ -186,7 +186,7 @@ export default class TimeBarLineChart extends Vue {
       borderWidth: 3,
       borderDash: dataset.lineStyle === 'dashed' ? [4, 3] : [],
       pointRadius: 0,
-      pointHitRadius: 2,
+      pointHitRadius: 10,
       fill: false,
       order: dataset.order ?? 0,
       lineTension: 0
@@ -272,6 +272,7 @@ export default class TimeBarLineChart extends Vue {
           this.chartData.datasets.filter(d => d.visible ?? true).length > 1,
         reverse: (this.legendOrderKind ?? 'asc') === 'desc',
         labels: {
+          usePointStyle: true,
           filter: (item: ChartLegendLabelItem) => {
             if (item.datasetIndex == null) {
               return false
@@ -282,6 +283,9 @@ export default class TimeBarLineChart extends Vue {
         }
       },
       scales: {
+        scaleLabel: {
+          display: false
+        },
         xAxes: [
           {
             id: 'day',
@@ -299,7 +303,7 @@ export default class TimeBarLineChart extends Vue {
         yAxes: [
           {
             id: 'y-axis-left',
-            stacked: true,
+            stacked: this.displayYAxisLeftSetting.stacked ?? true,
             gridLines: {
               display: true,
               color: '#E5E5E5'
