@@ -29,6 +29,18 @@
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
+        <monitoring-chart
+          :date="Data.patients_summary.date"
+          :parients-date="Data.patients_summary.date"
+          :parients-data="Data.patients_summary.data"
+          :inspection-persons-date="Data.inspection_persons_summary.date"
+          :inspection-persons-data="Data.inspection_persons_summary.data"
+          :main-summary-date="Data.main_summary_history.date"
+          :main-summary-data="Data.main_summary_history.data"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
         <new-patients-chart
           :date="Data.patients_summary.date"
           :daily-data="Data.patients_summary.data"
@@ -119,6 +131,7 @@ import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
 import NewPatientsChart from '@/components/NewPatientsChart.vue'
+import MonitoringChart from '@/components/MonitoringChart.vue'
 import InspectionCountChart from '@/components/InspectionCountChart.vue'
 import InspectionPersonsChart from '@/components/InspectionPersonsChart.vue'
 import MainSummaryChart from '@/components/MainSummaryChart.vue'
@@ -136,6 +149,7 @@ export default {
     SvgCard,
     ConfirmedCasesTable,
     ColumnMap,
+    MonitoringChart,
     NewPatientsChart,
     MainSummaryChart,
     HospitalizedChart,
