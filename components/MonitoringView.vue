@@ -117,6 +117,15 @@
         <!-- eslint-disable vue/no-v-html -->
       </ul>
     </div>
+
+    <template v-slot:infoPanel>
+      <data-view-basic-info-panel
+        l-title="判定"
+        :l-text="displayInfo.lText"
+        :s-text="displayInfo.sText"
+        :unit="displayInfo.unit"
+      />
+    </template>
   </data-view>
 </template>
 
@@ -187,6 +196,7 @@ import TimeBarLineChart, {
   GraphData,
   YAxisSetting
 } from '@/components/TimeBarLineChart.vue'
+import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 
 export const AICHI_POPULATION = 7549422
 
@@ -203,6 +213,12 @@ type ScoreType = {
 }
 
 type DataKind = 'latest' | 'history'
+
+type DisplayInfo = {
+  lText: string
+  sText: string
+  unit: string
+}
 
 type StatusKind = 0 | 1 | 2 // 0:基準値未満, 1:注意, 2:危険
 
@@ -225,7 +241,8 @@ type CellInfo = Colors & {
   components: {
     DataView,
     DataSelector,
-    TimeBarLineChart
+    TimeBarLineChart,
+    DataViewBasicInfoPanel
   }
 })
 export default class MonitoringView extends Vue {
@@ -293,6 +310,8 @@ export default class MonitoringView extends Vue {
     { key: 'history', label: '推移' } as SelectorItem
   ]
 
+  private readonly chartDataSet = new Map<DataKind, GraphData>()
+
   private readonly yAxisLeftSetting: YAxisSetting = {
     min: 0,
     suggestedMax: 110,
@@ -302,7 +321,30 @@ export default class MonitoringView extends Vue {
     visibleAxisValue: false
   } as YAxisSetting
 
-  private readonly chartDataSet = new Map<DataKind, GraphData>()
+  private get displayInfo(): DisplayInfo {
+    let lText = '－'
+    console.debug(this.totalCell)
+    switch (this.totalCell.status) {
+      case 1:
+        lText = '注意'
+        break
+      case 2:
+        lText = '危険'
+        break
+    }
+
+    return {
+      lText,
+      sText: `${this.displayDate} 時点`,
+      unit: ''
+    }
+  }
+
+  private formatDateLabel = (date: string | string[]): string => {
+    return (typeof date === 'string' ? [date] : date)
+      .map(d => dayjs(d).format('M/D'))
+      .join('～')
+  }
 
   constructor() {
     super()
@@ -413,10 +455,12 @@ export default class MonitoringView extends Vue {
       // 全て危険ならその日は赤
       this.totalCell.bgColor = this.indicator.colors.danger.bgColor
       this.totalCell.textColor = this.indicator.colors.danger.textColor
+      this.totalCell.status = 2
     } else if (items.any(d => d.cell.status >= 1)) {
       // 一つでも注意以上ならその日は黄色
       this.totalCell.bgColor = this.indicator.colors.caution.bgColor
       this.totalCell.textColor = this.indicator.colors.caution.textColor
+      this.totalCell.status = 1
     }
 
     // 現状日から７日前までの陽性者数合計
