@@ -56,6 +56,12 @@ import DateSelectSlider from '@/components/DateSelectSlider.vue'
 import TimeBarLineChart, { GraphData } from '@/components/TimeBarLineChart.vue'
 import { MainSummaryDataType } from '~/utils/types'
 
+export type HospitalizedAverageType = {
+  date: Dayjs
+  count: number
+  average: number | undefined
+}
+
 type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
 
 type DisplayInfo = {
@@ -158,13 +164,9 @@ export default class HospitalizedChart extends Vue {
     }
   }
 
-  public static makeAverageHospitalized = (
+  public static makeAverageHospitals = (
     data: MainSummaryDataType[]
-  ): Enumerable.IEnumerable<{
-    date: Dayjs
-    count: number
-    average: number | undefined
-  }> => {
+  ): Enumerable.IEnumerable<HospitalizedAverageType> => {
     const source = Enumerable.from(data).reverse()
     const startDate = dayjs('2020-03-31')
     return source
@@ -190,7 +192,7 @@ export default class HospitalizedChart extends Vue {
 
   private buildDailyTransitionGraphData = (): GraphData => {
     const now = dayjs()
-    const rows = HospitalizedChart.makeAverageHospitalized(this.dailyData ?? [])
+    const rows = HospitalizedChart.makeAverageHospitals(this.dailyData ?? [])
       .where(d => d.date < now)
       .select(d => {
         return {

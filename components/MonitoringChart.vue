@@ -49,11 +49,18 @@ ul.remarks {
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import * as Enumerable from 'linq'
-import NewPatientsChart from './NewPatientsChart.vue'
-import InspectionPersonsChart from './InspectionPersonsChart.vue'
-import HospitalizedChart from './HospitalizedChart.vue'
+import NewPatientsChart, {
+  NewPatientsAverageType
+} from './NewPatientsChart.vue'
+import InspectionPersonsChart, {
+  InspectionPersonAverageType
+} from './InspectionPersonsChart.vue'
+import HospitalizedChart, {
+  HospitalizedAverageType
+} from './HospitalizedChart.vue'
+import { AICHI_POPULATION } from './MonitoringView.vue'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
@@ -68,7 +75,19 @@ import {
   MainSummaryDataType
 } from '~/utils/types'
 
-type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
+type ScoreType = {
+  date: Dayjs
+  patients7DaysNum: number | undefined // 新規感染者数(7日間平均)
+  patients7DaysScore: number | undefined // 新規感染者数の危険度(100=20人)
+  patients10M7DaysNum: number | undefined // 感染率(7日間の10万人あたり感染者数)
+  patients10M7DaysScore: number | undefined // 感染率の危険度(50=0.5人)
+  positivesRate: number | undefined // 陽性率(7日分の陽性者数÷検査人数)
+  positivesScore: number | undefined // 陽性率の危険度(100=10%)
+  hospitals7DaysNum: number | undefined // 入院患者数(7日間平均)
+  hospitals7DaysScore: number | undefined // 入院患者数の危険度(50=150人, 100=250人)
+}
+
+type DataKind = 'daily-transition'
 
 type DisplayInfo = {
   lText: string
@@ -124,9 +143,7 @@ export default class MonitoringChart extends Vue {
   private readonly showSelector = false
   private dataKind: DataKind = 'daily-transition'
   private readonly dataKinds = [
-    // { key: 'weekly-transition', label: '週別' } as SelectorItem,
     { key: 'daily-transition', label: '日別' } as SelectorItem
-    // { key: 'daily-cumulative', label: '累計' } as SelectorItem
   ]
 
   private readonly chartDataSet = new Map<DataKind, GraphData>()
@@ -197,84 +214,83 @@ export default class MonitoringChart extends Vue {
   }
 
   private buildDailyTransitionGraphData = (): GraphData => {
-    const patients = NewPatientsChart.makeAveragePatients(
+    // 新規感染者数
+    const newPatients = NewPatientsChart.makeAverageNewPatients(
       this.parientsData ?? []
     )
-    const inspections = InspectionPersonsChart.makeAveragePositivePerPatients(
+    // 陽性率
+    const positives = InspectionPersonsChart.makeAveragePositives(
       this.inspectionPersonsData ?? []
     )
-    const summaries = HospitalizedChart.makeAverageHospitalized(
+    // 入院患者数
+    const hospitals = HospitalizedChart.makeAverageHospitals(
       this.mainSummaryData ?? []
     )
 
     // 3つのデータそれぞれの最古日付の中で、最も新しい日をグラフの開始日とする
     const startDate = Enumerable.from([
-      dayjs(patients.first().date),
-      dayjs(inspections.first().date),
-      dayjs(summaries.first().date)
+      dayjs(newPatients.first().date),
+      dayjs(positives.first().date),
+      dayjs(hospitals.first().date)
     ]).maxBy(x => x)
 
     // 3つのデータそれぞれの最新日付の中で、最も古い日をグラフの終了日とする
     const endDate = Enumerable.from([
-      dayjs(patients.last().date),
-      dayjs(inspections.last().date),
-      dayjs(summaries.last().date)
+      dayjs(newPatients.last().date),
+      dayjs(positives.last().date),
+      dayjs(hospitals.last().date)
     ]).minBy(x => x)
 
-    const zipped = patients
-      .where(d => startDate <= d.date && d.date <= endDate)
-      .zip(
-        inspections.where(d => startDate <= d.date && d.date <= endDate),
-        (p, i) => {
-          return {
-            date: p.date,
-            patientsAverage: p.average,
-            inspectionsAverage: i.average
-          }
-        }
-      )
-      .zip(
-        summaries.where(d => startDate <= d.date && d.date <= endDate),
-        (pi, s) => {
-          return {
-            date: pi.date,
-            patientsAverage: pi.patientsAverage,
-            inspectionsAverage: pi.inspectionsAverage,
-            summariesAverage: s.average
-          }
-        }
-      )
-    //       .toArray()
-    // console.debug(`${this.constructor.name}::buildDailyTransitionGraphData`, zipped)
-
     const now = dayjs()
-    const rows = zipped // NewPatientsChart.makeAveragePatients(this.parientsData ?? [])
-      .where(d => d.date < now)
-      .select(d => {
-        return {
-          date: d.date.format('YYYY-MM-DD'),
-          patientsAverage: d.patientsAverage,
-          patientsRate: ((d.patientsAverage ?? 0) / 20) * 100,
-          inspectionsAverage: d.inspectionsAverage,
-          inspectionsRate: ((d.inspectionsAverage ?? 0) / 10) * 100,
-          summariesAverage: d.summariesAverage,
-          // summariesRate: (d.summariesAverage ?? 0) / 250 * 100,
-          summariesRate:
-            (d.summariesAverage ?? 0) <= 150
-              ? ((d.summariesAverage ?? 0) / 150) * 50
-              : (((d.summariesAverage ?? 0) - 150) / 100) * 50 + 50
+
+    const rows = newPatients
+      .where(d => startDate <= d.date && d.date <= endDate)
+      .zip<ScoreType>(
+        positives.where(d => startDate <= d.date && d.date <= endDate),
+        hospitals.where(d => startDate <= d.date && d.date <= endDate),
+        (
+          n: NewPatientsAverageType,
+          p: InspectionPersonAverageType,
+          h: HospitalizedAverageType
+        ): any => {
+          return {
+            date: n.date,
+            patients7DaysNum: n.average7days, // 新規感染者数(7日間平均)
+            patients7DaysScore:
+              n.average7days == null ? undefined : (n.average7days / 20) * 100, // 新規感染者数の危険度(100=20人)
+            patients10M7DaysNum:
+              n.count7days == null
+                ? undefined
+                : (n.count7days / AICHI_POPULATION) * 100000, // 感染率(7日間の10万人あたり感染者数)
+            patients10M7DaysScore:
+              n.count7days == null
+                ? undefined
+                : (n.count7days / AICHI_POPULATION) * 100000 * 100, // 感染率の危険度(50=0.5人)
+            positivesRate: p.average, // 陽性率(7日分の陽性者数÷検査人数)
+            positivesScore:
+              p.average == null ? undefined : (p.average / 10) * 100, // 陽性率の危険度(100=10%)
+            hospitals7DaysNum: h.average, // 入院患者数(7日間平均)
+            //  // 入院患者数の危険度(50=150人, 100=250人)
+            hospitals7DaysScore:
+              h.average == null
+                ? undefined
+                : (h.average ?? 0) <= 150
+                ? ((h.average ?? 0) / 150) * 50
+                : (((h.average ?? 0) - 150) / 100) * 50 + 50
+          } as ScoreType
         }
-      })
+      )
+      .where(d => d.date < now)
 
     return {
-      dates: rows.select(d => d.date).toArray(),
+      dates: rows.select(d => d.date.format('YYYY-MM-DD')).toArray(),
       datasets: [
         {
           type: 'line',
           title: '新規感染者数',
           unit: '人',
-          values: rows.select(d => d.patientsRate).toArray(),
-          tooltipValues: rows.select(d => d.patientsAverage).toArray(),
+          values: rows.select(d => d.patients7DaysScore).toArray(),
+          tooltipValues: rows.select(d => d.patients7DaysNum).toArray(),
           order: 1,
           color: '#bd3f4c'
         },
@@ -282,8 +298,8 @@ export default class MonitoringChart extends Vue {
           type: 'line',
           title: '陽性率',
           unit: '%',
-          values: rows.select(d => d.inspectionsRate).toArray(),
-          tooltipValues: rows.select(d => d.inspectionsAverage).toArray(),
+          values: rows.select(d => d.positivesScore).toArray(),
+          tooltipValues: rows.select(d => d.positivesRate).toArray(),
           order: 2,
           color: '#0070C0'
         },
@@ -291,10 +307,19 @@ export default class MonitoringChart extends Vue {
           type: 'line',
           title: '入院患者数',
           unit: '人',
-          values: rows.select(d => d.summariesRate).toArray(),
-          tooltipValues: rows.select(d => d.summariesAverage).toArray(),
+          values: rows.select(d => d.hospitals7DaysScore).toArray(),
+          tooltipValues: rows.select(d => d.hospitals7DaysNum).toArray(),
           order: 3,
           color: '#92D050'
+        },
+        {
+          type: 'line',
+          title: '感染率',
+          unit: '人',
+          values: rows.select(d => d.patients10M7DaysScore).toArray(),
+          tooltipValues: rows.select(d => d.patients10M7DaysNum).toArray(),
+          order: 4,
+          color: '#7F7F7F'
         },
         {
           type: 'line',
@@ -302,7 +327,7 @@ export default class MonitoringChart extends Vue {
           unit: '%',
           values: rows.select(_ => 50).toArray(),
           tooltipVisible: false,
-          order: 4,
+          order: 101,
           color: '#f0e68c',
           lineStyle: 'dashed'
         },
@@ -312,7 +337,7 @@ export default class MonitoringChart extends Vue {
           unit: '%',
           values: rows.select(_ => 100).toArray(),
           tooltipVisible: false,
-          order: 5,
+          order: 102,
           color: '#ff6347',
           lineStyle: 'dashed'
         }

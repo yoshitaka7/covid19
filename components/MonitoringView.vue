@@ -165,6 +165,8 @@ import {
 } from '~/utils/types'
 import DataView from '@/components/DataView.vue'
 
+export const AICHI_POPULATION = 7549422
+
 type StatusKind = 0 | 1 | 2 // 0:基準値未満, 1:注意, 2:危険
 
 type Colors = {
@@ -277,21 +279,21 @@ export default class MonitoringView extends Vue {
     const emptyCell = {} as CellInfo
 
     // 現状日の新規陽性者数の後方７日間平均
-    const latestPatient = NewPatientsChart.makeAveragePatients(
+    const latestPatient = NewPatientsChart.makeAverageNewPatients(
       this.parientsData
     )
       .reverse()
       .firstOrDefault(d => d.date <= latestMinDate)
 
     // 現状日の陽性率
-    const latestInspection = InspectionPersonsChart.makeAveragePositivePerPatients(
+    const latestInspection = InspectionPersonsChart.makeAveragePositives(
       this.inspectionPersonsData
     )
       .reverse()
       .firstOrDefault(d => d.date <= latestMinDate)
 
     // 現状日の入院者数の後方７日間平均
-    const latestMainSummary = HospitalizedChart.makeAverageHospitalized(
+    const latestMainSummary = HospitalizedChart.makeAverageHospitals(
       this.mainSummaryData
     )
       .reverse()
@@ -324,7 +326,7 @@ export default class MonitoringView extends Vue {
 
     const items = Enumerable.from([
       {
-        value: latestPatient?.average,
+        value: latestPatient?.average7days,
         indicator: this.indicator.patients,
         cell: this.patientCell
       },
@@ -369,7 +371,7 @@ export default class MonitoringView extends Vue {
       .sum(d => d['陽性者数'] ?? 0)
 
     this.youseiritsuCell = Object.assign({}, emptyCell) as CellInfo
-    const youseiritsu = (numPatients7days / 7549422) * 100000 // 愛知県の10万人あたり陽性者数
+    const youseiritsu = (numPatients7days / AICHI_POPULATION) * 100000 // 愛知県の10万人あたり陽性者数
     this.youseiritsuCell.label = format(youseiritsu, 2)
   }
 }
