@@ -272,7 +272,7 @@ export default class MonitoringView extends Vue {
   }
 
   private readonly remarks = [
-    '<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/taisakusisin.html>愛知県新型コロナウイルス感染拡大予防対策指針</a>の「指標」に基き、当プロジェクトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
+    '<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/taisakusisin.html>愛知県新型コロナウイルス感染拡大予防対策指針</a>の「指標」に基き、当サイトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
     '「新規感染者数」「入院患者数」は、過去7日間の平均です。定義詳細は「新規感染者数」「入院患者数」の各グラフを参照',
     '「陽性率」は参考値の場合があります。定義詳細は「陽性率・検査実施人数」のグラフを参照',
     '「感染率」とは、直近1週間の10万人あたり感染者数です。その算出には、推計人口(2020年3月1日時点)を使用'
@@ -323,7 +323,6 @@ export default class MonitoringView extends Vue {
 
   private get displayInfo(): DisplayInfo {
     let lText = '－'
-    console.debug(this.totalCell)
     switch (this.totalCell.status) {
       case 1:
         lText = '注意'
