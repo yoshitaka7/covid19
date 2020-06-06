@@ -112,7 +112,8 @@ export default class MonitoringChart extends Vue {
     suggestedMax: 110,
     unit: '%',
     visible: true,
-    stacked: false
+    stacked: false,
+    visibleAxisValue: false
   } as YAxisSetting
 
   private readonly remarks = [
@@ -160,13 +161,11 @@ export default class MonitoringChart extends Vue {
 
     const dataset = this.chartData.datasets[0]
     const latestValueText = dataset.values.slice(-1)[0].toLocaleString()
-    const diffLabel =
-      this.dataKind === 'weekly-transition' ? '前週比' : '前日比'
     const latestDate = this.formatDateLabel(this.chartData.dates.slice(-1)[0])
     return {
       lText: latestValueText,
-      sText: `${latestDate} 時点（${diffLabel}：${this.displayDiffValue} ${dataset.unit}）`,
-      unit: dataset.unit
+      sText: `${latestDate} 時点`,
+      unit: ''
     }
   }
 
@@ -273,8 +272,9 @@ export default class MonitoringChart extends Vue {
         {
           type: 'line',
           title: '新規感染者数',
-          unit: '%',
+          unit: '人',
           values: rows.select(d => d.patientsRate).toArray(),
+          tooltipValues: rows.select(d => d.patientsAverage).toArray(),
           order: 1,
           color: '#bd3f4c'
         },
@@ -283,14 +283,16 @@ export default class MonitoringChart extends Vue {
           title: '陽性率',
           unit: '%',
           values: rows.select(d => d.inspectionsRate).toArray(),
+          tooltipValues: rows.select(d => d.inspectionsAverage).toArray(),
           order: 2,
           color: '#0070C0'
         },
         {
           type: 'line',
           title: '入院患者数',
-          unit: '%',
+          unit: '人',
           values: rows.select(d => d.summariesRate).toArray(),
+          tooltipValues: rows.select(d => d.summariesAverage).toArray(),
           order: 3,
           color: '#92D050'
         },
@@ -299,6 +301,7 @@ export default class MonitoringChart extends Vue {
           title: '注意領域',
           unit: '%',
           values: rows.select(_ => 50).toArray(),
+          tooltipVisible: false,
           order: 4,
           color: '#f0e68c',
           lineStyle: 'dashed'
@@ -308,6 +311,7 @@ export default class MonitoringChart extends Vue {
           title: '危険領域',
           unit: '%',
           values: rows.select(_ => 100).toArray(),
+          tooltipVisible: false,
           order: 5,
           color: '#ff6347',
           lineStyle: 'dashed'

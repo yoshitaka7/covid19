@@ -48,6 +48,7 @@ export type YAxisSetting = {
   unit: string // 単位
   visible: boolean // 表示 or 非表示
   stacked: boolean // 積み上げるか？（既定値は true）
+  visibleAxisValue: boolean // 軸値の表示 or 非表示（既定値は true）
 }
 
 // X軸の日付（日次は string, 週次は [開始日, 終了日] の配列
@@ -65,6 +66,7 @@ export type GraphDataSet = {
   type: GraphKind // グラフ種別
   values: number[] // グラフ値の配列（X軸の日付分）
   tooltipValues?: number[] // ツールチップへの表示値（既定値は values と同じ）
+  tooltipVisible?: boolean // ツールチップへの表示（既定値は表示）
   unit: string // 単位（右上の情報表示に使用）
   color?: string // グラフの色（既定値は棒、折れ線それぞれの標準色）
   colors?: string[] // 日付毎の固有色。棒グラフのみ有効。（未指定時は color またはそれぞれの標準色）
@@ -240,7 +242,10 @@ export default class TimeBarLineChart extends Vue {
                 return {
                   order: dataset?.order ?? 0,
                   label: `${label}: ${formatValue} ${unit}`,
-                  visible: (dataset.visible ?? true) && !isNaN(value)
+                  visible:
+                    (dataset.visible ?? true) &&
+                    (dataset.tooltipVisible ?? true) &&
+                    !isNaN(value)
                 }
               })
               .where(d => d.visible)
@@ -283,9 +288,6 @@ export default class TimeBarLineChart extends Vue {
         }
       },
       scales: {
-        scaleLabel: {
-          display: false
-        },
         xAxes: [
           {
             id: 'day',
@@ -316,7 +318,9 @@ export default class TimeBarLineChart extends Vue {
               suggestedMax: this.displayYAxisLeftSetting.suggestedMax,
               stepSize: this.displayYAxisLeftSetting.step,
               callback: (value: any) => {
-                return `${value}${this.displayYAxisLeftSetting.unit}`
+                return this.displayYAxisLeftSetting.visibleAxisValue ?? true
+                  ? `${value}${this.displayYAxisLeftSetting.unit}`
+                  : ''
               }
             }
           },
