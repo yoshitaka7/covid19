@@ -66,6 +66,7 @@ export type GraphDataSet = {
   type: GraphKind // グラフ種別
   values: number[] // グラフ値の配列（X軸の日付分）
   tooltipValues?: number[] // ツールチップへの表示値（既定値は values と同じ）
+  tooltipTexts?: string[] // ツールチップへの表示文字列、タイトル・単位もカスタマイズする場合はこっち（toolstipValues より優先される）
   tooltipVisible?: boolean // ツールチップへの表示（既定値は表示）
   unit: string // 単位（右上の情報表示に使用）
   color?: string // グラフの色（既定値は棒、折れ線それぞれの標準色）
@@ -222,30 +223,40 @@ export default class TimeBarLineChart extends Vue {
 
             return Enumerable.from(this.chartData.datasets)
               .select((dataset, index) => {
-                const toolTipValues =
-                  this.chartData.datasets![index].tooltipValues ??
-                  this.chartData.datasets![index].values
+                let label = ''
+                if (dataset.tooltipTexts != null) {
+                  label = this.chartData.datasets![index].tooltipTexts![
+                    tooltipItem.index! + this.displaySpan[0]
+                  ]
+                } else {
+                  const toolTipValues =
+                    this.chartData.datasets![index].tooltipValues ??
+                    this.chartData.datasets![index].values
 
-                const value =
-                  toolTipValues[tooltipItem.index! + this.displaySpan[0]]
-                const label = dataset.title
-                const unit = dataset.unit
+                  const value =
+                    toolTipValues[tooltipItem.index! + this.displaySpan[0]]
+                  const title = dataset.title
+                  const unit = dataset.unit
 
-                const formatValue = (x => {
-                  if (x === Math.floor(x)) {
-                    return x
-                  } else {
-                    return Math.round(x * 10) / 10
-                  }
-                })(value)
+                  const formatValue = (x => {
+                    if (x === Math.floor(x)) {
+                      return x
+                    } else {
+                      return Math.round(x * 10) / 10
+                    }
+                  })(value)
+
+                  label =
+                    value == null ? '' : `${title}: ${formatValue} ${unit}`
+                }
 
                 return {
                   order: dataset?.order ?? 0,
-                  label: `${label}: ${formatValue} ${unit}`,
+                  label,
                   visible:
                     (dataset.visible ?? true) &&
                     (dataset.tooltipVisible ?? true) &&
-                    !isNaN(value)
+                    label !== ''
                 }
               })
               .where(d => d.visible)

@@ -197,6 +197,7 @@ import TimeBarLineChart, {
   YAxisSetting
 } from '@/components/TimeBarLineChart.vue'
 import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
+import { formatNumber } from '@/utils/formatNumber'
 
 export const AICHI_POPULATION = 7549422
 
@@ -339,7 +340,7 @@ export default class MonitoringView2 extends Vue {
     }
   }
 
-  private formatDateLabel = (date: string | string[]): string => {
+  private readonly formatDateLabel = (date: string | string[]): string => {
     return (typeof date === 'string' ? [date] : date)
       .map(d => dayjs(d).format('M/D'))
       .join('～')
@@ -361,11 +362,6 @@ export default class MonitoringView2 extends Vue {
     const latestMinDate = scores.last().date
     this.displayDate = latestMinDate.format('M/D')
 
-    const format = (x: number, digits: number = 1) => {
-      const per = 10 ** digits
-      return String(Math.round(x * per) / per)
-    }
-
     const emptyCell = {} as CellInfo
     this.patientCell = Object.assign({}, emptyCell) as CellInfo
     this.rateCell = Object.assign({}, emptyCell) as CellInfo
@@ -379,7 +375,7 @@ export default class MonitoringView2 extends Vue {
       cell: CellInfo
     ) => {
       if (average != null) {
-        cell.label = format(average)
+        cell.label = formatNumber(average)
         if (average >= indicators.danger) {
           cell.bgColor = dangerColors.bgColor
           cell.textColor = dangerColors.textColor
@@ -439,7 +435,7 @@ export default class MonitoringView2 extends Vue {
     this.youseiritsuCell.label =
       latest.patients10M7DaysNum == null
         ? '-'
-        : format(latest.patients10M7DaysNum, 2)
+        : formatNumber(latest.patients10M7DaysNum, 2)
 
     const graphData = this.buildDailyTransitionGraphData(scores)
     this.chartDataSet.set('history', graphData)
@@ -534,7 +530,11 @@ export default class MonitoringView2 extends Vue {
           title: '新規感染者数',
           unit: '人',
           values: rows.select(d => d.patients7DaysScore).toArray(),
-          tooltipValues: rows.select(d => d.patients7DaysNum).toArray(),
+          tooltipTexts: rows
+            .select(
+              d => `新規感染者数: ${formatNumber(d.patients7DaysNum, 2)} 人`
+            )
+            .toArray(),
           order: 1,
           color: '#bd3f4c'
         },
@@ -543,7 +543,9 @@ export default class MonitoringView2 extends Vue {
           title: '陽性率',
           unit: '%',
           values: rows.select(d => d.positivesScore).toArray(),
-          tooltipValues: rows.select(d => d.positivesRate).toArray(),
+          tooltipTexts: rows
+            .select(d => `陽性率: ${formatNumber(d.positivesRate, 2)} %`)
+            .toArray(),
           order: 2,
           color: '#0070C0'
         },
@@ -552,7 +554,11 @@ export default class MonitoringView2 extends Vue {
           title: '入院患者数',
           unit: '人',
           values: rows.select(d => d.hospitals7DaysScore).toArray(),
-          tooltipValues: rows.select(d => d.hospitals7DaysNum).toArray(),
+          tooltipTexts: rows
+            .select(
+              d => `入院患者数: ${formatNumber(d.hospitals7DaysNum, 2)} 人`
+            )
+            .toArray(),
           order: 3,
           color: '#92D050'
         },
@@ -561,7 +567,9 @@ export default class MonitoringView2 extends Vue {
           title: '感染率',
           unit: '人',
           values: rows.select(d => d.patients10M7DaysScore).toArray(),
-          tooltipValues: rows.select(d => d.patients10M7DaysNum).toArray(),
+          tooltipTexts: rows
+            .select(d => `感染率: ${formatNumber(d.patients10M7DaysNum, 2)} 人`)
+            .toArray(),
           order: 4,
           color: '#7F7F7F'
         },
