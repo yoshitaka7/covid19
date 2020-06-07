@@ -535,9 +535,7 @@ export default class MonitoringView extends Vue {
           unit: '人',
           values: rows.select(d => d.patients7DaysScore).toArray(),
           tooltipTexts: rows
-            .select(
-              d => `新規感染者数: ${formatNumber(d.patients7DaysNum, 2)} 人`
-            )
+            .select(d => `新規感染者数: ${formatNumber(d.patients7DaysNum)} 人`)
             .toArray(),
           order: 1,
           color: '#bd3f4c'
@@ -548,7 +546,7 @@ export default class MonitoringView extends Vue {
           unit: '%',
           values: rows.select(d => d.positivesScore).toArray(),
           tooltipTexts: rows
-            .select(d => `陽性率: ${formatNumber(d.positivesRate, 2)} %`)
+            .select(d => `陽性率: ${formatNumber(d.positivesRate)} %`)
             .toArray(),
           order: 2,
           color: '#0070C0'
@@ -559,9 +557,7 @@ export default class MonitoringView extends Vue {
           unit: '人',
           values: rows.select(d => d.hospitals7DaysScore).toArray(),
           tooltipTexts: rows
-            .select(
-              d => `入院患者数: ${formatNumber(d.hospitals7DaysNum, 2)} 人`
-            )
+            .select(d => `入院患者数: ${formatNumber(d.hospitals7DaysNum)} 人`)
             .toArray(),
           order: 3,
           color: '#92D050'
