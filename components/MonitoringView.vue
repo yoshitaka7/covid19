@@ -348,6 +348,8 @@ export default class MonitoringView extends Vue {
   constructor() {
     super()
 
+    const scores = this.build7daysScore()
+
     // 3つのデータのもっとも最新の更新日をこのパネルの更新日とする
     this.updateAt = Enumerable.from([
       this.parientsDate,
@@ -356,16 +358,7 @@ export default class MonitoringView extends Vue {
     ]).maxBy(d => d)
 
     // 3つのデータそれぞれの最新日付の中で、最も古い日を現状日とする
-    const latestMinDate = Enumerable.from([
-      dayjs(this.parientsData.slice(-1)[0]['日付']),
-      dayjs(this.inspectionPersonsData.slice(-1)[0]['日付']),
-      dayjs(
-        dayjs(this.mainSummaryData.slice(-1)[0]['更新日時']).format(
-          'YYYY-MM-DD'
-        )
-      ) // 時刻を切り落とす
-    ]).minBy(x => x)
-
+    const latestMinDate = scores.last().date
     this.displayDate = latestMinDate.format('M/D')
 
     const format = (x: number, digits: number = 1) => {
@@ -374,28 +367,6 @@ export default class MonitoringView extends Vue {
     }
 
     const emptyCell = {} as CellInfo
-
-    // 現状日の新規陽性者数の後方７日間平均
-    const latestPatient = NewPatientsChart.makeAverageNewPatients(
-      this.parientsData
-    )
-      .reverse()
-      .firstOrDefault(d => d.date <= latestMinDate)
-
-    // 現状日の陽性率
-    const latestInspection = InspectionPersonsChart.makeAveragePositives(
-      this.inspectionPersonsData
-    )
-      .reverse()
-      .firstOrDefault(d => d.date <= latestMinDate)
-
-    // 現状日の入院者数の後方７日間平均
-    const latestMainSummary = HospitalizedChart.makeAverageHospitals(
-      this.mainSummaryData
-    )
-      .reverse()
-      .firstOrDefault(d => d.date <= latestMinDate)
-
     this.patientCell = Object.assign({}, emptyCell) as CellInfo
     this.rateCell = Object.assign({}, emptyCell) as CellInfo
     this.hospitalCell = Object.assign({}, emptyCell) as CellInfo
@@ -421,19 +392,21 @@ export default class MonitoringView extends Vue {
       }
     }
 
+    const latest = scores.last()
+
     const items = Enumerable.from([
       {
-        value: latestPatient?.average7days,
+        value: latest.patients7DaysNum,
         indicator: this.indicator.patients,
         cell: this.patientCell
       },
       {
-        value: latestInspection?.average,
+        value: latest.positivesRate,
         indicator: this.indicator.rate,
         cell: this.rateCell
       },
       {
-        value: latestMainSummary?.average,
+        value: latest.hospitals7DaysNum,
         indicator: this.indicator.hospitals,
         cell: this.hospitalCell
       }
@@ -462,18 +435,14 @@ export default class MonitoringView extends Vue {
       this.totalCell.status = 1
     }
 
-    // 現状日から７日前までの陽性者数合計
-    const numPatients7days = Enumerable.from(this.inspectionPersonsData)
-      .reverse()
-      .where(d => dayjs(d['日付']) <= latestMinDate)
-      .take(7)
-      .sum(d => d['陽性者数'] ?? 0)
-
     this.youseiritsuCell = Object.assign({}, emptyCell) as CellInfo
-    const youseiritsu = (numPatients7days / AICHI_POPULATION) * 100000 // 愛知県の10万人あたり陽性者数
-    this.youseiritsuCell.label = format(youseiritsu, 2)
+    this.youseiritsuCell.label =
+      latest.patients10M7DaysNum == null
+        ? '-'
+        : format(latest.patients10M7DaysNum, 2)
 
-    this.chartDataSet.set('history', this.buildDailyTransitionGraphData())
+    const graphData = this.buildDailyTransitionGraphData(scores)
+    this.chartDataSet.set('history', graphData)
   }
 
   private get chartData(): GraphData {
@@ -488,7 +457,7 @@ export default class MonitoringView extends Vue {
     }
   }
 
-  private buildDailyTransitionGraphData = (): GraphData => {
+  private build7daysScore = (): Enumerable.IEnumerable<ScoreType> => {
     // 新規感染者数
     const newPatients = NewPatientsChart.makeAverageNewPatients(
       this.parientsData ?? []
@@ -518,7 +487,7 @@ export default class MonitoringView extends Vue {
 
     const now = dayjs()
 
-    const rows = newPatients
+    return newPatients
       .where(d => startDate <= d.date && d.date <= endDate)
       .zip<ScoreType>(
         positives.where(d => startDate <= d.date && d.date <= endDate),
@@ -556,7 +525,11 @@ export default class MonitoringView extends Vue {
         }
       )
       .where(d => d.date < now)
+  }
 
+  private buildDailyTransitionGraphData = (
+    rows: Enumerable.IEnumerable<ScoreType>
+  ): GraphData => {
     return {
       dates: rows.select(d => d.date.format('YYYY-MM-DD')).toArray(),
       datasets: [
