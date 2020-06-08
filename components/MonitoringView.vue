@@ -497,9 +497,7 @@ export default class MonitoringView extends Vue {
             date: n.date,
             patients7DaysNum: n.average7days, // 新規感染者数(7日間平均)
             patients7DaysScore:
-              n.average7days == null
-                ? undefined
-                : (n.average7days / this.indicator.patients.caution) * 100, // 新規感染者数の危険度(100=20人)
+              n.average7days == null ? undefined : (n.average7days / 20) * 100, // 新規感染者数の危険度(100=20人)
             patients10M7DaysNum:
               n.count7days == null
                 ? undefined
@@ -510,20 +508,15 @@ export default class MonitoringView extends Vue {
                 : (n.count7days / AICHI_POPULATION) * 100000 * 100, // 感染率の危険度(50=0.5人)
             positivesRate: p.average, // 陽性率(7日分の陽性者数÷検査人数)
             positivesScore:
-              p.average == null
-                ? undefined
-                : (p.average / this.indicator.rate.caution) * 100, // 陽性率の危険度(100=10%)
+              p.average == null ? undefined : (p.average / 10) * 100, // 陽性率の危険度(100=10%)
             hospitals7DaysNum: h.average, // 入院患者数(7日間平均)
             //  // 入院患者数の危険度(50=150人, 100=250人)
             hospitals7DaysScore:
               h.average == null
                 ? undefined
-                : (h.average ?? 0) <= this.indicator.hospitals.caution
-                ? ((h.average ?? 0) / this.indicator.hospitals.caution) * 50
-                : (((h.average ?? 0) - this.indicator.hospitals.caution) /
-                    100) *
-                    50 +
-                  50
+                : (h.average ?? 0) <= 150
+                ? ((h.average ?? 0) / 150) * 50
+                : (((h.average ?? 0) - 150) / 100) * 50 + 50
           } as ScoreType
         }
       )
