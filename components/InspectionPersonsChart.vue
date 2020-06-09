@@ -67,6 +67,14 @@ import {
   InspectionPersonsSummaryWeelky
 } from '~/utils/types'
 
+export type InspectionPersonAverageType = {
+  date: Dayjs
+  positives: number
+  persons: number
+  average: number | undefined
+  uncertain: boolean
+}
+
 type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
 
 type DisplayInfo = {
@@ -228,15 +236,9 @@ export default class InspectionPersonsChart extends Vue {
     }
   }
 
-  public static makeAveragePositivePerPatients = (
+  public static makeAveragePositives = (
     data: InspectionPersonsSummaryDaily[]
-  ): Enumerable.IEnumerable<{
-    date: Dayjs
-    positives: number
-    persons: number
-    average: number | undefined
-    uncertain: boolean
-  }> => {
+  ): Enumerable.IEnumerable<InspectionPersonAverageType> => {
     const source = Enumerable.from(data).reverse()
     return source
       .select(d => d['日付'])
@@ -269,7 +271,7 @@ export default class InspectionPersonsChart extends Vue {
 
   private buildDailyTransitionGraphData = (): GraphData => {
     const now = dayjs()
-    const rows = InspectionPersonsChart.makeAveragePositivePerPatients(
+    const rows = InspectionPersonsChart.makeAveragePositives(
       this.dailyData ?? []
     )
       .where(d => d.date < now)

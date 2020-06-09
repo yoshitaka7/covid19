@@ -47,6 +47,8 @@ export type YAxisSetting = {
   step?: number // グリッド線刻み値（既定値は自動）
   unit: string // 単位
   visible: boolean // 表示 or 非表示
+  stacked: boolean // 積み上げるか？（既定値は true）
+  visibleAxisValue: boolean // 軸値の表示 or 非表示（既定値は true）
 }
 
 // X軸の日付（日次は string, 週次は [開始日, 終了日] の配列
@@ -64,6 +66,8 @@ export type GraphDataSet = {
   type: GraphKind // グラフ種別
   values: number[] // グラフ値の配列（X軸の日付分）
   tooltipValues?: number[] // ツールチップへの表示値（既定値は values と同じ）
+  tooltipTexts?: string[] // ツールチップへの表示文字列、タイトル・単位もカスタマイズする場合はこっち（toolstipValues より優先される）
+  tooltipVisible?: boolean // ツールチップへの表示（既定値は表示）
   unit: string // 単位（右上の情報表示に使用）
   color?: string // グラフの色（既定値は棒、折れ線それぞれの標準色）
   colors?: string[] // 日付毎の固有色。棒グラフのみ有効。（未指定時は color またはそれぞれの標準色）
@@ -146,15 +150,14 @@ export default class TimeBarLineChart extends Vue {
             continue
           }
           const ds = this.chartData.datasets[legend.datasetIndex]
-          if (ds.colors == null) {
-            continue
-          }
           if (ds.type === 'bar') {
             legend.fillStyle = ds.color ?? this.defaultBarColor
             legend.strokeStyle = undefined
+            legend.pointStyle = 'rect'
           } else if (ds.type === 'line') {
-            legend.fillStyle = ds.color ?? this.defaultLineColor
-            legend.strokeStyle = undefined
+            legend.fillStyle = undefined
+            legend.strokeStyle = ds.color ?? this.defaultLineColor
+            legend.pointStyle = 'line'
           }
         }
       }
@@ -186,7 +189,7 @@ export default class TimeBarLineChart extends Vue {
       borderWidth: 3,
       borderDash: dataset.lineStyle === 'dashed' ? [4, 3] : [],
       pointRadius: 0,
-      pointHitRadius: 2,
+      pointHitRadius: 10,
       fill: false,
       order: dataset.order ?? 0,
       lineTension: 0
@@ -220,27 +223,40 @@ export default class TimeBarLineChart extends Vue {
 
             return Enumerable.from(this.chartData.datasets)
               .select((dataset, index) => {
-                const toolTipValues =
-                  this.chartData.datasets![index].tooltipValues ??
-                  this.chartData.datasets![index].values
+                let label = ''
+                if (dataset.tooltipTexts != null) {
+                  label = this.chartData.datasets![index].tooltipTexts![
+                    tooltipItem.index! + this.displaySpan[0]
+                  ]
+                } else {
+                  const toolTipValues =
+                    this.chartData.datasets![index].tooltipValues ??
+                    this.chartData.datasets![index].values
 
-                const value =
-                  toolTipValues[tooltipItem.index! + this.displaySpan[0]]
-                const label = dataset.title
-                const unit = dataset.unit
+                  const value =
+                    toolTipValues[tooltipItem.index! + this.displaySpan[0]]
+                  const title = dataset.title
+                  const unit = dataset.unit
 
-                const formatValue = (x => {
-                  if (x === Math.floor(x)) {
-                    return x
-                  } else {
-                    return Math.round(x * 10) / 10
-                  }
-                })(value)
+                  const formatValue = (x => {
+                    if (x === Math.floor(x)) {
+                      return x
+                    } else {
+                      return Math.round(x * 10) / 10
+                    }
+                  })(value)
+
+                  label =
+                    value == null ? '' : `${title}: ${formatValue} ${unit}`
+                }
 
                 return {
                   order: dataset?.order ?? 0,
-                  label: `${label}: ${formatValue} ${unit}`,
-                  visible: (dataset.visible ?? true) && !isNaN(value)
+                  label,
+                  visible:
+                    (dataset.visible ?? true) &&
+                    (dataset.tooltipVisible ?? true) &&
+                    label !== ''
                 }
               })
               .where(d => d.visible)
@@ -272,6 +288,7 @@ export default class TimeBarLineChart extends Vue {
           this.chartData.datasets.filter(d => d.visible ?? true).length > 1,
         reverse: (this.legendOrderKind ?? 'asc') === 'desc',
         labels: {
+          usePointStyle: true,
           filter: (item: ChartLegendLabelItem) => {
             if (item.datasetIndex == null) {
               return false
@@ -299,7 +316,7 @@ export default class TimeBarLineChart extends Vue {
         yAxes: [
           {
             id: 'y-axis-left',
-            stacked: true,
+            stacked: this.displayYAxisLeftSetting.stacked ?? true,
             gridLines: {
               display: true,
               color: '#E5E5E5'
@@ -312,7 +329,9 @@ export default class TimeBarLineChart extends Vue {
               suggestedMax: this.displayYAxisLeftSetting.suggestedMax,
               stepSize: this.displayYAxisLeftSetting.step,
               callback: (value: any) => {
-                return `${value}${this.displayYAxisLeftSetting.unit}`
+                return this.displayYAxisLeftSetting.visibleAxisValue ?? true
+                  ? `${value}${this.displayYAxisLeftSetting.unit}`
+                  : ''
               }
             }
           },

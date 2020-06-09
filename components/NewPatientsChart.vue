@@ -57,6 +57,13 @@ import DateSelectSlider from '@/components/DateSelectSlider.vue'
 import TimeBarLineChart, { GraphData } from '@/components/TimeBarLineChart.vue'
 import { PatientsSummaryDaily, PatientsSummaryWeekly } from '~/utils/types'
 
+export type NewPatientsAverageType = {
+  date: Dayjs
+  count: number
+  average7days: number | undefined
+  count7days: number | undefined
+}
+
 type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
 
 type DisplayInfo = {
@@ -176,13 +183,9 @@ export default class NewPatientsChart extends Vue {
     }
   }
 
-  public static makeAveragePatients = (
+  public static makeAverageNewPatients = (
     data: PatientsSummaryDaily[]
-  ): Enumerable.IEnumerable<{
-    date: Dayjs
-    count: number
-    average: number | undefined
-  }> => {
+  ): Enumerable.IEnumerable<NewPatientsAverageType> => {
     const source = Enumerable.from(data).reverse()
     return source
       .select(d => d['日付'])
@@ -195,11 +198,16 @@ export default class NewPatientsChart extends Vue {
                 .where(d => d['小計'] !== undefined)
                 .average(d => Number(d['小計']))
             : undefined
+        const cnt =
+          d.count() === 7
+            ? d.where(d => d['小計'] !== undefined).sum(d => Number(d['小計']))
+            : undefined
 
         return {
           date: dayjs(dayjs(first['日付']).format('YYYY-MM-DD')), // 時刻を切り落とす
           count: Number(first['小計']),
-          average: ave
+          average7days: ave,
+          count7days: cnt
         }
       })
       .reverse()
@@ -207,13 +215,13 @@ export default class NewPatientsChart extends Vue {
 
   private buildDailyTransitionGraphData = (): GraphData => {
     const now = dayjs()
-    const rows = NewPatientsChart.makeAveragePatients(this.dailyData ?? [])
+    const rows = NewPatientsChart.makeAverageNewPatients(this.dailyData ?? [])
       .where(d => d.date < now)
       .select(d => {
         return {
           date: d.date.format('YYYY-MM-DD'),
           count: d.count,
-          average: d.average
+          average7days: d.average7days
         }
       })
 
@@ -231,7 +239,7 @@ export default class NewPatientsChart extends Vue {
           type: 'line',
           title: '過去7日間の平均',
           unit: '人',
-          values: rows.select(d => d.average).toArray(),
+          values: rows.select(d => d.average7days).toArray(),
           order: 1
         }
       ]
