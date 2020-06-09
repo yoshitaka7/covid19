@@ -546,7 +546,7 @@ export default class MonitoringView extends Vue {
           unit: '%',
           values: rows.select(d => d.positivesScore).toArray(),
           tooltipTexts: rows
-            .select(d => `陽性率: ${formatNumber(d.positivesRate)} %`)
+            .select(d => `陽性率: ${formatNumber(d.positivesRate)}%`)
             .toArray(),
           order: 2,
           color: '#0070C0'
