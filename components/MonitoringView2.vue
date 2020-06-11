@@ -1,6 +1,6 @@
 <template>
   <data-view
-    title="判断指標と達成状況"
+    title="判断指標と達成状況2"
     title-id="new-patients-chart"
     url="https://www.pref.aichi.jp/site/covid19-aichi/"
     :date="updateAt"
@@ -246,7 +246,7 @@ type CellInfo = Colors & {
     DataViewBasicInfoPanel
   }
 })
-export default class MonitoringView extends Vue {
+export default class MonitoringView2 extends Vue {
   private readonly indicator = {
     colors: {
       caution: {
@@ -512,11 +512,7 @@ export default class MonitoringView extends Vue {
             hospitals7DaysNum: h.average, // 入院患者数(7日間平均)
             //  // 入院患者数の危険度(50=150人, 100=250人)
             hospitals7DaysScore:
-              h.average == null
-                ? undefined
-                : (h.average ?? 0) <= 150
-                ? ((h.average ?? 0) / 150) * 50
-                : (((h.average ?? 0) - 150) / 100) * 50 + 50
+              h.average == null ? undefined : ((h.average ?? 0) / 150) * 50
           } as ScoreType
         }
       )
@@ -546,7 +542,7 @@ export default class MonitoringView extends Vue {
           unit: '%',
           values: rows.select(d => d.positivesScore).toArray(),
           tooltipTexts: rows
-            .select(d => `陽性率: ${formatNumber(d.positivesRate)}%`)
+            .select(d => `陽性率: ${formatNumber(d.positivesRate)} %`)
             .toArray(),
           order: 2,
           color: '#0070C0'
@@ -585,12 +581,22 @@ export default class MonitoringView extends Vue {
         },
         {
           type: 'line',
-          title: '危険領域',
+          title: '危険領域(新規感染者数, 陽性率)',
           unit: '%',
           values: rows.select(_ => 100).toArray(),
           tooltipVisible: false,
           order: 102,
           color: '#ff6347',
+          lineStyle: 'dashed'
+        },
+        {
+          type: 'line',
+          title: '危険領域(入院患者数)',
+          unit: '%',
+          values: rows.select(_ => (50 / 150) * 250).toArray(),
+          tooltipVisible: false,
+          order: 102,
+          color: 'pink',
           lineStyle: 'dashed'
         }
       ]
