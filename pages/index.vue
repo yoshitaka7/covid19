@@ -77,10 +77,7 @@
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
           :subtext="'（一部、県知事のTwitter）'"
           :title-date="confirmedCases['更新日時']"
-          :remarks="[
-            '県内において疑い例または患者の濃厚接触者として検査を行ったものについて掲載（チャーター機帰国者、クルーズ船乗客等は含まれていない。）',
-            confirmedCases['備考']
-          ]"
+          :remarks="[confirmedCases['備考']]"
         >
           <confirmed-cases-table v-bind="confirmedCases" />
         </svg-card>
