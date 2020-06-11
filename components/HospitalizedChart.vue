@@ -9,11 +9,15 @@
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <time-bar-line-chart
-      chart-id="hospitalized-chart"
-      :chart-data="chartData"
-      legend-order-kind="desc"
-    />
+    <div
+      style="flex-grow: 1; display: flex; align-items: center; padding-bottom: 15px;"
+    >
+      <time-bar-line-chart
+        chart-id="hospitalized-chart"
+        :chart-data="chartData"
+        legend-order-kind="desc"
+      />
+    </div>
 
     <div>
       <ul class="remarks">

@@ -93,6 +93,8 @@ export default class DataView extends Vue {
 }
 .DataView {
   @include card-container();
+  display: flex;
+  flex-direction: column;
   height: 100%;
   &-content {
     display: flex;

@@ -9,7 +9,9 @@
     :subtext="subtext"
     :title-date="titleDate"
   >
-    <div style="flex-grow: 1; display: flex; align-items: center;">
+    <div
+      style="flex-grow: 1; display: flex; align-items: center; padding-bottom: 15px;"
+    >
       <slot />
     </div>
 
@@ -30,9 +32,6 @@
 
 <style lang="scss" scoped>
 .SvgCard {
-  display: flex;
-  flex-direction: column;
-
   ::v-deep svg {
     width: 100%;
   }

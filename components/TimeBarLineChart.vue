@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 100%;">
     <bar
       :chart-id="chartId"
       :chart-data="displayData"
