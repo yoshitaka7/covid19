@@ -88,7 +88,7 @@ export default class MainSummaryChart extends Vue {
   public dailyData?: MainSummaryDataType[]
 
   private readonly remarks = [
-    '愛知県が発表した「検査陽性者の状況」を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
+    '愛知県が発表した「検査陽性者の状況」を当サイトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
     '検査陽性者状況が取得できなかった日の値は表示していません',
     '凡例をクリックするとその項目の[表示/非表示]が切り替えられます'
   ]
