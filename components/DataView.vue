@@ -152,6 +152,8 @@ export default class DataView extends Vue {
     justify-content: space-between;
     flex-direction: row-reverse;
     .OpenDataLink {
+      text-align: right;
+      white-space: normal;
       font-size: 0.75rem;
       text-decoration: none;
       .ExternalLinkIcon {
