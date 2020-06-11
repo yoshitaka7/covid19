@@ -19,7 +19,7 @@
     >
       <slot />
     </v-card-text>
-    <v-footer absolute class="DataView-Footer" width="97%">
+    <v-footer class="DataView-Footer" width="97%">
       <time :datetime="formattedDate">{{ date }} 更新</time>
       <a
         v-if="url"
@@ -129,12 +129,18 @@ export default class DataView extends Vue {
     color: $gray-3;
   }
   &-CardText {
-    margin-bottom: 78px;
-    margin-top: 35px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
   }
   &-CardTextForXS {
-    margin-bottom: 78px;
-    margin-top: 70px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
   }
   &-Footer {
     background-color: $white !important;

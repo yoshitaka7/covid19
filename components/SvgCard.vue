@@ -8,29 +8,31 @@
     :remarks="remarks"
     :subtext="subtext"
     :title-date="titleDate"
-    :title-remark="titleRemark"
   >
-    <template v-slot:button>
-      <p class="Graph-Desc">
-        （注）県内において疑い例または患者の濃厚接触者として検査を行ったものについて掲載<br />
-        （チャーター機帰国者、クルーズ船乗客等は含まれていない。）<br />
-        {{ titleRemark }}
-      </p>
-    </template>
-    <slot />
-    <!-- eslint-disable vue/no-v-html -->
-    <div
-      v-for="remarks_text in remarks"
-      :key="remarks_text"
-      v-sanitaize
-      v-html="remarks_text"
-    />
-    <!-- eslint-disable vue/no-v-html -->
+    <div style="flex-grow: 1; display: flex; align-items: center;">
+      <slot />
+    </div>
+
+    <div>
+      <ul class="remarks">
+        <!-- eslint-disable vue/no-v-html -->
+        <li
+          v-for="remarks_text in remarks"
+          :key="remarks_text"
+          v-sanitaize
+          v-html="remarks_text"
+        />
+        <!-- eslint-disable vue/no-v-html -->
+      </ul>
+    </div>
   </data-view>
 </template>
 
 <style lang="scss" scoped>
 .SvgCard {
+  display: flex;
+  flex-direction: column;
+
   ::v-deep svg {
     width: 100%;
   }
@@ -40,6 +42,11 @@
     font-size: 12px;
     color: $gray-3;
   }
+}
+
+ul.remarks {
+  font-size: 0.75rem;
+  list-style-type: '※ ';
 }
 </style>
 

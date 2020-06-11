@@ -66,10 +66,10 @@
   &-Title {
     @include card-h2();
   }
-  &-CardText {
-    margin-bottom: 78px;
-    margin-top: 20px;
-  }
+  // &-CardText {
+  //   margin-bottom: 0px;
+  //   margin-top: 20px;
+  // }
 }
 .v-toolbar__content {
   height: auto !important;
