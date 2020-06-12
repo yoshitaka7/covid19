@@ -9,11 +9,15 @@
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <time-bar-line-chart
-      chart-id="hospitalized-chart"
-      :chart-data="chartData"
-      legend-order-kind="desc"
-    />
+    <div
+      style="flex-grow: 1; display: flex; align-items: center; padding-bottom: 15px;"
+    >
+      <time-bar-line-chart
+        chart-id="hospitalized-chart"
+        :chart-data="chartData"
+        legend-order-kind="desc"
+      />
+    </div>
 
     <div>
       <ul class="remarks">
@@ -88,7 +92,7 @@ export default class HospitalizedChart extends Vue {
 
   private remarks = [
     '「入院患者数」とは、愛知県が発表した「検査陽性者の状況」のうち、「入院中」の人数です。',
-    '愛知県が発表した「検査陽性者の状況」を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
+    '愛知県が発表した「検査陽性者の状況」を当サイトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
     '感染症発生状況が取得できなかった日の値は表示していません',
     '過去7日間の平均は、入院患者数の後方7日移動平均値です'
   ]

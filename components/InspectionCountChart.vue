@@ -10,11 +10,15 @@
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <time-bar-line-chart
-      chart-id="inspection-count-chart"
-      :chart-data="chartData"
-      :y-axis-left-setting="yAxisLeftSetting"
-    />
+    <div
+      style="flex-grow: 1; display: flex; align-items: center; padding-bottom: 15px;"
+    >
+      <time-bar-line-chart
+        chart-id="inspection-count-chart"
+        :chart-data="chartData"
+        :y-axis-left-setting="yAxisLeftSetting"
+      />
+    </div>
 
     <div>
       <ul class="remarks">
