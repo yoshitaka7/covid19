@@ -10,14 +10,18 @@
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <time-bar-line-chart
-      chart-id="inspection-count-chart"
-      :chart-data="chartData"
-      legend-order-kind="desc"
-      :y-axis-left-setting="yAxisLeftSetting"
-      :y-axis-right-setting="yAxisRightSetting"
-      disable-legend-click="true"
-    />
+    <div
+      style="flex-grow: 1; display: flex; align-items: center; padding-bottom: 15px;"
+    >
+      <time-bar-line-chart
+        chart-id="inspection-count-chart"
+        :chart-data="chartData"
+        legend-order-kind="desc"
+        :y-axis-left-setting="yAxisLeftSetting"
+        :y-axis-right-setting="yAxisRightSetting"
+        disable-legend-click="true"
+      />
+    </div>
 
     <div>
       <ul class="remarks">
