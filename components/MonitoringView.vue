@@ -10,100 +10,104 @@
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <time-bar-line-chart
-      v-if="dataKind === 'history'"
-      chart-id="monitoring-chart"
-      :chart-data="chartData"
-      :y-axis-left-setting="yAxisLeftSetting"
-      legend-order-kind="asc"
-    />
+    <div
+      style="flex-grow: 1; display: flex; align-items: center; padding-bottom: 15px;"
+    >
+      <time-bar-line-chart
+        v-if="dataKind === 'history'"
+        chart-id="monitoring-chart"
+        :chart-data="chartData"
+        :y-axis-left-setting="yAxisLeftSetting"
+        legend-order-kind="asc"
+      />
 
-    <table v-if="dataKind === 'latest'" class="table">
-      <thead>
-        <tr>
-          <th scope="col" class="col-header">
-            基準項目
-          </th>
-          <th
-            scope="col"
-            class="col-header"
-            :bgcolor="indicator.colors.caution.bgColor"
-            :style="'color: ' + indicator.colors.caution.textColor"
-          >
-            注意<br />領域
-          </th>
-          <th
-            scope="col"
-            class="col-header"
-            :bgcolor="indicator.colors.danger.bgColor"
-            :style="'color: ' + indicator.colors.danger.textColor"
-          >
-            危険<br />領域
-          </th>
-          <th
-            scope="col"
-            class="col-header"
-            :bgcolor="totalCell.bgColor"
-            :style="'color: ' + totalCell.textColor"
-          >
-            {{ displayDate }}<br />の状況
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row" class="row-header">
-            新規感染者数
-          </th>
-          <td class="col-caution">{{ indicator.patients.caution }}人</td>
-          <td class="col-danger">{{ indicator.patients.danger }}人</td>
-          <td
-            class="col-actual"
-            :bgcolor="patientCell.bgColor"
-            :style="'color: ' + patientCell.textColor"
-          >
-            {{ patientCell.label }}人
-          </td>
-        </tr>
-        <tr>
-          <th scope="row" class="row-header">
-            陽性率
-          </th>
-          <td class="col-caution">{{ indicator.rate.caution }}%</td>
-          <td class="col-danger">{{ indicator.rate.danger }}%</td>
-          <td
-            class="col-actual"
-            :bgcolor="rateCell.bgColor"
-            :style="'color: ' + rateCell.textColor"
-          >
-            {{ rateCell.label }}%
-          </td>
-        </tr>
-        <tr style="border: 3px solid #a83945; border-top-style:none;">
-          <th scope="row" class="row-header">
-            入院患者数
-          </th>
-          <td class="col-caution">{{ indicator.hospitals.caution }}人</td>
-          <td class="col-danger">{{ indicator.hospitals.danger }}人</td>
-          <td
-            class="col-actual"
-            :bgcolor="hospitalCell.bgColor"
-            :style="'color: ' + hospitalCell.textColor"
-          >
-            {{ hospitalCell.label }}人
-          </td>
-        </tr>
-        <tr style="height: 20px" />
-        <tr style="border: 3px solid #a83945">
-          <th scope="row" class="row-header">
-            感染率
-          </th>
-          <td class="col-caution">0.5人</td>
-          <td class="col-danger" />
-          <td class="col-actual">{{ youseiritsuCell.label }}人</td>
-        </tr>
-      </tbody>
-    </table>
+      <table v-if="dataKind === 'latest'" class="table">
+        <thead>
+          <tr>
+            <th scope="col" class="col-header">
+              基準項目
+            </th>
+            <th
+              scope="col"
+              class="col-header"
+              :bgcolor="indicator.colors.caution.bgColor"
+              :style="'color: ' + indicator.colors.caution.textColor"
+            >
+              注意<br />領域
+            </th>
+            <th
+              scope="col"
+              class="col-header"
+              :bgcolor="indicator.colors.danger.bgColor"
+              :style="'color: ' + indicator.colors.danger.textColor"
+            >
+              危険<br />領域
+            </th>
+            <th
+              scope="col"
+              class="col-header"
+              :bgcolor="totalCell.bgColor"
+              :style="'color: ' + totalCell.textColor"
+            >
+              {{ displayDate }}<br />の状況
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" class="row-header">
+              新規感染者数
+            </th>
+            <td class="col-caution">{{ indicator.patients.caution }}人</td>
+            <td class="col-danger">{{ indicator.patients.danger }}人</td>
+            <td
+              class="col-actual"
+              :bgcolor="patientCell.bgColor"
+              :style="'color: ' + patientCell.textColor"
+            >
+              {{ patientCell.label }}人
+            </td>
+          </tr>
+          <tr>
+            <th scope="row" class="row-header">
+              陽性率
+            </th>
+            <td class="col-caution">{{ indicator.rate.caution }}%</td>
+            <td class="col-danger">{{ indicator.rate.danger }}%</td>
+            <td
+              class="col-actual"
+              :bgcolor="rateCell.bgColor"
+              :style="'color: ' + rateCell.textColor"
+            >
+              {{ rateCell.label }}%
+            </td>
+          </tr>
+          <tr style="border: 3px solid #a83945; border-top-style:none;">
+            <th scope="row" class="row-header">
+              入院患者数
+            </th>
+            <td class="col-caution">{{ indicator.hospitals.caution }}人</td>
+            <td class="col-danger">{{ indicator.hospitals.danger }}人</td>
+            <td
+              class="col-actual"
+              :bgcolor="hospitalCell.bgColor"
+              :style="'color: ' + hospitalCell.textColor"
+            >
+              {{ hospitalCell.label }}人
+            </td>
+          </tr>
+          <tr style="height: 20px" />
+          <tr style="border: 3px solid #a83945">
+            <th scope="row" class="row-header">
+              感染率
+            </th>
+            <td class="col-caution">0.5人</td>
+            <td class="col-danger" />
+            <td class="col-actual">{{ youseiritsuCell.label }}人</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div>
       <ul class="remarks">
