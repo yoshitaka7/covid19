@@ -90,7 +90,7 @@
           :date="Data.patients.date"
           :data="patientsPerCities"
           :legends="patientsPerCitiesLegends"
-          :title-date="Data.patients.date"
+          :last-date="patientsPerCitiesLastDate['日付']"
           :remarks="[
             '公表されている居住地が、54市町村以外(尾張地方、三河地方など)や県外は対象外',
             '感染率とは10万人あたり感染者数を指し、その算出には、推計人口(2020年3月1日時点)を使用'
@@ -126,6 +126,7 @@ import CityData from '@/data/city_data.json'
 
 import formatConfirmedCases from '@/utils/formatConfirmedCases'
 import formatPatientsPerCities from '@/utils/formatPatientsPerCities'
+import formatPatientsPerCitiesLastDate from '@/utils/formatPatientsPerCitiesLastDate'
 import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
@@ -174,6 +175,9 @@ export default {
       Data.patients.data,
       patientsPerCitiesLegends
     )
+    const patientsPerCitiesLastDate = formatPatientsPerCitiesLastDate(
+      Data.patients_summary
+    )
 
     const data = {
       Data,
@@ -181,6 +185,7 @@ export default {
       confirmedCases,
       patientsPerCities,
       patientsPerCitiesLegends,
+      patientsPerCitiesLastDate,
       headerItem: {
         icon: 'mdi-chart-timeline-variant',
         title: '愛知県内の最新感染動向',

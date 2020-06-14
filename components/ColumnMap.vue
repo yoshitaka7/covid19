@@ -6,7 +6,7 @@
     :url="url"
     :date="date"
     :remarks="remarks"
-    :title-date="titleDate"
+    :last-date="lastDate"
   >
     <table
       class="tabularmaps"
@@ -273,7 +273,7 @@ export default {
       required: false,
       default: () => []
     },
-    titleDate: {
+    lastDate: {
       type: String,
       required: false,
       default: ''
