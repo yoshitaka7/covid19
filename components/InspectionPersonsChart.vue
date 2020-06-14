@@ -10,14 +10,18 @@
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <time-bar-line-chart
-      chart-id="inspection-count-chart"
-      :chart-data="chartData"
-      legend-order-kind="desc"
-      :y-axis-left-setting="yAxisLeftSetting"
-      :y-axis-right-setting="yAxisRightSetting"
-      disable-legend-click="true"
-    />
+    <div
+      style="flex-grow: 1; display: flex; align-items: center; padding-bottom: 15px;"
+    >
+      <time-bar-line-chart
+        chart-id="inspection-count-chart"
+        :chart-data="chartData"
+        legend-order-kind="desc"
+        :y-axis-left-setting="yAxisLeftSetting"
+        :y-axis-right-setting="yAxisRightSetting"
+        disable-legend-click="true"
+      />
+    </div>
 
     <div>
       <ul class="remarks">
@@ -45,6 +49,7 @@
 
 <style lang="scss" scoped>
 ul.remarks {
+  font-size: 0.75rem;
   list-style-type: '※ ';
 }
 </style>
@@ -65,6 +70,14 @@ import {
   InspectionPersonsSummaryDaily,
   InspectionPersonsSummaryWeelky
 } from '~/utils/types'
+
+export type InspectionPersonAverageType = {
+  date: Dayjs
+  positives: number
+  persons: number
+  average: number | undefined
+  uncertain: boolean
+}
 
 type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
 
@@ -132,7 +145,7 @@ export default class InspectionPersonsChart extends Vue {
   private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private get displayTitle(): string {
-    return `検査実施人数・陽性率${
+    return `陽性率・検査実施人数${
       this.dataKind === 'weekly-transition' ? '(週別)' : ''
     }`
   }
@@ -227,15 +240,9 @@ export default class InspectionPersonsChart extends Vue {
     }
   }
 
-  private makeAveragePositivePerPatients = (
+  public static makeAveragePositives = (
     data: InspectionPersonsSummaryDaily[]
-  ): Enumerable.IEnumerable<{
-    date: Dayjs
-    positives: number
-    persons: number
-    average: number | undefined
-    uncertain: boolean
-  }> => {
+  ): Enumerable.IEnumerable<InspectionPersonAverageType> => {
     const source = Enumerable.from(data).reverse()
     return source
       .select(d => d['日付'])
@@ -268,7 +275,9 @@ export default class InspectionPersonsChart extends Vue {
 
   private buildDailyTransitionGraphData = (): GraphData => {
     const now = dayjs()
-    const rows = this.makeAveragePositivePerPatients(this.dailyData ?? [])
+    const rows = InspectionPersonsChart.makeAveragePositives(
+      this.dailyData ?? []
+    )
       .where(d => d.date < now)
       .select(d => {
         let negatives: number | undefined

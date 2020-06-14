@@ -3,13 +3,20 @@
     title="重症者数"
     title-id="critically-chart"
     :date="date"
-    url="https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html"
+    url="https://www.pref.aichi.jp/site/covid19-aichi/"
   >
     <template v-if="showSelector" v-slot:button>
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <time-bar-line-chart chart-id="critically-chart" :chart-data="chartData" />
+    <div
+      style="flex-grow: 1; display: flex; align-items: center; padding-bottom: 15px;"
+    >
+      <time-bar-line-chart
+        chart-id="critically-chart"
+        :chart-data="chartData"
+      />
+    </div>
 
     <div>
       <ul class="remarks">
@@ -36,6 +43,7 @@
 
 <style lang="scss" scoped>
 ul.remarks {
+  font-size: 0.75rem;
   list-style-type: '※ ';
 }
 </style>
@@ -77,7 +85,7 @@ export default class CriticallyChart extends Vue {
 
   private readonly remarks = [
     '「重症者数」とは、愛知県が発表した「検査陽性者の状況」のうち、「重症」の人数です。',
-    '愛知県が発表した「検査陽性者の状況」を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
+    '愛知県が発表した「検査陽性者の状況」を当サイトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
     '感染症発生状況が取得できなかった日の値は表示していません'
   ]
 

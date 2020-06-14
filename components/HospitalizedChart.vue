@@ -3,17 +3,21 @@
     title="入院患者数"
     title-id="hospitalized-chart"
     :date="date"
-    url="https://www.pref.aichi.jp/site/covid19-aichi/kansensya-kensa.html"
+    url="https://www.pref.aichi.jp/site/covid19-aichi/"
   >
     <template v-if="showSelector" v-slot:button>
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <time-bar-line-chart
-      chart-id="hospitalized-chart"
-      :chart-data="chartData"
-      legend-order-kind="desc"
-    />
+    <div
+      style="flex-grow: 1; display: flex; align-items: center; padding-bottom: 15px;"
+    >
+      <time-bar-line-chart
+        chart-id="hospitalized-chart"
+        :chart-data="chartData"
+        legend-order-kind="desc"
+      />
+    </div>
 
     <div>
       <ul class="remarks">
@@ -40,6 +44,7 @@
 
 <style lang="scss" scoped>
 ul.remarks {
+  font-size: 0.75rem;
   list-style-type: '※ ';
 }
 </style>
@@ -54,6 +59,12 @@ import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
 import TimeBarLineChart, { GraphData } from '@/components/TimeBarLineChart.vue'
 import { MainSummaryDataType } from '~/utils/types'
+
+export type HospitalizedAverageType = {
+  date: Dayjs
+  count: number
+  average: number | undefined
+}
 
 type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
 
@@ -81,7 +92,7 @@ export default class HospitalizedChart extends Vue {
 
   private remarks = [
     '「入院患者数」とは、愛知県が発表した「検査陽性者の状況」のうち、「入院中」の人数です。',
-    '愛知県が発表した「検査陽性者の状況」を当プロジェクトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
+    '愛知県が発表した「検査陽性者の状況」を当サイトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
     '感染症発生状況が取得できなかった日の値は表示していません',
     '過去7日間の平均は、入院患者数の後方7日移動平均値です'
   ]
@@ -157,13 +168,9 @@ export default class HospitalizedChart extends Vue {
     }
   }
 
-  private makeAverageHospitalized = (
+  public static makeAverageHospitals = (
     data: MainSummaryDataType[]
-  ): Enumerable.IEnumerable<{
-    date: Dayjs
-    count: number
-    average: number | undefined
-  }> => {
+  ): Enumerable.IEnumerable<HospitalizedAverageType> => {
     const source = Enumerable.from(data).reverse()
     const startDate = dayjs('2020-03-31')
     return source
@@ -189,7 +196,7 @@ export default class HospitalizedChart extends Vue {
 
   private buildDailyTransitionGraphData = (): GraphData => {
     const now = dayjs()
-    const rows = this.makeAverageHospitalized(this.dailyData ?? [])
+    const rows = HospitalizedChart.makeAverageHospitals(this.dailyData ?? [])
       .where(d => d.date < now)
       .select(d => {
         return {

@@ -18,23 +18,32 @@
     />
     <v-row class="DataBlock">
       <v-col cols="12" md="6" class="DataCard">
-        <svg-card
-          title="検査陽性者の状況"
-          :title-id="'details-of-confirmed-cases'"
-          :date="headerItem.date"
-          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
-          :subtext="'（一部、県知事のTwitter）'"
-          :title-date="confirmedCases['更新日時']"
-          :title-remark="confirmedCases['備考']"
-        >
-          <confirmed-cases-table v-bind="confirmedCases" />
-        </svg-card>
+        <monitoring-view
+          :parients-date="Data.patients_summary.date"
+          :parients-data="Data.patients_summary.data"
+          :inspection-persons-date="Data.inspection_persons_summary.date"
+          :inspection-persons-data="Data.inspection_persons_summary.data"
+          :main-summary-date="Data.main_summary_history.date"
+          :main-summary-data="Data.main_summary_history.data"
+        />
       </v-col>
 
+      <!-- <v-col cols="12" md="6" class="DataCard">
+        <monitoring-view-2
+          :parients-date="Data.patients_summary.date"
+          :parients-data="Data.patients_summary.data"
+          :inspection-persons-date="Data.inspection_persons_summary.date"
+          :inspection-persons-data="Data.inspection_persons_summary.data"
+          :main-summary-date="Data.main_summary_history.date"
+          :main-summary-data="Data.main_summary_history.data"
+        />
+      </v-col> -->
+
       <v-col cols="12" md="6" class="DataCard">
-        <hospitalized-chart
-          :date="Data.main_summary_history.date"
-          :daily-data="Data.main_summary_history.data"
+        <new-patients-chart
+          :date="Data.patients_summary.date"
+          :daily-data="Data.patients_summary.data"
+          :weekly-data="dataWeekly.patients_summary.data"
         />
       </v-col>
 
@@ -47,10 +56,9 @@
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
-        <new-patients-chart
-          :date="Data.patients_summary.date"
-          :daily-data="Data.patients_summary.data"
-          :weekly-data="dataWeekly.patients_summary.data"
+        <hospitalized-chart
+          :date="Data.main_summary_history.date"
+          :daily-data="Data.main_summary_history.data"
         />
       </v-col>
 
@@ -62,11 +70,17 @@
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
-        <inspection-count-chart
-          :date="Data.inspections_summary.date"
-          :daily-data="Data.inspections_summary.data"
-          :weekly-data="dataWeekly.inspections_summary.data"
-        />
+        <svg-card
+          title="検査陽性者の状況"
+          :title-id="'details-of-confirmed-cases'"
+          :date="headerItem.date"
+          :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
+          :subtext="'（一部、県知事のTwitter）'"
+          :title-date="confirmedCases['更新日時']"
+          :remarks="[confirmedCases['備考']]"
+        >
+          <confirmed-cases-table v-bind="confirmedCases" />
+        </svg-card>
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
@@ -91,6 +105,14 @@
           :daily-data="Data.main_summary_history.data"
         />
       </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
+        <inspection-count-chart
+          :date="Data.inspections_summary.date"
+          :daily-data="Data.inspections_summary.data"
+          :weekly-data="dataWeekly.inspections_summary.data"
+        />
+      </v-col>
     </v-row>
   </div>
 </template>
@@ -113,6 +135,8 @@ import InspectionPersonsChart from '@/components/InspectionPersonsChart.vue'
 import MainSummaryChart from '@/components/MainSummaryChart.vue'
 import HospitalizedChart from '@/components/HospitalizedChart.vue'
 import CriticallyChart from '@/components/CriticallyChart.vue'
+import MonitoringView from '@/components/MonitoringView.vue'
+// import MonitoringView2 from '@/components/MonitoringView2.vue'
 import weeklizer from '@/utils/weeklizer'
 import normalizer from '@/utils/normalizer'
 
@@ -129,7 +153,9 @@ export default {
     HospitalizedChart,
     CriticallyChart,
     InspectionCountChart,
-    InspectionPersonsChart
+    InspectionPersonsChart,
+    MonitoringView
+    // MonitoringView2
   },
   data() {
     // 日次データの補正
