@@ -90,7 +90,7 @@
           :date="Data.patients.date"
           :data="patientsPerCities"
           :legends="patientsPerCitiesLegends"
-          :title-date="Data.patients.date"
+          :title-date="patientsPerCitiesDate"
           :remarks="[
             '公表されている居住地が、54市町村以外(尾張地方、三河地方など)や県外は対象外',
             '感染率とは10万人あたり感染者数を指し、その算出には、推計人口(2020年3月1日時点)を使用'
@@ -174,6 +174,9 @@ export default {
       Data.patients.data,
       patientsPerCitiesLegends
     )
+    const patientsPerCitiesDate = Data.patients_summary.data.slice(-1)[0][
+      '日付'
+    ]
 
     const data = {
       Data,
@@ -181,6 +184,7 @@ export default {
       confirmedCases,
       patientsPerCities,
       patientsPerCitiesLegends,
+      patientsPerCitiesDate,
       headerItem: {
         icon: 'mdi-chart-timeline-variant',
         title: '愛知県内の最新感染動向',
