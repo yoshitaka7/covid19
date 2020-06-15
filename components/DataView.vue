@@ -6,10 +6,7 @@
           {{ title }}
         </h3>
         <div v-if="titleDate" class="DataView-ToolbarTitleDate">
-          {{ formattedTitleDate }} 現在
-        </div>
-        <div v-if="lastDate" class="DataView-ToolbarTitleDate">
-          {{ formattedLastDate }} 時点
+          {{ formattedTitleDate }} 時点
         </div>
         <slot name="button" />
       </div>
@@ -44,7 +41,6 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import {
   convertDatetimeToISO8601Format,
-  convertDatetimeToShortFormat,
   convertDateToShortFormat
 } from '@/utils/formatDate'
 
@@ -56,13 +52,11 @@ export default class DataView extends Vue {
   @Prop() private url!: string
   @Prop() private info!: any // FIXME expect info as {lText:string, sText:string unit:string}
   @Prop() private titleDate!: string
-  @Prop() private lastDate!: string
   @Prop() private remarks!: object
   @Prop() private subtext!: string
 
   formattedDate: string = convertDatetimeToISO8601Format(this.date)
-  formattedTitleDate: string = convertDatetimeToShortFormat(this.titleDate)
-  formattedLastDate: string = convertDateToShortFormat(this.lastDate)
+  formattedTitleDate: string = convertDateToShortFormat(this.titleDate)
 }
 </script>
 
