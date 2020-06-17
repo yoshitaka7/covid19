@@ -10,9 +10,7 @@
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <div
-      style="flex-grow: 1; display: flex; align-items: center; padding-bottom: 15px;"
-    >
+    <div style="flex-grow: 1; display: flex; align-items: start;">
       <time-bar-line-chart
         v-if="dataKind === 'history'"
         chart-id="monitoring-chart"
@@ -109,19 +107,6 @@
       </table>
     </div>
 
-    <div>
-      <ul class="remarks">
-        <!-- eslint-disable vue/no-v-html -->
-        <li
-          v-for="remarks_text in remarks"
-          :key="remarks_text"
-          v-sanitaize
-          v-html="remarks_text"
-        />
-        <!-- eslint-disable vue/no-v-html -->
-      </ul>
-    </div>
-
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
         l-title="判定"
@@ -134,11 +119,6 @@
 </template>
 
 <style lang="scss" scoped>
-ul.remarks {
-  font-size: 0.75rem;
-  list-style-type: '※ ';
-}
-
 .table {
   height: 0;
   width: 100%;
@@ -194,6 +174,7 @@ import {
   PatientsSummaryDaily,
   InspectionPersonsSummaryDaily
 } from '~/utils/types'
+import RemarksView from '@/components/RemarksView.vue'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import TimeBarLineChart, {
@@ -247,7 +228,8 @@ type CellInfo = Colors & {
     DataView,
     DataSelector,
     TimeBarLineChart,
-    DataViewBasicInfoPanel
+    DataViewBasicInfoPanel,
+    RemarksView
   }
 })
 export default class MonitoringView extends Vue {
