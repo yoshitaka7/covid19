@@ -19,20 +19,23 @@
     >
       <slot />
     </v-card-text>
-    <v-footer class="DataView-Footer" width="97%">
-      <time :datetime="formattedDate">{{ date }} 更新</time>
-      <a
-        v-if="url"
-        class="OpenDataLink"
-        :href="url"
-        target="_blank"
-        rel="noopener"
-      >
-        出典: 愛知県新型コロナウイルス感染症対策サイト{{ subtext }}
-        <v-icon class="ExternalLinkIcon" size="15">
-          mdi-open-in-new
-        </v-icon>
-      </a>
+    <v-footer class="DataView-Footer">
+      <remarks-view class="Remarks" :remarks="remarks" />
+      <div class="SourceAndDate">
+        <time :datetime="formattedDate">{{ date }} 更新</time>
+        <a
+          v-if="url"
+          class="OpenDataLink"
+          :href="url"
+          target="_blank"
+          rel="noopener"
+        >
+          出典: 愛知県新型コロナウイルス感染症対策サイト{{ subtext }}
+          <v-icon class="ExternalLinkIcon" size="15">
+            mdi-open-in-new
+          </v-icon>
+        </a>
+      </div>
     </v-footer>
   </v-card>
 </template>
@@ -43,8 +46,13 @@ import {
   convertDatetimeToISO8601Format,
   convertDateToShortFormat
 } from '@/utils/formatDate'
+import RemarksView from '@/components/RemarksView.vue'
 
-@Component
+@Component({
+  components: {
+    RemarksView
+  }
+})
 export default class DataView extends Vue {
   @Prop() private title!: string
   @Prop() private titleId!: string
@@ -146,18 +154,32 @@ export default class DataView extends Vue {
   }
   &-Footer {
     background-color: $white !important;
-    margin: 2px 4px 12px;
-    @include font-size(12);
-    color: $gray-3 !important;
-    justify-content: space-between;
-    flex-direction: row-reverse;
-    .OpenDataLink {
-      text-align: right;
-      white-space: normal;
-      font-size: 0.75rem;
-      text-decoration: none;
-      .ExternalLinkIcon {
-        vertical-align: text-bottom;
+    margin-top: 0px;
+    margin-bottom: 12px;
+    margin-left: 0px;
+    margin-right: 0px;
+
+    .Remarks {
+      margin-bottom: 10px;
+    }
+
+    .SourceAndDate {
+      @include font-size(12);
+      color: $gray-3 !important;
+      width: 100%;
+      display: flex;
+      flex: 0 1 auto !important;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      flex-direction: row-reverse;
+      .OpenDataLink {
+        text-align: right;
+        white-space: normal;
+        font-size: 0.75rem;
+        text-decoration: none;
+        .ExternalLinkIcon {
+          vertical-align: text-bottom;
+        }
       }
     }
   }

@@ -84,16 +84,6 @@
         </div>
       </div>
     </div>
-    <ul class="remarks">
-      <!-- eslint-disable vue/no-v-html -->
-      <li
-        v-for="remarks_text in remarks"
-        :key="remarks_text"
-        v-sanitaize
-        v-html="remarks_text"
-      />
-      <!-- eslint-disable vue/no-v-html -->
-    </ul>
   </data-view>
 </template>
 
@@ -227,10 +217,6 @@
 }
 #tmtitle {
   color: white;
-}
-ul.remarks {
-  font-size: 0.75rem;
-  list-style-type: '※ ';
 }
 </style>
 
