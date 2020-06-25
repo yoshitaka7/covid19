@@ -89,7 +89,9 @@ export default class NewPatientsChart extends Vue {
   private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private get displayTitle(): string {
-    return `新規感染者数${
+    return `${
+      this.dataKind === 'daily-cumulative' ? '累計' : '新規'
+    }感染者数${
       this.dataKind === 'weekly-transition' ? '(週別)' : ''
     }`
   }
