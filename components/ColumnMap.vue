@@ -220,109 +220,94 @@
 }
 </style>
 
-<script>
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import DataView from '@/components/DataView.vue'
 
-export default {
-  components: { DataView },
-  props: {
-    title: {
-      type: String,
-      default: ''
-    },
-    titleId: {
-      type: String,
-      default: ''
-    },
-    date: {
-      type: String,
-      required: true,
-      default: ''
-    },
-    data: {
-      type: Map,
-      required: true,
-      default: () => new Map()
-    },
-    legends: {
-      type: Array,
-      required: true,
-      default: () => []
-    },
-    url: {
-      type: String,
-      required: false,
-      default: ''
-    },
-    remarks: {
-      type: Array,
-      required: false,
-      default: () => []
-    },
-    titleDate: {
-      type: String,
-      required: false,
-      default: ''
-    },
-    titleRemark: {
-      type: String,
-      required: false,
-      default: ''
+@Component({
+  components: {
+    DataView
+  }
+})
+export default class ColumnMap extends Vue {
+  @Prop()
+  public title?: string
+
+  @Prop()
+  public titleId?: string
+
+  @Prop()
+  public date?: string
+
+  @Prop()
+  public data!: Map<string, any>
+
+  @Prop()
+  public legends!: any[]
+
+  @Prop()
+  public url?: string
+
+  @Prop()
+  public remarks?: any[]
+
+  @Prop()
+  public titleDate?: string
+
+  @Prop()
+  public titleRemark?: string
+
+  private get table() {
+    // const TABULARMAP_SRC = `
+    //   扶桑	犬山	春日井	尾張旭	瀬戸	みよし	豊田	豊根
+    //   江南	大口	小牧	長久手	日進	知立	岡崎	東栄
+    //   一宮	岩倉	北名古屋	豊山	東郷	刈谷	安城	設楽
+    //   稲沢	清須	名古屋	大府	豊明	高浜	幸田	新城
+    //   津島	あま	大治	阿久比	東浦	碧南	西尾	豊川
+    //   愛西	蟹江	東海	半田	武豊			蒲郡
+    //   弥富	飛島	知多	常滑	美浜	南知多	田原	豊橋`
+    const TABULARMAP_SRC = `
+      23362	23215	23206	23226	23204	23236	23211	23563
+      23217	23361	23219	23238	23230	23225	23202	23562
+      23203	23228	23234	23342	23302	23210	23212	23561
+      23220	23233	23100	23223	23229	23227	23501	23221
+      23208	23237	23424	23441	23442	23209	23213	23207
+      23232	23425	23222	23205	23447			23214
+      23235	23427	23224	23216	23446	23445	23231	23201`
+
+    const items = []
+    const ssrc = TABULARMAP_SRC.substring(1).split('\n')
+    for (const ss of ssrc) {
+      items.push(ss.split('\t'))
     }
-  },
-  computed: {
-    table() {
-      // const TABULARMAP_SRC = `
-      //   扶桑	犬山	春日井	尾張旭	瀬戸	みよし	豊田	豊根
-      //   江南	大口	小牧	長久手	日進	知立	岡崎	東栄
-      //   一宮	岩倉	北名古屋	豊山	東郷	刈谷	安城	設楽
-      //   稲沢	清須	名古屋	大府	豊明	高浜	幸田	新城
-      //   津島	あま	大治	阿久比	東浦	碧南	西尾	豊川
-      //   愛西	蟹江	東海	半田	武豊			蒲郡
-      //   弥富	飛島	知多	常滑	美浜	南知多	田原	豊橋`
-      const TABULARMAP_SRC = `
-        23362	23215	23206	23226	23204	23236	23211	23563
-        23217	23361	23219	23238	23230	23225	23202	23562
-        23203	23228	23234	23342	23302	23210	23212	23561
-        23220	23233	23100	23223	23229	23227	23501	23221
-        23208	23237	23424	23441	23442	23209	23213	23207
-        23232	23425	23222	23205	23447			23214
-        23235	23427	23224	23216	23446	23445	23231	23201`
 
-      const items = []
-      const ssrc = TABULARMAP_SRC.substring(1).split('\n')
-      for (const ss of ssrc) {
-        items.push(ss.split('\t'))
-      }
-
-      return items.map(row => {
-        return row.map(col => {
-          const hit = this.data.get(col.trim())
-          if (hit == null) {
-            return {
-              values: ['', '', ''],
-              foregroundColor: 'transparent',
-              backgroundColor: 'white'
-            }
-          }
-
-          const foregroundColor =
-            hit.legendIndex >= 0
-              ? this.legends[hit.legendIndex].foregroundColor
-              : 'black'
-          const backgroundColor =
-            hit.legendIndex >= 0
-              ? this.legends[hit.legendIndex].backgroundColor
-              : 'white'
-
+    return items.map(row => {
+      return row.map(col => {
+        const hit = this.data.get(col.trim())
+        if (hit == null) {
           return {
-            values: [hit.cityName, hit.patientsTotal, hit.patientsPer100k],
-            foregroundColor,
-            backgroundColor
+            values: ['', '', ''],
+            foregroundColor: 'transparent',
+            backgroundColor: 'white'
           }
-        })
+        }
+
+        const foregroundColor =
+          hit.legendIndex >= 0
+            ? this.legends[hit.legendIndex].foregroundColor
+            : 'black'
+        const backgroundColor =
+          hit.legendIndex >= 0
+            ? this.legends[hit.legendIndex].backgroundColor
+            : 'white'
+
+        return {
+          values: [hit.cityName, hit.patientsTotal, hit.patientsPer100k],
+          foregroundColor,
+          backgroundColor
+        }
       })
-    }
+    })
   }
 }
 </script>
