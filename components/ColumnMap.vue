@@ -48,6 +48,15 @@
       </tr>
     </table>
 
+    <date-select-slider
+      :chart-data="weekDates"
+      :value="displaySpan"
+      :min="spanMin"
+      :max="spanMax"
+      :label-formatter="sliderLabelFormatter"
+      @sliderInput="sliderUpdate"
+    />
+
     <div class="ColumnMap-LegendPanel">
       <div class="ColumnMap-LegendMapPanel">
         <div class="ColumnMap-LegendTitle">
@@ -222,11 +231,21 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
+import dayjs from 'dayjs'
+import { DateRange } from './TimeBarLineChart.vue'
 import DataView from '@/components/DataView.vue'
+import DateSelectSlider from '@/components/DateSelectSlider.vue'
+import { WeekRange } from '~/utils/weeklizer'
+import {
+  CitySummaryDataType,
+  WeekCityPatientDataType,
+  CityDataType
+} from '~/utils/formatPatientsPerCities'
 
 @Component({
   components: {
-    DataView
+    DataView,
+    DateSelectSlider
   }
 })
 export default class ColumnMap extends Vue {
@@ -243,6 +262,15 @@ export default class ColumnMap extends Vue {
   public data!: Map<string, any>
 
   @Prop()
+  public dataWeekly!: {
+    weekRange: WeekRange
+    cityNumMap: Map<string, WeekCityPatientDataType>
+  }[]
+
+  @Prop()
+  public cityDataMap!: Map<string, CityDataType>
+
+  @Prop()
   public legends!: any[]
 
   @Prop()
@@ -256,6 +284,49 @@ export default class ColumnMap extends Vue {
 
   @Prop()
   public titleRemark?: string
+
+  private readonly defaultSpan: number = 3
+
+  private displaySpan: number[] = [0, 0]
+
+  private spanMin: number = 0
+
+  private get weekDates(): DateRange[] {
+    return this.dataWeekly.map(x => [
+      x.weekRange.from.format('YYYY/MM/DD'),
+      x.weekRange.to.format('YYYY/MM/DD')
+    ])
+  }
+
+  private get spanMax(): number {
+    return this.dataWeekly.length - 1
+  }
+
+  private readonly sliderLabelFormatter = (
+    date: DateRange,
+    isFrom: boolean
+  ) => {
+    if (!date) {
+      return ''
+    } else if (typeof date === 'string') {
+      return dayjs(date).format('M/D')
+    } else {
+      return date.map(date => dayjs(date).format('M/D'))[isFrom ? 0 : 1]
+    }
+  }
+
+  constructor() {
+    super()
+
+    this.displaySpan = [
+      this.dataWeekly.length - this.defaultSpan,
+      this.dataWeekly.length - 1
+    ]
+  }
+
+  public sliderUpdate(sliderValue: number[]) {
+    this.displaySpan = sliderValue
+  }
 
   private get table() {
     // const TABULARMAP_SRC = `
@@ -283,7 +354,66 @@ export default class ColumnMap extends Vue {
 
     return items.map(row => {
       return row.map(col => {
-        const hit = this.data.get(col.trim())
+        const result = new Map<string, CitySummaryDataType>()
+        const ranged = this.dataWeekly.slice(
+          this.displaySpan[0],
+          this.displaySpan[1] + 1
+        )
+
+        const city = this.cityDataMap.get(col.trim())
+        if (city != null) {
+          const countOfCity = city['検索ワード'].reduce((count, word) => {
+            const countOfSearchWord = ranged.reduce((cnt, weeked) => {
+              const hit = weeked.cityNumMap.get(word)
+              if (hit != null) {
+                cnt += hit['感染者数'] ?? 0
+              }
+              return cnt
+            }, 0)
+
+            return count + countOfSearchWord
+          }, 0)
+
+          const patientsPer100k =
+            Math.floor((countOfCity / city['人口']) * 1000000) / 10 // 10万人あたり感染者数
+          const legendIndex = this.legends.findIndex(legend => {
+            if (typeof legend.range === 'number') {
+              return legend.range === patientsPer100k
+            } else {
+              return (
+                legend.range.min <= patientsPer100k &&
+                patientsPer100k < legend.range.max
+              )
+            }
+          })
+
+          result.set(city['市町村コード'], {
+            cityCode: city['市町村コード'], // 市町村コード
+            cityName: city['市町村名'], // 市町村名
+            patientsTotal: countOfCity, // 患者数
+            patientsPer100k,
+            legendIndex
+          } as CitySummaryDataType)
+        }
+
+        // const ranged = this.dataWeekly.slice(this.displaySpan[0], this.displaySpan[1] + 1)
+
+        // for (const range of ranged) {
+        //   const cityToNum = range.cityNumMap.get(col.trim())
+        //   if (cityToNum != null) {
+        //     const hit = result.get(cityToNum.cityCode)
+        //     if (hit == null) {
+        //       result.set(cityToNum.cityCode, cityToNum)
+        //     } else {
+        //       const cloned = Object.assign({}, hit)
+        //       cloned.patientsTotal += cityToNum.patientsTotal
+        //       result.set(cloned.cityCode, cloned)
+        //     }
+        //   }
+        // }
+
+        // const hit = this.data.get(col.trim())
+        const hit = result.get(col.trim())
         if (hit == null) {
           return {
             values: ['', '', ''],

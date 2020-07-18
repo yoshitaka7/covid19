@@ -85,10 +85,12 @@
 
       <v-col cols="12" md="6" class="DataCard">
         <column-map
-          title="市町村別感染者数"
+          title="市町村別感染状況"
           :title-id="'patients-per-cities'"
           :date="Data.patients.date"
           :data="patientsPerCities"
+          :city-data-map="cityDataMap"
+          :data-weekly="patientsPerCitiesWeekly"
           :legends="patientsPerCitiesLegends"
           :title-date="patientsPerCitiesDate"
           :remarks="[
@@ -125,7 +127,10 @@ import Data from '@/data/data.json'
 import CityData from '@/data/city_data.json'
 
 import formatConfirmedCases from '@/utils/formatConfirmedCases'
-import formatPatientsPerCities from '@/utils/formatPatientsPerCities'
+import formatPatientsPerCities, {
+  formatPatientsPerCitiesWeekly,
+  makeCityDataMap
+} from '@/utils/formatPatientsPerCities'
 import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
@@ -168,6 +173,7 @@ export default {
     const confirmedCases = formatConfirmedCases(Data.main_summary_history)
 
     // 市区町村別の感染者数
+    const cityDataMap = makeCityDataMap(CityData.data)
     const patientsPerCitiesLegends = []
     const patientsPerCities = formatPatientsPerCities(
       CityData.data,
@@ -177,12 +183,17 @@ export default {
     const patientsPerCitiesDate = Data.patients_summary.data.slice(-1)[0][
       '日付'
     ]
+    const patientsPerCitiesWeekly = formatPatientsPerCitiesWeekly(
+      Data.patients.data
+    )
 
     const data = {
       Data,
       dataWeekly,
       confirmedCases,
+      cityDataMap,
       patientsPerCities,
+      patientsPerCitiesWeekly,
       patientsPerCitiesLegends,
       patientsPerCitiesDate,
       headerItem: {
