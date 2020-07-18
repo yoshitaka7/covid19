@@ -237,10 +237,24 @@ import DataView from '@/components/DataView.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
 import { WeekRange } from '~/utils/weeklizer'
 import {
-  CitySummaryDataType,
   WeekCityPatientDataType,
   CityDataType
 } from '~/utils/formatPatientsPerCities'
+
+type CitySummaryDataType = {
+  cityCode: string // 市町村コード
+  cityName: string // 市町村名
+  patientsTotal: number // 患者数
+  patientsPer100k: number // 10万人あたり患者数
+  legendIndex: number // 該当凡例
+}
+
+type CitySummaryLegendType = {
+  range: { min: number; max: number } | number //
+  rangeName: string //
+  foregroundColor: string //
+  backgroundColor: string //
+}
 
 @Component({
   components: {
@@ -259,9 +273,6 @@ export default class ColumnMap extends Vue {
   public date?: string
 
   @Prop()
-  public data!: Map<string, any>
-
-  @Prop()
   public dataWeekly!: {
     weekRange: WeekRange
     cityNumMap: Map<string, WeekCityPatientDataType>
@@ -269,9 +280,6 @@ export default class ColumnMap extends Vue {
 
   @Prop()
   public cityDataMap!: Map<string, CityDataType>
-
-  @Prop()
-  public legends!: any[]
 
   @Prop()
   public url?: string
@@ -314,6 +322,45 @@ export default class ColumnMap extends Vue {
       return date.map(date => dayjs(date).format('M/D'))[isFrom ? 0 : 1]
     }
   }
+
+  private readonly legends: CitySummaryLegendType[] = [
+    {
+      range: 0,
+      rangeName: '0人',
+      foregroundColor: 'black',
+      backgroundColor: 'white'
+    },
+    {
+      range: { min: Number.MIN_SAFE_INTEGER, max: 2 },
+      rangeName: '2人未満',
+      foregroundColor: 'black',
+      backgroundColor: '#c5eddf'
+    },
+    {
+      range: { min: 2.0, max: 8.0 },
+      rangeName: '2人以上',
+      foregroundColor: 'white',
+      backgroundColor: '#8abccf'
+    },
+    {
+      range: { min: 8.0, max: 32.0 },
+      rangeName: '8人以上',
+      foregroundColor: 'white',
+      backgroundColor: '#73a2c6'
+    },
+    {
+      range: { min: 32.0, max: 128.0 },
+      rangeName: '32人以上',
+      foregroundColor: 'white',
+      backgroundColor: '#4771b2'
+    },
+    {
+      range: { min: 128, max: Number.MAX_SAFE_INTEGER },
+      rangeName: '128人以上',
+      foregroundColor: 'white',
+      backgroundColor: '#00429d'
+    }
+  ]
 
   constructor() {
     super()
