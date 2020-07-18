@@ -46,6 +46,14 @@ export const formatPatientsPerCitiesWeekly = (
     1
   )
 
+  // 開始日、終了日の調整
+  if (weekRanges.length > 0 && data.length > 0) {
+    weekRanges[0].from = dayjs(data[0]['発表日'])
+    weekRanges[weekRanges.length - 1].to = dayjs(
+      data[data.length - 1]['発表日']
+    )
+  }
+
   const containsWeek = (x: string) => {
     const d = dayjs(x)
     return weekRanges.find(r => r.from <= d && d <= r.to)
