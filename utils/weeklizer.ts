@@ -11,7 +11,7 @@ import {
 } from '../utils/types'
 
 // 週次化の週の開始日と終了日
-type WeekRange = {
+export type WeekRange = {
   from: Dayjs
   to: Dayjs
 }
@@ -236,7 +236,7 @@ const weeklizeInspectionPersonsSummary = (
 // [{ 2/3,  2/9  },
 //  { 2/10, 2/16 },
 //  { 2/17, 2/23 }]
-const makeWeekRanges = (
+export const makeWeekRanges = (
   beginDate: Dayjs,
   lastDate: Dayjs,
   chunkStartYoubi: YoubiKind
