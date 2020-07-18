@@ -65,7 +65,7 @@
         <div class="ColumnMap-LegendMapCell">
           <div class="ColumnMap-LegendMapText">
             <span>居住地</span>
-            <span>累計感染者数</span>
+            <span>感染者数</span>
             <span>感染率※</span>
           </div>
         </div>
@@ -115,7 +115,7 @@
   }
   &-PanelText {
     font-size: 11px;
-    line-height: 1.3;
+    line-height: 1.1;
     width: calc(11px * 4);
     margin: 0 auto;
     white-space: nowrap;
@@ -123,7 +123,7 @@
   }
   &-PanelTextForMD {
     font-size: 9px;
-    line-height: 1.3;
+    line-height: 1.1;
     width: calc(9px * 3.2);
     margin: 0 auto;
     white-space: nowrap;
@@ -145,7 +145,7 @@
     flex-direction: column;
   }
   &-LegendMapCell {
-    width: calc(11px * 7);
+    width: calc(11px * 5);
     height: 60px;
     border: 1px solid #333;
     border-radius: 5px;
@@ -173,7 +173,7 @@
     justify-content: center;
     font-size: 11px;
     line-height: 1.3;
-    width: calc(11px * 7);
+    width: calc(11px * 5);
     margin: 0 auto;
     white-space: nowrap;
     overflow: hidden;
@@ -203,7 +203,7 @@
 .tabularmaps td {
   width: 200px; //calc(100% / 4);
   // height: calc(60vw / 5);
-  height: 50px;
+  height: 44px;
   //font-size: 3vw;
   vertical-align: middle;
   text-align: center;
