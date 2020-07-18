@@ -245,7 +245,7 @@ type CitySummaryDataType = {
   cityCode: string // 市町村コード
   cityName: string // 市町村名
   patientsTotal: number // 患者数
-  patientsPer100k: number // 10万人あたり患者数
+  patientsPer100k: string // 10万人あたり患者数
   legendIndex: number // 該当凡例
 }
 
@@ -421,8 +421,12 @@ export default class ColumnMap extends Vue {
             return count + countOfSearchWord
           }, 0)
 
-          const patientsPer100k =
-            Math.floor((countOfCity / city['人口']) * 1000000) / 10 // 10万人あたり感染者数
+          const patientsPer100k = (countOfCity / city['人口']) * 100000 // 10万人あたり感染者数
+          let patientsPer100kDisp = '' + Math.round(patientsPer100k * 10) / 10 // 10万人あたり感染者数
+          if (patientsPer100kDisp === '0' && patientsPer100k > 0) {
+            patientsPer100kDisp = '0+'
+          }
+
           const legendIndex = this.legends.findIndex(legend => {
             if (typeof legend.range === 'number') {
               return legend.range === patientsPer100k
@@ -438,7 +442,7 @@ export default class ColumnMap extends Vue {
             cityCode: city['市町村コード'], // 市町村コード
             cityName: city['市町村名'], // 市町村名
             patientsTotal: countOfCity, // 患者数
-            patientsPer100k,
+            patientsPer100k: patientsPer100kDisp,
             legendIndex
           } as CitySummaryDataType)
         }
