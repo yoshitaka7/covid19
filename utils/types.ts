@@ -61,6 +61,8 @@ export type MainSummaryDataType = {
   陽性患者数: number
   入院中: number
   軽症中等症: number
+  軽症無症状: number
+  中等症: number
   重症: number
   転院: number
   施設入所: number

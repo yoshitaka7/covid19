@@ -68,7 +68,8 @@ export default class MainSummaryChart extends Vue {
   private readonly remarks = [
     '愛知県が発表した「検査陽性者の状況」を当サイトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
     '検査陽性者状況が取得できなかった日の値は表示していません',
-    '凡例をクリックするとその項目の[表示/非表示]が切り替えられます'
+    '凡例をクリックするとその項目の[表示/非表示]が切り替えられます',
+    '7月24日より、[軽症中等症]が[軽症無症状]と[中等症]に分割されました'
   ]
 
   private readonly showSelector = false
@@ -152,6 +153,8 @@ export default class MainSummaryChart extends Vue {
         return {
           date: dayjs(d['更新日時']).format('YYYY-MM-DD'),
           milds: Number(d['軽症中等症']),
+          asymptomatic: Number(d['軽症無症状']),
+          moderate: Number(d['中等症']),
           severes: Number(d['重症']),
           isolated: Number(d['施設入所']),
           transfered: Number(d['転院']),
@@ -169,15 +172,15 @@ export default class MainSummaryChart extends Vue {
           color: '#984807',
           unit: '人',
           values: rows.select(d => d.deaths).toArray(),
-          order: 6
+          order: 8
         },
         {
           type: 'bar',
-          title: '退院',
-          color: '#0070C0',
+          title: '重症',
+          color: '#D99694',
           unit: '人',
-          values: rows.select(d => d.discharged).toArray(),
-          order: 1
+          values: rows.select(d => d.severes).toArray(),
+          order: 7
         },
         {
           type: 'bar',
@@ -185,7 +188,31 @@ export default class MainSummaryChart extends Vue {
           color: '#7F7F7F',
           unit: '人',
           values: rows.select(d => d.transfered).toArray(),
+          order: 6
+        },
+        {
+          type: 'bar',
+          title: '中等症',
+          color: '#E6C79A',
+          unit: '人',
+          values: rows.select(d => d.moderate).toArray(),
+          order: 5
+        },
+        {
+          type: 'bar',
+          title: '軽症無症状',
+          color: '#FEE4AA',
+          unit: '人',
+          values: rows.select(d => d.asymptomatic).toArray(),
           order: 4
+        },
+        {
+          type: 'bar',
+          title: '軽症中等症',
+          color: '#FCD5B5',
+          unit: '人',
+          values: rows.select(d => d.milds).toArray(),
+          order: 3
         },
         {
           type: 'bar',
@@ -197,19 +224,11 @@ export default class MainSummaryChart extends Vue {
         },
         {
           type: 'bar',
-          title: '重症',
-          color: '#D99694',
+          title: '退院',
+          color: '#0070C0',
           unit: '人',
-          values: rows.select(d => d.severes).toArray(),
-          order: 5
-        },
-        {
-          type: 'bar',
-          title: '軽症中等症',
-          color: '#FCD5B5',
-          unit: '人',
-          values: rows.select(d => d.milds).toArray(),
-          order: 3
+          values: rows.select(d => d.discharged).toArray(),
+          order: 1
         }
       ]
     } as GraphData
