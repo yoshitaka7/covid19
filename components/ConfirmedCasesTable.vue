@@ -131,17 +131,14 @@ export default Vue.extend({
     },
     軽症中等症: {
       type: Number,
-      required: false,
       default: -1
     },
     軽症無症状: {
       type: Number,
-      required: false,
       default: -1
     },
     中等症: {
       type: Number,
-      required: false,
       default: -1
     },
     重症: {
