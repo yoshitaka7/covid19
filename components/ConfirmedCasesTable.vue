@@ -27,13 +27,35 @@
             </span>
           </div>
           <ul :class="$style.group">
-            <li :class="[$style.box]">
+            <li v-if="軽症中等症" :class="[$style.box]">
               <div :class="$style.content">
                 <!-- eslint-disable vue/no-v-html-->
                 <span v-html="$t('軽症・中等症')" />
                 <!-- eslint-enable vue/no-v-html-->
                 <span>
                   <strong>{{ 軽症中等症.toLocaleString() }}</strong>
+                  <span :class="$style.unit">{{ $t('人') }}</span>
+                </span>
+              </div>
+            </li>
+            <li v-if="軽症無症状" :class="[$style.box]">
+              <div :class="$style.content">
+                <!-- eslint-disable vue/no-v-html-->
+                <span v-html="$t('軽症・無症状')" />
+                <!-- eslint-enable vue/no-v-html-->
+                <span>
+                  <strong>{{ 軽症無症状.toLocaleString() }}</strong>
+                  <span :class="$style.unit">{{ $t('人') }}</span>
+                </span>
+              </div>
+            </li>
+            <li v-if="中等症" :class="[$style.box]">
+              <div :class="$style.content">
+                <!-- eslint-disable vue/no-v-html-->
+                <span v-html="$t('中等症')" />
+                <!-- eslint-enable vue/no-v-html-->
+                <span>
+                  <strong>{{ 中等症.toLocaleString() }}</strong>
                   <span :class="$style.unit">{{ $t('人') }}</span>
                 </span>
               </div>
@@ -109,7 +131,15 @@ export default Vue.extend({
     },
     軽症中等症: {
       type: Number,
-      required: true
+      required: false
+    },
+    軽症無症状: {
+      type: Number,
+      required: false
+    },
+    中等症: {
+      type: Number,
+      required: false
     },
     重症: {
       type: Number,
