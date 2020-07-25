@@ -27,7 +27,10 @@
             </span>
           </div>
           <ul :class="$style.group">
-            <li v-if="軽症中等症 > -1" :class="[$style.box]">
+            <li
+              v-if="軽症中等症 > -1 && 軽症中等症 != ''"
+              :class="[$style.box]"
+            >
               <div :class="$style.content">
                 <!-- eslint-disable vue/no-v-html-->
                 <span v-html="$t('軽症・中等症')" />
@@ -38,7 +41,10 @@
                 </span>
               </div>
             </li>
-            <li v-if="軽症無症状 > -1" :class="[$style.box]">
+            <li
+              v-if="軽症無症状 > -1 && 軽症無症状 != ''"
+              :class="[$style.box]"
+            >
               <div :class="$style.content">
                 <!-- eslint-disable vue/no-v-html-->
                 <span v-html="$t('軽症・無症状')" />
@@ -49,7 +55,7 @@
                 </span>
               </div>
             </li>
-            <li v-if="中等症 > -1" :class="[$style.box]">
+            <li v-if="中等症 > -1 && 中等症 != ''" :class="[$style.box]">
               <div :class="$style.content">
                 <!-- eslint-disable vue/no-v-html-->
                 <span v-html="$t('中等症')" />
