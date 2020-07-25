@@ -30,7 +30,7 @@
             :bgcolor="indicator.colors.caution.bgColor"
             :style="'color: ' + indicator.colors.caution.textColor"
           >
-            注意<br />領域
+            警戒<br />領域
           </th>
           <th
             scope="col"
@@ -221,7 +221,7 @@ type DisplayInfo = {
   unit: string
 }
 
-type StatusKind = 0 | 1 | 2 // 0:基準値未満, 1:注意, 2:危険
+type StatusKind = 0 | 1 | 2 // 0:基準値未満, 1:警戒, 2:危険
 
 type Colors = {
   bgColor: string
@@ -326,7 +326,7 @@ export default class MonitoringView2 extends Vue {
     let lText = '－'
     switch (this.totalCell.status) {
       case 1:
-        lText = '注意'
+        lText = '警戒'
         break
       case 2:
         lText = '危険'
@@ -425,7 +425,7 @@ export default class MonitoringView2 extends Vue {
       this.totalCell.textColor = this.indicator.colors.danger.textColor
       this.totalCell.status = 2
     } else if (items.any(d => d.cell.status >= 1)) {
-      // 一つでも注意以上ならその日は黄色
+      // 一つでも警戒以上ならその日は黄色
       this.totalCell.bgColor = this.indicator.colors.caution.bgColor
       this.totalCell.textColor = this.indicator.colors.caution.textColor
       this.totalCell.status = 1
@@ -571,7 +571,7 @@ export default class MonitoringView2 extends Vue {
         },
         {
           type: 'line',
-          title: '注意領域',
+          title: '警戒領域',
           unit: '%',
           values: rows.select(_ => 50).toArray(),
           tooltipVisible: false,

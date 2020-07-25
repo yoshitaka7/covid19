@@ -10,9 +10,7 @@
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <div
-      style="flex-grow: 1; display: flex; align-items: center; padding-bottom: 15px;"
-    >
+    <div style="flex-grow: 1; display: flex; align-items: start;">
       <time-bar-line-chart
         v-if="dataKind === 'history'"
         chart-id="monitoring-chart"
@@ -33,7 +31,7 @@
               :bgcolor="indicator.colors.caution.bgColor"
               :style="'color: ' + indicator.colors.caution.textColor"
             >
-              注意<br />領域
+              警戒<br />領域
             </th>
             <th
               scope="col"
@@ -109,19 +107,6 @@
       </table>
     </div>
 
-    <div>
-      <ul class="remarks">
-        <!-- eslint-disable vue/no-v-html -->
-        <li
-          v-for="remarks_text in remarks"
-          :key="remarks_text"
-          v-sanitaize
-          v-html="remarks_text"
-        />
-        <!-- eslint-disable vue/no-v-html -->
-      </ul>
-    </div>
-
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
         l-title="判定"
@@ -134,11 +119,6 @@
 </template>
 
 <style lang="scss" scoped>
-ul.remarks {
-  font-size: 0.75rem;
-  list-style-type: '※ ';
-}
-
 .table {
   height: 0;
   width: 100%;
@@ -194,6 +174,7 @@ import {
   PatientsSummaryDaily,
   InspectionPersonsSummaryDaily
 } from '~/utils/types'
+import RemarksView from '@/components/RemarksView.vue'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
 import TimeBarLineChart, {
@@ -225,7 +206,7 @@ type DisplayInfo = {
   unit: string
 }
 
-type StatusKind = 0 | 1 | 2 // 0:基準値未満, 1:注意, 2:危険
+type StatusKind = 0 | 1 | 2 // 0:基準値未満, 1:警戒, 2:危険
 
 type Colors = {
   bgColor: string
@@ -247,7 +228,8 @@ type CellInfo = Colors & {
     DataView,
     DataSelector,
     TimeBarLineChart,
-    DataViewBasicInfoPanel
+    DataViewBasicInfoPanel,
+    RemarksView
   }
 })
 export default class MonitoringView extends Vue {
@@ -330,7 +312,7 @@ export default class MonitoringView extends Vue {
     let lText = '－'
     switch (this.totalCell.status) {
       case 1:
-        lText = '注意'
+        lText = '警戒'
         break
       case 2:
         lText = '危険'
@@ -429,7 +411,7 @@ export default class MonitoringView extends Vue {
       this.totalCell.textColor = this.indicator.colors.danger.textColor
       this.totalCell.status = 2
     } else if (items.any(d => d.cell.status >= 1)) {
-      // 一つでも注意以上ならその日は黄色
+      // 一つでも警戒以上ならその日は黄色
       this.totalCell.bgColor = this.indicator.colors.caution.bgColor
       this.totalCell.textColor = this.indicator.colors.caution.textColor
       this.totalCell.status = 1
@@ -579,7 +561,7 @@ export default class MonitoringView extends Vue {
         },
         {
           type: 'line',
-          title: '注意領域',
+          title: '警戒領域',
           unit: '%',
           values: rows.select(_ => 50).toArray(),
           tooltipVisible: false,

@@ -10,27 +10,12 @@
       <data-selector v-model="dataKind" :items="dataKinds" />
     </template>
 
-    <div
-      style="flex-grow: 1; display: flex; align-items: center; padding-bottom: 15px;"
-    >
+    <div style="flex-grow: 1; display: flex; align-items: start;">
       <time-bar-line-chart
         chart-id="new-patients-chart"
         :chart-data="chartData"
         legend-order-kind="desc"
       />
-    </div>
-
-    <div>
-      <ul class="remarks">
-        <!-- eslint-disable vue/no-v-html -->
-        <li
-          v-for="remarks_text in remarks"
-          :key="remarks_text"
-          v-sanitaize
-          v-html="remarks_text"
-        />
-        <!-- eslint-disable vue/no-v-html -->
-      </ul>
     </div>
 
     <template v-slot:infoPanel>
@@ -42,13 +27,6 @@
     </template>
   </data-view>
 </template>
-
-<style lang="scss" scoped>
-ul.remarks {
-  font-size: 0.75rem;
-  list-style-type: '※ ';
-}
-</style>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
@@ -111,7 +89,9 @@ export default class NewPatientsChart extends Vue {
   private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private get displayTitle(): string {
-    return `新規感染者数${
+    return `${
+      this.dataKind === 'daily-cumulative' ? '累計' : '新規'
+    }感染者数${
       this.dataKind === 'weekly-transition' ? '(週別)' : ''
     }`
   }
