@@ -87,7 +87,7 @@ export default class MainSummaryChart extends Vue {
   }
 
   private get displayDiffValue(): string {
-    const dataset = this.chartData.datasets[1]
+    const dataset = this.chartData.datasets[7]
     if (dataset.values.slice(-2)[0] === undefined) {
       return '-'
     }
@@ -105,7 +105,7 @@ export default class MainSummaryChart extends Vue {
       } as DisplayInfo
     }
 
-    const dataset = this.chartData.datasets[1]
+    const dataset = this.chartData.datasets[7]
     const latestValueText = dataset.values.slice(-1)[0].toLocaleString()
     const diffLabel =
       this.dataKind === 'weekly-transition' ? '前週比' : '前日比'
