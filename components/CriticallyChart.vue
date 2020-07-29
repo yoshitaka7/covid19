@@ -14,6 +14,7 @@
       <time-bar-line-chart
         chart-id="critically-chart"
         :chart-data="chartData"
+        legend-order-kind="desc"
       />
     </div>
 
@@ -29,7 +30,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import * as Enumerable from 'linq'
 import DataView from '@/components/DataView.vue'
 import DataSelector, { SelectorItem } from '@/components/DataSelector.vue'
@@ -37,6 +38,12 @@ import DataViewBasicInfoPanel from '@/components/DataViewBasicInfoPanel.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
 import TimeBarLineChart, { GraphData } from '@/components/TimeBarLineChart.vue'
 import { MainSummaryDataType } from '~/utils/types'
+
+export type CriticallyAverageType = {
+  date: Dayjs
+  count: number
+  average: number | undefined
+}
 
 type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
 
@@ -65,11 +72,12 @@ export default class CriticallyChart extends Vue {
   private readonly remarks = [
     '「重症者数」とは、愛知県が発表した「検査陽性者の状況」のうち、「重症」の人数です。',
     '愛知県が発表した「検査陽性者の状況」を当サイトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
-    '感染症発生状況が取得できなかった日の値は表示していません'
+    '感染症発生状況が取得できなかった日の値は表示していません',
+    '過去7日間の平均は、重症者数の後方7日移動平均値です'
   ]
 
-  private readonly showSelector = false
-  private readonly dataKind: DataKind = 'daily-transition'
+  private showSelector = false
+  private dataKind: DataKind = 'daily-transition'
   private readonly dataKinds = [
     { key: 'daily-transition', label: '日別' } as SelectorItem
   ]
@@ -139,14 +147,41 @@ export default class CriticallyChart extends Vue {
     }
   }
 
+  public static makeAverageCriticals = (
+    data: MainSummaryDataType[]
+  ): Enumerable.IEnumerable<CriticallyAverageType> => {
+    const source = Enumerable.from(data).reverse()
+    const startDate = dayjs('2020-03-31')
+    return source
+      .select(d => d['更新日時'])
+      .select((_, index) => source.skip(index).take(7))
+      .select(d => {
+        const first = d.first()
+        const ave =
+          startDate <= dayjs(first['更新日時']) && d.count() === 7
+            ? d
+                .where(d => d['重症'] !== undefined)
+                .average(d => Number(d['重症']))
+            : undefined
+
+        return {
+          date: dayjs(dayjs(first['更新日時']).format('YYYY-MM-DD')), // 時刻を切り落とす
+          count: first['重症'],
+          average: ave
+        }
+      })
+      .reverse()
+  }
+
   private buildDailyTransitionGraphData = (): GraphData => {
     const now = dayjs()
-    const rows = Enumerable.from(this.dailyData ?? [])
-      .where(d => dayjs(d['更新日時']) < now)
+    const rows = CriticallyChart.makeAverageCriticals(this.dailyData ?? [])
+      .where(d => d.date < now)
       .select(d => {
         return {
-          date: dayjs(d['更新日時']).format('YYYY-MM-DD'),
-          count: Number(d['重症'])
+          date: d.date.format('YYYY-MM-DD'),
+          count: d.count,
+          average: d.average
         }
       })
 
@@ -159,6 +194,13 @@ export default class CriticallyChart extends Vue {
           unit: '人',
           values: rows.select(d => d.count).toArray(),
           order: 2
+        },
+        {
+          type: 'line',
+          title: '過去7日間の平均',
+          unit: '人',
+          values: rows.select(d => d.average).toArray(),
+          order: 1
         }
       ]
     } as GraphData

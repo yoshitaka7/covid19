@@ -63,6 +63,13 @@
       </v-col>
 
       <v-col cols="12" md="6" class="DataCard">
+        <critically-chart
+          :date="Data.main_summary_history.date"
+          :daily-data="Data.main_summary_history.data"
+        />
+      </v-col>
+
+      <v-col cols="12" md="6" class="DataCard">
         <main-summary-chart
           :date="Data.main_summary_history.date"
           :daily-data="Data.main_summary_history.data"
@@ -96,13 +103,6 @@
             '感染率とは10万人あたり感染者数を指し、その算出には、推計人口(2020年3月1日時点)を使用'
           ]"
           :url="'https://www.pref.aichi.jp/site/covid19-aichi/'"
-        />
-      </v-col>
-
-      <v-col cols="12" md="6" class="DataCard">
-        <critically-chart
-          :date="Data.main_summary_history.date"
-          :daily-data="Data.main_summary_history.data"
         />
       </v-col>
 
