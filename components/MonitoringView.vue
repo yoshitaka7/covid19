@@ -108,7 +108,7 @@
           <tr style="height: 20px" />
           <tr style="border: 3px solid #a83945">
             <th scope="row" class="row-header">
-              重傷者数
+              重症者数
             </th>
             <td class="col-caution">{{ indicator.criticals.caution }}人</td>
             <td class="col-warning">{{ indicator.criticals.warning }}人</td>
@@ -554,7 +554,7 @@ export default class MonitoringView extends Vue {
     const hospitals = HospitalizedChart.makeAverageHospitals(
       this.mainSummaryData ?? []
     )
-    // 重傷者数
+    // 重症者数
     const criticals = CriticallyChart.makeAverageCriticals(
       this.mainSummaryData ?? []
     )
