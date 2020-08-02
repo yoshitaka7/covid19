@@ -31,7 +31,15 @@
               :bgcolor="indicator.colors.caution.bgColor"
               :style="'color: ' + indicator.colors.caution.textColor"
             >
-              警戒<br />領域
+              警戒
+            </th>
+            <th
+              scope="col"
+              class="col-header"
+              :bgcolor="indicator.colors.warning.bgColor"
+              :style="'color: ' + indicator.colors.warning.textColor"
+            >
+              厳重<br />警戒
             </th>
             <th
               scope="col"
@@ -39,7 +47,7 @@
               :bgcolor="indicator.colors.danger.bgColor"
               :style="'color: ' + indicator.colors.danger.textColor"
             >
-              危険<br />領域
+              危険
             </th>
             <th
               scope="col"
@@ -57,6 +65,7 @@
               新規感染者数
             </th>
             <td class="col-caution">{{ indicator.patients.caution }}人</td>
+            <td class="col-warning">{{ indicator.patients.warning }}人</td>
             <td class="col-danger">{{ indicator.patients.danger }}人</td>
             <td
               class="col-actual"
@@ -71,6 +80,7 @@
               陽性率
             </th>
             <td class="col-caution">{{ indicator.rate.caution }}%</td>
+            <td class="col-warning">{{ indicator.rate.warning }}%</td>
             <td class="col-danger">{{ indicator.rate.danger }}%</td>
             <td
               class="col-actual"
@@ -85,6 +95,7 @@
               入院患者数
             </th>
             <td class="col-caution">{{ indicator.hospitals.caution }}人</td>
+            <td class="col-warning">{{ indicator.hospitals.warning }}人</td>
             <td class="col-danger">{{ indicator.hospitals.danger }}人</td>
             <td
               class="col-actual"
@@ -97,11 +108,18 @@
           <tr style="height: 20px" />
           <tr style="border: 3px solid #a83945">
             <th scope="row" class="row-header">
-              感染率
+              重症者数
             </th>
-            <td class="col-caution">0.5人</td>
-            <td class="col-danger" />
-            <td class="col-actual">{{ youseiritsuCell.label }}人</td>
+            <td class="col-caution">{{ indicator.criticals.caution }}人</td>
+            <td class="col-warning">{{ indicator.criticals.warning }}人</td>
+            <td class="col-danger">{{ indicator.criticals.danger }}人</td>
+            <td
+              class="col-actual"
+              :bgcolor="criticalCell.bgColor"
+              :style="'color: ' + criticalCell.textColor"
+            >
+              {{ criticalCell.label }}人
+            </td>
           </tr>
         </tbody>
       </table>
@@ -109,7 +127,6 @@
 
     <template v-slot:infoPanel>
       <data-view-basic-info-panel
-        l-title="判定"
         :l-text="displayInfo.lText"
         :s-text="displayInfo.sText"
         :unit="displayInfo.unit"
@@ -145,6 +162,11 @@
   border: 1px solid #a83945;
 }
 
+.col-warning {
+  text-align: center;
+  border: 1px solid #a83945;
+}
+
 .col-danger {
   text-align: center;
   border: 1px solid #a83945;
@@ -169,6 +191,7 @@ import InspectionPersonsChart, {
 import HospitalizedChart, {
   HospitalizedAverageType
 } from './HospitalizedChart.vue'
+import CriticallyChart, { CriticallyAverageType } from './CriticallyChart.vue'
 import {
   MainSummaryDataType,
   PatientsSummaryDaily,
@@ -190,12 +213,12 @@ type ScoreType = {
   date: Dayjs
   patients7DaysNum: number | undefined // 新規感染者数(7日間平均)
   patients7DaysScore: number | undefined // 新規感染者数の危険度(100=20人)
-  patients10M7DaysNum: number | undefined // 感染率(7日間の10万人あたり感染者数)
-  patients10M7DaysScore: number | undefined // 感染率の危険度(50=0.5人)
   positivesRate: number | undefined // 陽性率(7日分の陽性者数÷検査人数)
   positivesScore: number | undefined // 陽性率の危険度(100=10%)
   hospitals7DaysNum: number | undefined // 入院患者数(7日間平均)
   hospitals7DaysScore: number | undefined // 入院患者数の危険度(50=150人, 100=250人)
+  criticals7DaysNum: number | undefined // 重症者数(7日間平均)
+  criticals7DaysScore: number | undefined // 重症者数の危険度(50=150人, 100=250人)
 }
 
 type DataKind = 'latest' | 'history'
@@ -206,7 +229,10 @@ type DisplayInfo = {
   unit: string
 }
 
-type StatusKind = 0 | 1 | 2 // 0:基準値未満, 1:警戒, 2:危険
+// 指標群(新規感染者数、陽性率、入院患者数、重症者数)
+type IndicatorKind = 'patient' | 'rate' | 'hospital' | 'critical'
+
+type StatusKind = 'normal' | 'caution' | 'warning' | 'danger'
 
 type Colors = {
   bgColor: string
@@ -214,11 +240,14 @@ type Colors = {
 }
 
 type Values = {
-  caution: number
-  danger: number
+  normal: number // 注意
+  caution: number // 警戒
+  warning: number // 厳重警戒
+  danger: number // 危険
 }
 
 type CellInfo = Colors & {
+  indicator: IndicatorKind
   label: string
   status: StatusKind
 }
@@ -235,34 +264,49 @@ type CellInfo = Colors & {
 export default class MonitoringView extends Vue {
   private readonly indicator = {
     colors: {
+      normal: {
+        bgColor: '#92d050',
+        textColor: '#a83945'
+      } as Colors,
       caution: {
-        bgColor: '#f0e68c',
-        textColor: 'a83945'
+        bgColor: '#F0E48B',
+        textColor: '#a83945'
+      } as Colors,
+      warning: {
+        bgColor: '#FF7A01',
+        textColor: 'white'
       } as Colors,
       danger: {
-        bgColor: '#ff6347',
+        bgColor: '#FF0084',
         textColor: 'white'
       } as Colors
     },
     patients: {
       caution: 10,
-      danger: 20
+      warning: 20,
+      danger: 40
     } as Values,
     rate: {
       caution: 5.0,
-      danger: 10.0
+      warning: 10.0,
+      danger: 20.0
     } as Values,
     hospitals: {
       caution: 150,
-      danger: 250
+      warning: 250,
+      danger: 500
+    } as Values,
+    criticals: {
+      caution: 7,
+      warning: 12,
+      danger: 26
     } as Values
   }
 
   private readonly remarks = [
-    '<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/taisakusisin.html>愛知県新型コロナウイルス感染拡大予防対策指針</a>の「指標」に基き、当サイトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
-    '「新規感染者数」「入院患者数」は、過去7日間の平均です。定義詳細は「新規感染者数」「入院患者数」の各グラフを参照',
-    '「陽性率」は参考値の場合があります。定義詳細は「陽性率・検査実施人数」のグラフを参照',
-    '「感染率」とは、直近1週間の10万人あたり感染者数です。その算出には、推計人口(2020年3月1日時点)を使用'
+    '<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/novel-coronavirus-kensyouiinkai.html>第2回愛知県新型コロナウイルス感染症検証委員会 資料</a>の P.14 「指標」に基き、当サイトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
+    '「新規感染者数」「入院患者数」「重症者数」は、過去7日間の平均です。定義詳細は「新規感染者数」「入院患者数」「重症者数」の各グラフを参照',
+    '「陽性率」は参考値の場合があります。定義詳細は「陽性率・検査実施人数」のグラフを参照'
   ]
 
   @Prop()
@@ -289,7 +333,7 @@ export default class MonitoringView extends Vue {
   private rateCell: CellInfo
   private hospitalCell: CellInfo
   private totalCell: CellInfo
-  private youseiritsuCell: CellInfo
+  private criticalCell: CellInfo
 
   private dataKind: DataKind = 'latest'
   private readonly dataKinds = [
@@ -311,10 +355,16 @@ export default class MonitoringView extends Vue {
   private get displayInfo(): DisplayInfo {
     let lText = '－'
     switch (this.totalCell.status) {
-      case 1:
+      case 'normal':
+        lText = '注意'
+        break
+      case 'caution':
         lText = '警戒'
         break
-      case 2:
+      case 'warning':
+        lText = '厳重警戒'
+        break
+      case 'danger':
         lText = '危険'
         break
     }
@@ -349,27 +399,53 @@ export default class MonitoringView extends Vue {
     this.displayDate = latestMinDate.format('M/D')
 
     const emptyCell = {} as CellInfo
-    this.patientCell = Object.assign({}, emptyCell) as CellInfo
-    this.rateCell = Object.assign({}, emptyCell) as CellInfo
-    this.hospitalCell = Object.assign({}, emptyCell) as CellInfo
+    this.patientCell = Object.assign({}, { indicator: 'patient' }) as CellInfo
+    this.rateCell = Object.assign({}, { indicator: 'rate' }) as CellInfo
+    this.hospitalCell = Object.assign({}, { indicator: 'hospital' }) as CellInfo
+    this.criticalCell = Object.assign({}, { indicator: 'critical' }) as CellInfo
 
     const applyStyle = (
       average: number | undefined,
       indicators: Values,
       cautionColors: Colors,
+      warningColors: Colors,
       dangerColors: Colors,
       cell: CellInfo
     ) => {
       if (average != null) {
         cell.label = formatNumber(average)
-        if (average >= indicators.danger) {
-          cell.bgColor = dangerColors.bgColor
-          cell.textColor = dangerColors.textColor
-          cell.status = 2
-        } else if (average >= indicators.caution) {
-          cell.bgColor = cautionColors.bgColor
-          cell.textColor = cautionColors.textColor
-          cell.status = 1
+
+        const indicies: {
+          indicator: number
+          status: StatusKind
+          bgColor: string
+          textColor: string
+        }[] = [
+          {
+            indicator: indicators.danger,
+            status: 'danger',
+            bgColor: dangerColors.bgColor,
+            textColor: dangerColors.textColor
+          },
+          {
+            indicator: indicators.warning,
+            status: 'warning',
+            bgColor: warningColors.bgColor,
+            textColor: warningColors.textColor
+          },
+          {
+            indicator: indicators.caution,
+            status: 'caution',
+            bgColor: cautionColors.bgColor,
+            textColor: cautionColors.textColor
+          }
+        ]
+
+        const hit = indicies.find(x => average >= x.indicator)
+        if (hit != null) {
+          cell.bgColor = hit.bgColor
+          cell.textColor = hit.textColor
+          cell.status = hit.status
         }
       }
     }
@@ -391,6 +467,11 @@ export default class MonitoringView extends Vue {
         value: latest.hospitals7DaysNum,
         indicator: this.indicator.hospitals,
         cell: this.hospitalCell
+      },
+      {
+        value: latest.criticals7DaysNum,
+        indicator: this.indicator.criticals,
+        cell: this.criticalCell
       }
     ])
 
@@ -399,29 +480,49 @@ export default class MonitoringView extends Vue {
         item.value,
         item.indicator,
         this.indicator.colors.caution,
+        this.indicator.colors.warning,
         this.indicator.colors.danger,
         item.cell
       )
     )
 
     this.totalCell = Object.assign({}, emptyCell) as CellInfo
-    if (items.all(d => d.cell.status === 2)) {
+    // 総合判断からは 重症者数 を除外
+    const conclusionItems = Enumerable.from(items).where(
+      x => x.cell.indicator !== 'critical'
+    )
+    if (conclusionItems.all(d => d.cell.status === 'danger')) {
       // 全て危険ならその日は赤
       this.totalCell.bgColor = this.indicator.colors.danger.bgColor
       this.totalCell.textColor = this.indicator.colors.danger.textColor
-      this.totalCell.status = 2
-    } else if (items.any(d => d.cell.status >= 1)) {
-      // 一つでも警戒以上ならその日は黄色
+      this.totalCell.status = 'danger'
+    } else if (
+      conclusionItems.any(
+        d => d.cell.status === 'warning' || d.cell.status === 'danger'
+      )
+    ) {
+      // 一つでも厳重警戒以上ならその日は橙
+      this.totalCell.bgColor = this.indicator.colors.warning.bgColor
+      this.totalCell.textColor = this.indicator.colors.warning.textColor
+      this.totalCell.status = 'warning'
+    } else if (
+      conclusionItems.any(
+        d =>
+          d.cell.status === 'caution' ||
+          d.cell.status === 'warning' ||
+          d.cell.status === 'danger'
+      )
+    ) {
+      // 一つでも警戒以上ならその日は黄
       this.totalCell.bgColor = this.indicator.colors.caution.bgColor
       this.totalCell.textColor = this.indicator.colors.caution.textColor
-      this.totalCell.status = 1
+      this.totalCell.status = 'caution'
+    } else {
+      // いずれにも該当しなかったらその日は緑
+      this.totalCell.bgColor = this.indicator.colors.normal.bgColor
+      this.totalCell.textColor = this.indicator.colors.normal.textColor
+      this.totalCell.status = 'normal'
     }
-
-    this.youseiritsuCell = Object.assign({}, emptyCell) as CellInfo
-    this.youseiritsuCell.label =
-      latest.patients10M7DaysNum == null
-        ? '-'
-        : formatNumber(latest.patients10M7DaysNum, 2)
 
     const graphData = this.buildDailyTransitionGraphData(scores)
     this.chartDataSet.set('history', graphData)
@@ -452,57 +553,78 @@ export default class MonitoringView extends Vue {
     const hospitals = HospitalizedChart.makeAverageHospitals(
       this.mainSummaryData ?? []
     )
+    // 重症者数
+    const criticals = CriticallyChart.makeAverageCriticals(
+      this.mainSummaryData ?? []
+    )
 
-    // 3つのデータそれぞれの最古日付の中で、最も新しい日をグラフの開始日とする
+    // 4つのデータそれぞれの最古日付の中で、最も新しい日をグラフの開始日とする
     const startDate = Enumerable.from([
       dayjs(newPatients.first().date),
       dayjs(positives.first().date),
-      dayjs(hospitals.first().date)
+      dayjs(hospitals.first().date),
+      dayjs(criticals.first().date)
     ]).maxBy(x => x)
 
-    // 3つのデータそれぞれの最新日付の中で、最も古い日をグラフの終了日とする
+    // 4つのデータそれぞれの最新日付の中で、最も古い日をグラフの終了日とする
     const endDate = Enumerable.from([
       dayjs(newPatients.last().date),
       dayjs(positives.last().date),
-      dayjs(hospitals.last().date)
+      dayjs(hospitals.last().date),
+      dayjs(criticals.last().date)
     ]).minBy(x => x)
 
     const now = dayjs()
+
+    const calcScore = (num: number | undefined, vals: Values) => {
+      if (num == null) {
+        return 0
+      }
+
+      const values = [vals.normal, vals.caution, vals.warning, vals.danger]
+      const scores = [0, 25, 50, 100]
+
+      let index = values.findIndex(x => num < x)
+      if (index < 0) {
+        index = values.length - 1 // ヒットしないのは danger 超えなので danger を使う
+      }
+
+      const prevVal = values[index - 1] ?? 0
+      const hitVal = values[index]
+      const prevScore = scores[index - 1] ?? 0
+      const hitScore = scores[index]
+
+      const score =
+        ((num - prevVal) / (hitVal - prevVal)) * (hitScore - prevScore) +
+        prevScore
+      return score
+    }
 
     return newPatients
       .where(d => startDate <= d.date && d.date <= endDate)
       .zip<ScoreType>(
         positives.where(d => startDate <= d.date && d.date <= endDate),
         hospitals.where(d => startDate <= d.date && d.date <= endDate),
+        criticals.where(d => startDate <= d.date && d.date <= endDate),
         (
           n: NewPatientsAverageType,
           p: InspectionPersonAverageType,
-          h: HospitalizedAverageType
+          h: HospitalizedAverageType,
+          c: CriticallyAverageType
         ): any => {
           return {
             date: n.date,
             patients7DaysNum: n.average7days, // 新規感染者数(7日間平均)
-            patients7DaysScore:
-              n.average7days == null ? undefined : (n.average7days / 20) * 100, // 新規感染者数の危険度(100=20人)
-            patients10M7DaysNum:
-              n.count7days == null
-                ? undefined
-                : (n.count7days / AICHI_POPULATION) * 100000, // 感染率(7日間の10万人あたり感染者数)
-            patients10M7DaysScore:
-              n.count7days == null
-                ? undefined
-                : (n.count7days / AICHI_POPULATION) * 100000 * 100, // 感染率の危険度(50=0.5人)
+            patients7DaysScore: calcScore(
+              n.average7days,
+              this.indicator.patients
+            ),
             positivesRate: p.average, // 陽性率(7日分の陽性者数÷検査人数)
-            positivesScore:
-              p.average == null ? undefined : (p.average / 10) * 100, // 陽性率の危険度(100=10%)
+            positivesScore: calcScore(p.average, this.indicator.rate),
             hospitals7DaysNum: h.average, // 入院患者数(7日間平均)
-            //  // 入院患者数の危険度(50=150人, 100=250人)
-            hospitals7DaysScore:
-              h.average == null
-                ? undefined
-                : (h.average ?? 0) <= 150
-                ? ((h.average ?? 0) / 150) * 50
-                : (((h.average ?? 0) - 150) / 100) * 50 + 50
+            hospitals7DaysScore: calcScore(h.average, this.indicator.hospitals),
+            criticals7DaysNum: c.average, // 重症者数(7日間平均)
+            criticals7DaysScore: calcScore(c.average, this.indicator.criticals)
           } as ScoreType
         }
       )
@@ -550,33 +672,43 @@ export default class MonitoringView extends Vue {
         },
         {
           type: 'line',
-          title: '感染率',
+          title: '重症者数',
           unit: '人',
-          values: rows.select(d => d.patients10M7DaysScore).toArray(),
+          values: rows.select(d => d.criticals7DaysScore).toArray(),
           tooltipTexts: rows
-            .select(d => `感染率: ${formatNumber(d.patients10M7DaysNum, 2)} 人`)
+            .select(d => `重症者数: ${formatNumber(d.criticals7DaysNum)} 人`)
             .toArray(),
           order: 4,
           color: '#7F7F7F'
         },
         {
           type: 'line',
-          title: '警戒領域',
+          title: '警戒',
           unit: '%',
-          values: rows.select(_ => 50).toArray(),
+          values: rows.select(_ => 25).toArray(),
           tooltipVisible: false,
           order: 101,
-          color: '#f0e68c',
+          color: this.indicator.colors.caution.bgColor,
           lineStyle: 'dashed'
         },
         {
           type: 'line',
-          title: '危険領域',
+          title: '厳重警戒',
+          unit: '%',
+          values: rows.select(_ => 50).toArray(),
+          tooltipVisible: false,
+          order: 101,
+          color: this.indicator.colors.warning.bgColor,
+          lineStyle: 'dashed'
+        },
+        {
+          type: 'line',
+          title: '危険',
           unit: '%',
           values: rows.select(_ => 100).toArray(),
           tooltipVisible: false,
           order: 102,
-          color: '#ff6347',
+          color: this.indicator.colors.danger.bgColor,
           lineStyle: 'dashed'
         }
       ]
