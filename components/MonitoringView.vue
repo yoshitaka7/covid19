@@ -37,7 +37,7 @@
               scope="col"
               class="col-header"
               :bgcolor="indicator.colors.warning.bgColor"
-              :style="'color: ' + indicator.colors.danger.textColor"
+              :style="'color: ' + indicator.colors.warning.textColor"
             >
               厳重<br />警戒
             </th>
@@ -266,18 +266,18 @@ export default class MonitoringView extends Vue {
     colors: {
       normal: {
         bgColor: '#92d050',
-        textColor: 'a83945'
+        textColor: '#a83945'
       } as Colors,
       caution: {
-        bgColor: '#f0e68c',
-        textColor: 'a83945'
+        bgColor: '#F0E48B',
+        textColor: '#a83945'
       } as Colors,
       warning: {
-        bgColor: '#ff6347',
+        bgColor: '#FF7A01',
         textColor: 'white'
       } as Colors,
       danger: {
-        bgColor: 'red',
+        bgColor: '#FF0084',
         textColor: 'white'
       } as Colors
     },
