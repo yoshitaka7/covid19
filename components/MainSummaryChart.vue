@@ -111,7 +111,7 @@ export default class MainSummaryChart extends Vue {
       this.dataKind === 'weekly-transition' ? '前週比' : '前日比'
     const latestDate = this.formatDateLabel(this.chartData.dates.slice(-1)[0])
     return {
-      lTitle: '退院数',
+      lTitle: '退院',
       lText: latestValueText,
       sText: `${latestDate} 時点（${diffLabel}：${this.displayDiffValue} ${dataset.unit}）`,
       unit: dataset.unit
