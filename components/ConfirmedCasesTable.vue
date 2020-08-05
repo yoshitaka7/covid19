@@ -13,7 +13,7 @@
       <div :class="$style.content">
         <span> {{ $t('陽性患者数') }} ({{ $t('累積') }}) </span>
         <span>
-          <strong>{{ 陽性患者数.toLocaleString() }}</strong>
+          <strong>{{ formatNumber(陽性患者数) }}</strong>
           <span :class="$style.unit">{{ $t('人') }}</span>
         </span>
       </div>
@@ -22,46 +22,40 @@
           <div :class="$style.content">
             <span>{{ $t('入院等') }}</span>
             <span>
-              <strong>{{ 入院中.toLocaleString() }}</strong>
+              <strong>{{ formatNumber(入院中) }}</strong>
               <span :class="$style.unit">{{ $t('人') }}</span>
             </span>
           </div>
           <ul :class="$style.group">
-            <li
-              v-if="軽症中等症 > -1 && 軽症中等症 != ''"
-              :class="[$style.box]"
-            >
+            <li v-if="toNumber(軽症中等症) != null" :class="[$style.box]">
               <div :class="$style.content">
                 <!-- eslint-disable vue/no-v-html-->
                 <span v-html="$t('軽症・中等症')" />
                 <!-- eslint-enable vue/no-v-html-->
                 <span>
-                  <strong>{{ 軽症中等症.toLocaleString() }}</strong>
+                  <strong>{{ formatNumber(軽症中等症) }}</strong>
                   <span :class="$style.unit">{{ $t('人') }}</span>
                 </span>
               </div>
             </li>
-            <li
-              v-if="軽症無症状 > -1 && 軽症無症状 != ''"
-              :class="[$style.box]"
-            >
+            <li v-if="toNumber(軽症無症状) != null" :class="[$style.box]">
               <div :class="$style.content">
                 <!-- eslint-disable vue/no-v-html-->
                 <span v-html="$t('軽症・無症状')" />
                 <!-- eslint-enable vue/no-v-html-->
                 <span>
-                  <strong>{{ 軽症無症状.toLocaleString() }}</strong>
+                  <strong>{{ formatNumber(軽症無症状) }}</strong>
                   <span :class="$style.unit">{{ $t('人') }}</span>
                 </span>
               </div>
             </li>
-            <li v-if="中等症 > -1 && 中等症 != ''" :class="[$style.box]">
+            <li v-if="toNumber(中等症) != null" :class="[$style.box]">
               <div :class="$style.content">
                 <!-- eslint-disable vue/no-v-html-->
                 <span v-html="$t('中等症')" />
                 <!-- eslint-enable vue/no-v-html-->
                 <span>
-                  <strong>{{ 中等症.toLocaleString() }}</strong>
+                  <strong>{{ formatNumber(中等症) }}</strong>
                   <span :class="$style.unit">{{ $t('人') }}</span>
                 </span>
               </div>
@@ -70,7 +64,7 @@
               <div :class="$style.content">
                 <span>{{ $t('重症') }}</span>
                 <span>
-                  <strong>{{ 重症.toLocaleString() }}</strong>
+                  <strong>{{ formatNumber(重症) }}</strong>
                   <span :class="$style.unit">{{ $t('人') }}</span>
                 </span>
               </div>
@@ -81,7 +75,7 @@
           <div :class="$style.content">
             <span>{{ $t('施設入所') }}</span>
             <span>
-              <strong>{{ 施設入所.toLocaleString() }}</strong>
+              <strong>{{ formatNumber(施設入所) }}</strong>
               <span :class="$style.unit">{{ $t('人') }}</span>
             </span>
           </div>
@@ -90,7 +84,7 @@
           <div :class="$style.content">
             <span>{{ $t('転院') }}</span>
             <span>
-              <strong>{{ 転院.toLocaleString() }}</strong>
+              <strong>{{ formatNumber(転院) }}</strong>
               <span :class="$style.unit">{{ $t('人') }}</span>
             </span>
           </div>
@@ -99,7 +93,7 @@
           <div :class="$style.content">
             <span>{{ $t('死亡') }}</span>
             <span>
-              <strong>{{ 死亡.toLocaleString() }}</strong>
+              <strong>{{ formatNumber(死亡) }}</strong>
               <span :class="$style.unit">{{ $t('人') }}</span>
             </span>
           </div>
@@ -108,7 +102,7 @@
           <div :class="$style.content">
             <span>{{ $t('退院') }}</span>
             <span>
-              <strong>{{ 退院.toLocaleString() }}</strong>
+              <strong>{{ formatNumber(退院) }}</strong>
               <span :class="$style.unit">{{ $t('人') }}</span>
             </span>
           </div>
@@ -118,57 +112,79 @@
   </ul>
 </template>
 
+<i18n>
+{
+  "ja": {
+    "人": "人",
+    "累積": "累積",
+    "入院等": "入院等",
+    "中等症": "中等症",
+    "重症": "重症",
+    "施設入所": "施設入所",
+    "転院": "転院",
+    "死亡": "死亡",
+    "退院": "退院",
+    "軽症・無症状": "軽症・無症状",
+    "陽性患者数": "陽性患者数",
+    "検査実施人数": "検査実施人数"
+  }
+}
+</i18n>
+
 <script lang="ts">
 import Vue from 'vue'
+import { Component, Prop } from 'vue-property-decorator'
+
+@Component
 /* eslint-disable vue/prop-name-casing */
-export default Vue.extend({
-  props: {
-    検査実施人数: {
-      type: Number,
-      required: true
-    },
-    陽性患者数: {
-      type: Number,
-      required: true
-    },
-    入院中: {
-      type: Number,
-      required: true
-    },
-    軽症中等症: {
-      type: Number,
-      default: -1
-    },
-    軽症無症状: {
-      type: Number,
-      default: -1
-    },
-    中等症: {
-      type: Number,
-      default: -1
-    },
-    重症: {
-      type: Number,
-      required: true
-    },
-    施設入所: {
-      type: Number,
-      required: true
-    },
-    転院: {
-      type: Number,
-      required: true
-    },
-    死亡: {
-      type: Number,
-      required: true
-    },
-    退院: {
-      type: Number,
-      required: true
+export default class ConfirmedCasedTable extends Vue {
+  @Prop()
+  public 検査実施人数!: number | string
+
+  @Prop()
+  public 陽性患者数!: number | string
+
+  @Prop()
+  public 入院中!: number | string
+
+  @Prop()
+  public 軽症中等症!: number | string
+
+  @Prop()
+  public 軽症無症状!: number | string
+
+  @Prop()
+  public 中等症!: number | string
+
+  @Prop()
+  public 重症!: number | string
+
+  @Prop()
+  public 施設入所!: number | string
+
+  @Prop()
+  public 転院!: number | string
+
+  @Prop()
+  public 死亡!: number | string
+
+  @Prop()
+  public 退院!: number | string
+
+  toNumber(value: number | string): number | undefined {
+    if (value == null || value === '') {
+      return undefined
     }
+    return Number(value)
   }
-})
+
+  formatNumber(value: number | string): string {
+    if (value == null || value === '') {
+      return '-'
+    }
+    return Number(value).toLocaleString()
+  }
+}
 </script>
 
 <style lang="scss" module>
