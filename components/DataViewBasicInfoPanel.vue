@@ -21,7 +21,7 @@
 .DataView {
   &-DataInfo {
     margin-top: 20px;
-    max-width: 40%;
+    max-width: 45%;
     text-align: right;
     &-summary {
       display: inline-block;
