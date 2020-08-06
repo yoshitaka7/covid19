@@ -240,11 +240,12 @@ import {
   WeekCityPatientDataType,
   CityDataType
 } from '~/utils/formatPatientsPerCities'
+import { formatNumber } from '@/utils/formatNumber'
 
 type CitySummaryDataType = {
   cityCode: string // 市町村コード
   cityName: string // 市町村名
-  patientsTotal: number // 患者数
+  patientsTotal: string // 患者数
   patientsPer100k: string // 10万人あたり患者数
   legendIndex: number // 該当凡例
 }
@@ -441,7 +442,7 @@ export default class ColumnMap extends Vue {
           result.set(city['市町村コード'], {
             cityCode: city['市町村コード'], // 市町村コード
             cityName: city['市町村名'], // 市町村名
-            patientsTotal: countOfCity, // 患者数
+            patientsTotal: formatNumber(countOfCity), // 患者数
             patientsPer100k: patientsPer100kDisp,
             legendIndex
           } as CitySummaryDataType)
