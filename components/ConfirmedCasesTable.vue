@@ -3,8 +3,8 @@
     <li :class="$style.box">
       <div :class="$style.inspections">
         <span> {{ $t('検査実施人数') }} </span>
-        <span>
-          <strong>{{ 検査実施人数.toLocaleString() }}</strong>
+        <span :class="$style.count">
+          <strong>{{ formatNumber(検査実施人数) }}</strong>
           <span :class="$style.unit">{{ $t('人') }}</span>
         </span>
       </div>
@@ -12,7 +12,7 @@
     <li :class="[$style.box, $style.parent]">
       <div :class="$style.content">
         <span> {{ $t('陽性患者数') }} ({{ $t('累積') }}) </span>
-        <span>
+        <span :class="$style.count">
           <strong>{{ formatNumber(陽性患者数) }}</strong>
           <span :class="$style.unit">{{ $t('人') }}</span>
         </span>
@@ -20,8 +20,8 @@
       <ul :class="$style.group">
         <li :class="[$style.box, $style.parent]">
           <div :class="$style.content">
-            <span>{{ $t('入院等') }}</span>
-            <span>
+            <span>{{ $t('入院等') }}{{ $t(formatBreakdown(備考)) }}</span>
+            <span :class="$style.count">
               <strong>{{ formatNumber(入院中) }}</strong>
               <span :class="$style.unit">{{ $t('人') }}</span>
             </span>
@@ -32,7 +32,7 @@
                 <!-- eslint-disable vue/no-v-html-->
                 <span v-html="$t('軽症・中等症')" />
                 <!-- eslint-enable vue/no-v-html-->
-                <span>
+                <span :class="$style.count">
                   <strong>{{ formatNumber(軽症中等症) }}</strong>
                   <span :class="$style.unit">{{ $t('人') }}</span>
                 </span>
@@ -43,7 +43,7 @@
                 <!-- eslint-disable vue/no-v-html-->
                 <span v-html="$t('軽症・無症状')" />
                 <!-- eslint-enable vue/no-v-html-->
-                <span>
+                <span :class="$style.count">
                   <strong>{{ formatNumber(軽症無症状) }}</strong>
                   <span :class="$style.unit">{{ $t('人') }}</span>
                 </span>
@@ -54,7 +54,7 @@
                 <!-- eslint-disable vue/no-v-html-->
                 <span v-html="$t('中等症')" />
                 <!-- eslint-enable vue/no-v-html-->
-                <span>
+                <span :class="$style.count">
                   <strong>{{ formatNumber(中等症) }}</strong>
                   <span :class="$style.unit">{{ $t('人') }}</span>
                 </span>
@@ -63,7 +63,7 @@
             <li :class="[$style.box]">
               <div :class="$style.content">
                 <span>{{ $t('重症') }}</span>
-                <span>
+                <span :class="$style.count">
                   <strong>{{ formatNumber(重症) }}</strong>
                   <span :class="$style.unit">{{ $t('人') }}</span>
                 </span>
@@ -74,7 +74,7 @@
         <li :class="[$style.box]">
           <div :class="$style.content">
             <span>{{ $t('施設入所') }}</span>
-            <span>
+            <span :class="$style.count">
               <strong>{{ formatNumber(施設入所) }}</strong>
               <span :class="$style.unit">{{ $t('人') }}</span>
             </span>
@@ -83,7 +83,7 @@
         <li :class="[$style.box]">
           <div :class="$style.content">
             <span>{{ $t('転院') }}</span>
-            <span>
+            <span :class="$style.count">
               <strong>{{ formatNumber(転院) }}</strong>
               <span :class="$style.unit">{{ $t('人') }}</span>
             </span>
@@ -92,7 +92,7 @@
         <li :class="[$style.box]">
           <div :class="$style.content">
             <span>{{ $t('死亡') }}</span>
-            <span>
+            <span :class="$style.count">
               <strong>{{ formatNumber(死亡) }}</strong>
               <span :class="$style.unit">{{ $t('人') }}</span>
             </span>
@@ -101,7 +101,7 @@
         <li :class="[$style.box]">
           <div :class="$style.content">
             <span>{{ $t('退院') }}</span>
-            <span>
+            <span :class="$style.count">
               <strong>{{ formatNumber(退院) }}</strong>
               <span :class="$style.unit">{{ $t('人') }}</span>
             </span>
@@ -126,7 +126,8 @@
     "退院": "退院",
     "軽症・無症状": "軽症・無症状",
     "陽性患者数": "陽性患者数",
-    "検査実施人数": "検査実施人数"
+    "検査実施人数": "検査実施人数",
+    "備考": "備考"
   }
 }
 </i18n>
@@ -171,6 +172,9 @@ export default class ConfirmedCasedTable extends Vue {
   @Prop()
   public 退院!: number | string
 
+  @Prop()
+  public 備考!: string
+
   toNumber(value: number | string): number | undefined {
     if (value == null || value === '') {
       return undefined
@@ -183,6 +187,21 @@ export default class ConfirmedCasedTable extends Vue {
       return '-'
     }
     return Number(value).toLocaleString()
+  }
+
+  formatBreakdown(remarks: string): string {
+    const startpos = remarks.indexOf('入院等の内訳')
+    if (startpos < 0) {
+      return ''
+    }
+    const endpos = remarks.indexOf('。', startpos + 6)
+    return (
+      '（' +
+      (endpos < 0
+        ? remarks.substring(startpos + 4)
+        : remarks.substring(startpos + 4, endpos)) +
+      '）'
+    )
   }
 }
 </script>
@@ -244,6 +263,9 @@ $inspections-color: #333333;
   span.unit {
     @include font-size(14);
   }
+  span.count {
+    white-space: nowrap;
+  }
 }
 .inspections {
   padding: 5px 10px;
@@ -276,6 +298,9 @@ $inspections-color: #333333;
   }
   span.unit {
     @include font-size(14);
+  }
+  span.count {
+    white-space: nowrap;
   }
 }
 .box {
