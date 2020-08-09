@@ -4,5 +4,5 @@ export const formatNumber = (x: number | undefined, digits: number = 1) => {
   }
 
   const per = 10 ** digits
-  return String(Math.round(x * per) / per)
+  return Number(Math.round(x * per) / per).toLocaleString()
 }

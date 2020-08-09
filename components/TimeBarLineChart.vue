@@ -25,6 +25,7 @@ import dayjs from 'dayjs'
 import Enumerable from 'linq'
 import { ChartLegendLabelItem, ChartLegendOptions } from 'chart.js'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
+import { formatNumber } from '@/utils/formatNumber'
 
 // グラフの種類
 export type GraphKind = 'bar' | 'line'
@@ -247,7 +248,9 @@ export default class TimeBarLineChart extends Vue {
                   })(value)
 
                   label =
-                    value == null ? '' : `${title}: ${formatValue} ${unit}`
+                    value == null
+                      ? ''
+                      : `${title}: ${formatNumber(formatValue)} ${unit}`
                 }
 
                 return {
@@ -330,7 +333,7 @@ export default class TimeBarLineChart extends Vue {
               stepSize: this.displayYAxisLeftSetting.step,
               callback: (value: any) => {
                 return this.displayYAxisLeftSetting.visibleAxisValue ?? true
-                  ? `${value}${this.displayYAxisLeftSetting.unit}`
+                  ? `${formatNumber(value)}${this.displayYAxisLeftSetting.unit}`
                   : ''
               }
             }
