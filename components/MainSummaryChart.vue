@@ -69,7 +69,6 @@ export default class MainSummaryChart extends Vue {
     '愛知県が発表した「検査陽性者の状況」を当サイトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
     '検査陽性者状況が取得できなかった日の値は表示していません',
     '凡例をクリックするとその項目の[表示/非表示]が切り替えられます',
-    '7月24日より、[軽症中等症]が[軽症無症状]と[中等症]に分割されました',
     '7/27以前の[軽症中等症]には、「自宅療養」「調整」「入院調整」「軽症無症状」「中等症」が含まれています'
   ]
 
@@ -157,12 +156,11 @@ export default class MainSummaryChart extends Vue {
           return {
             date: dayjs(d['更新日時']).format('YYYY-MM-DD'),
 
-            discharged: Number(d['退院']) + Number(d['転院']), // 退院等
-            isolated: Number(d['施設入所']),
-            milds:
-              Number(d['軽症中等症'] + d['軽症無症状']) + Number(d['中等症']),
-            severes: Number(d['重症']),
-            deaths: Number(d['死亡']),
+            discharged: (d['退院'] ?? 0) + (d['転院'] ?? 0), // 退院等
+            isolated: d['施設入所'],
+            milds: d['軽症中等症'] ?? (d['入院中'] ?? 0) - (d['重症'] ?? 0),
+            severes: d['重症'],
+            deaths: d['死亡'],
 
             moderate: undefined, // 中等症
             asymptomatic: undefined, // 軽症無症状
@@ -176,16 +174,16 @@ export default class MainSummaryChart extends Vue {
           return {
             date: dayjs(d['更新日時']).format('YYYY-MM-DD'),
 
-            discharged: Number(d['退院']) + Number(d['転院']), // 退院等
-            isolated: Number(d['施設入所']),
-            home: Number(d['自宅療養']),
-            suspend: Number(d['調整']),
-            hospital_suspend: Number(d['入院調整']),
+            discharged: (d['退院'] ?? 0) + (d['転院'] ?? 0), // 退院等
+            isolated: d['施設入所'],
+            home: d['自宅療養'],
+            suspend: d['調整'],
+            hospital_suspend: d['入院調整'],
             asymptomatic:
-              Number(d['入院']) - Number(d['重症']) - Number(d['中等症']),
-            moderate: Number(d['中等症']),
-            severes: Number(d['重症']),
-            deaths: Number(d['死亡']),
+              (d['入院'] ?? 0) - (d['重症'] ?? 0) - (d['中等症'] ?? 0),
+            moderate: d['中等症'],
+            severes: d['重症'],
+            deaths: d['死亡'],
 
             milds: undefined // 軽症中等症
           }
