@@ -13,6 +13,9 @@ export default (Data: DataDaily): void => {
   // 状況別のデータ無し日を補間（数値は undefined）
   paddingMainSummaryHistoryDays(Data)
 
+  // 数値項目に文字が入っている場合は undefined にする
+  normalizeMainSummaryHistoryNumbers(Data)
+
   // 陽性患者数の終了日の補正
   normalizePatientsSummaryEndDate(Data)
 
@@ -50,6 +53,40 @@ const paddingMainSummaryHistoryDays = (Data: DataDaily) => {
   }
 
   Data.main_summary_history.data = paddedItems
+}
+
+const normalizeMainSummaryHistoryNumbers = (Data: DataDaily) => {
+  const numOrUndefined = (x: any): any => {
+    if (x === '' || x == null || Number.isNaN(Number(x))) {
+      return undefined
+    }
+    return Number(x)
+  }
+
+  const flds = [
+    '検査実施人数',
+    '陽性患者数',
+    '入院中',
+    '軽症中等症',
+    '軽症無症状',
+    '中等症',
+    '重症',
+    '転院',
+    '施設入所',
+    '入院',
+    '入院調整',
+    '自宅療養',
+    '調整',
+    '死亡',
+    '退院'
+  ]
+
+  for (const row of Data.main_summary_history.data) {
+    const rowAny = row as any
+    for (const fld of flds) {
+      rowAny[fld] = numOrUndefined(rowAny[fld])
+    }
+  }
 }
 
 const paddingInspectionPersonsSummaryDays = (Data: DataDaily) => {

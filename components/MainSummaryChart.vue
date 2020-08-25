@@ -69,7 +69,7 @@ export default class MainSummaryChart extends Vue {
     '愛知県が発表した「検査陽性者の状況」を当サイトで記録・時系列化したものであり、実際の数値とは異なる可能性があります',
     '検査陽性者状況が取得できなかった日の値は表示していません',
     '凡例をクリックするとその項目の[表示/非表示]が切り替えられます',
-    '7月24日より、[軽症中等症]が[軽症無症状]と[中等症]に分割されました'
+    '7/27以前の[軽症中等症]には、「自宅療養」「調整」「入院調整」「軽症無症状」「中等症」が含まれています'
   ]
 
   private readonly showSelector = false
@@ -87,7 +87,7 @@ export default class MainSummaryChart extends Vue {
   }
 
   private get displayDiffValue(): string {
-    const dataset = this.chartData.datasets[7]
+    const dataset = this.chartData.datasets.slice(-1)[0]
     if (dataset.values.slice(-2)[0] === undefined) {
       return '-'
     }
@@ -105,8 +105,8 @@ export default class MainSummaryChart extends Vue {
       } as DisplayInfo
     }
 
-    const dataset = this.chartData.datasets[7]
-    const latestValueText = dataset.values.slice(-1)[0].toLocaleString()
+    const dataset = this.chartData.datasets.slice(-1)[0]
+    const latestValueText = dataset.values.slice(-1)[0]?.toLocaleString() ?? ''
     const diffLabel =
       this.dataKind === 'weekly-transition' ? '前週比' : '前日比'
     const latestDate = this.formatDateLabel(this.chartData.dates.slice(-1)[0])
@@ -150,19 +150,45 @@ export default class MainSummaryChart extends Vue {
     const rows = Enumerable.from(this.dailyData ?? [])
       .where(d => dayjs(d['更新日時']) < today)
       .select(d => {
-        return {
-          date: dayjs(d['更新日時']).format('YYYY-MM-DD'),
-          milds: Number(d['軽症中等症']),
-          asymptomatic: Number(d['軽症無症状']),
-          moderate: Number(d['中等症']),
-          severes: Number(d['重症']),
-          isolated: Number(d['施設入所']),
-          transfered: Number(d['転院']),
-          deaths: Number(d['死亡']),
-          discharged: Number(d['退院'])
+        if (dayjs(d['更新日時']) < dayjs('2020-07-27 23:59:59')) {
+          // 入院等分割前(～7/27)は、５個の全積み上げで、症状の軽い順で下から
+          // 「退院等」「施設入所」「軽症中等症」「重症」「死亡」
+          return {
+            date: dayjs(d['更新日時']).format('YYYY-MM-DD'),
+
+            discharged: (d['退院'] ?? 0) + (d['転院'] ?? 0), // 退院等
+            isolated: d['施設入所'],
+            milds: d['軽症中等症'] ?? (d['入院中'] ?? 0) - (d['重症'] ?? 0),
+            severes: d['重症'],
+            deaths: d['死亡'],
+
+            moderate: undefined, // 中等症
+            asymptomatic: undefined, // 軽症無症状
+            hospital_suspend: undefined, // 入院調整
+            home: undefined, // 自宅療養
+            suspend: undefined // 調整
+          }
+        } else {
+          // 現時点(7/28～)は、９個の全積み上げで、症状の軽い順で下から
+          // 「退院等」「施設入所」「自宅療養」「調整」「入院調整」「軽症無症状」「中等症」「重症」「死亡」
+          return {
+            date: dayjs(d['更新日時']).format('YYYY-MM-DD'),
+
+            discharged: (d['退院'] ?? 0) + (d['転院'] ?? 0), // 退院等
+            isolated: d['施設入所'],
+            home: d['自宅療養'],
+            suspend: d['調整'],
+            hospital_suspend: d['入院調整'],
+            asymptomatic:
+              (d['入院'] ?? 0) - (d['重症'] ?? 0) - (d['中等症'] ?? 0),
+            moderate: d['中等症'],
+            severes: d['重症'],
+            deaths: d['死亡'],
+
+            milds: undefined // 軽症中等症
+          }
         }
       })
-
     return {
       dates: rows.select(d => d.date).toArray(),
       datasets: [
@@ -172,7 +198,7 @@ export default class MainSummaryChart extends Vue {
           color: '#984807',
           unit: '人',
           values: rows.select(d => d.deaths).toArray(),
-          order: 8
+          order: 10
         },
         {
           type: 'bar',
@@ -180,15 +206,7 @@ export default class MainSummaryChart extends Vue {
           color: '#D99694',
           unit: '人',
           values: rows.select(d => d.severes).toArray(),
-          order: 7
-        },
-        {
-          type: 'bar',
-          title: '転院',
-          color: '#7F7F7F',
-          unit: '人',
-          values: rows.select(d => d.transfered).toArray(),
-          order: 6
+          order: 9
         },
         {
           type: 'bar',
@@ -196,7 +214,7 @@ export default class MainSummaryChart extends Vue {
           color: '#E6C79A',
           unit: '人',
           values: rows.select(d => d.moderate).toArray(),
-          order: 5
+          order: 8
         },
         {
           type: 'bar',
@@ -204,6 +222,30 @@ export default class MainSummaryChart extends Vue {
           color: '#FEE4AA',
           unit: '人',
           values: rows.select(d => d.asymptomatic).toArray(),
+          order: 7
+        },
+        {
+          type: 'bar',
+          title: '入院調整',
+          color: '#7f7f7f',
+          unit: '人',
+          values: rows.select(d => d.hospital_suspend).toArray(),
+          order: 6
+        },
+        {
+          type: 'bar',
+          title: '調整',
+          color: '#bfbfbf',
+          unit: '人',
+          values: rows.select(d => d.suspend).toArray(),
+          order: 5
+        },
+        {
+          type: 'bar',
+          title: '自宅療養',
+          color: '#04cc90',
+          unit: '人',
+          values: rows.select(d => d.home).toArray(),
           order: 4
         },
         {
@@ -224,7 +266,7 @@ export default class MainSummaryChart extends Vue {
         },
         {
           type: 'bar',
-          title: '退院',
+          title: '退院等',
           color: '#0070C0',
           unit: '人',
           values: rows.select(d => d.discharged).toArray(),
