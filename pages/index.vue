@@ -109,13 +109,13 @@
         />
       </v-col>
 
-      <v-col cols="12" md="6" class="DataCard">
+      <!-- <v-col cols="12" md="6" class="DataCard">
         <inspection-count-chart
           :date="Data.inspections_summary.date"
           :daily-data="Data.inspections_summary.data"
           :weekly-data="dataWeekly.inspections_summary.data"
         />
-      </v-col>
+      </v-col> -->
     </v-row>
   </div>
 </template>
@@ -136,7 +136,7 @@ import SvgCard from '@/components/SvgCard.vue'
 import ConfirmedCasesTable from '@/components/ConfirmedCasesTable.vue'
 import ColumnMap from '@/components/ColumnMap.vue'
 import NewPatientsChart from '@/components/NewPatientsChart.vue'
-import InspectionCountChart from '@/components/InspectionCountChart.vue'
+// import InspectionCountChart from '@/components/InspectionCountChart.vue'
 import InspectionPersonsChart from '@/components/InspectionPersonsChart.vue'
 import MainSummaryChart from '@/components/MainSummaryChart.vue'
 import HospitalizedChart from '@/components/HospitalizedChart.vue'
@@ -158,7 +158,7 @@ export default {
     MainSummaryChart,
     HospitalizedChart,
     CriticallyChart,
-    InspectionCountChart,
+    // InspectionCountChart,
     InspectionPersonsChart,
     MonitoringView
     // MonitoringView2
