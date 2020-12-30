@@ -121,16 +121,19 @@ const paddingInspectionPersonsSummaryDays = (Data: DataDaily) => {
 
   // inspection_persons_summary の陽性者数が未入力ならば、
   // patients_summary の同日の陽性者数（小計）を使用する
-  // NOTE find が linear-search なので件数増えると遅さが際立つ恐れ
   const ptArr = Data.patients_summary.data as PatientsSummaryDaily[]
+  const ptMap = new Map<string, PatientsSummaryDaily>(
+    ptArr.map(x => {
+      return [makeDateOnlyStr(x['日付']), x]
+    })
+  )
+
   for (const item of paddedItems) {
     if (Number.isInteger(item['陽性者数'] as number)) {
       continue
     }
 
-    const hit = ptArr.find(
-      d => makeDateOnlyStr(d['日付']) === makeDateOnlyStr(item['日付'])
-    )
+    const hit = ptMap.get(makeDateOnlyStr(item['日付']))
     if (hit) {
       item['陽性者数'] = hit['小計']
     }

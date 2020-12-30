@@ -282,14 +282,14 @@ export default class MonitoringView extends Vue {
       } as Colors
     },
     patients: {
-      caution: 10,
-      warning: 20,
-      danger: 40
+      caution: 50,
+      warning: 160,
+      danger: 260
     } as Values,
     rate: {
       caution: 5.0,
       warning: 10.0,
-      danger: 20.0
+      danger: 15.0
     } as Values,
     hospitals: {
       caution: 150,
@@ -297,14 +297,14 @@ export default class MonitoringView extends Vue {
       danger: 500
     } as Values,
     criticals: {
-      caution: 7,
-      warning: 12,
-      danger: 26
+      caution: 15,
+      warning: 25,
+      danger: 50
     } as Values
   }
 
   private readonly remarks = [
-    '<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/novel-coronavirus-kensyouiinkai.html>第2回愛知県新型コロナウイルス感染症検証委員会 資料</a>の P.14 「指標」に基き、当サイトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
+    '<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/novel-coronavirus-taisakuhonbu.html>2020年12月24日 第17回新型コロナウイルス感染症対策本部員会議　資料3,参考資料</a>に基き、当サイトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
     '「新規感染者数」「入院患者数」「重症者数」は、過去7日間の平均です。定義詳細は「新規感染者数」「入院患者数」「重症者数」の各グラフを参照',
     '「陽性率」は参考値の場合があります。定義詳細は「陽性率・検査実施人数」のグラフを参照'
   ]
