@@ -232,6 +232,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import dayjs from 'dayjs'
+import Enumerable from 'linq'
 import { DateRange } from './TimeBarLineChart.vue'
 import DataView from '@/components/DataView.vue'
 import DateSelectSlider from '@/components/DateSelectSlider.vue'
@@ -410,17 +411,13 @@ export default class ColumnMap extends Vue {
 
         const city = this.cityDataMap.get(col.trim())
         if (city != null) {
-          const countOfCity = city['検索ワード'].reduce((count, word) => {
-            const countOfSearchWord = ranged.reduce((cnt, weeked) => {
-              const hit = weeked.cityNumMap.get(word)
-              if (hit != null) {
-                cnt += hit['感染者数'] ?? 0
-              }
-              return cnt
-            }, 0)
-
-            return count + countOfSearchWord
-          }, 0)
+          const countOfCity = Enumerable.from(ranged)
+            .select(weeked => {
+              return (
+                weeked?.cityNumMap?.get(city['市町村コード'])?.感染者数 ?? 0
+              )
+            })
+            .sum()
 
           const patientsPer100k = (countOfCity / city['人口']) * 100000 // 10万人あたり感染者数
           let patientsPer100kDisp = '' + Math.round(patientsPer100k * 10) / 10 // 10万人あたり感染者数
@@ -448,23 +445,6 @@ export default class ColumnMap extends Vue {
           } as CitySummaryDataType)
         }
 
-        // const ranged = this.dataWeekly.slice(this.displaySpan[0], this.displaySpan[1] + 1)
-
-        // for (const range of ranged) {
-        //   const cityToNum = range.cityNumMap.get(col.trim())
-        //   if (cityToNum != null) {
-        //     const hit = result.get(cityToNum.cityCode)
-        //     if (hit == null) {
-        //       result.set(cityToNum.cityCode, cityToNum)
-        //     } else {
-        //       const cloned = Object.assign({}, hit)
-        //       cloned.patientsTotal += cityToNum.patientsTotal
-        //       result.set(cloned.cityCode, cloned)
-        //     }
-        //   }
-        // }
-
-        // const hit = this.data.get(col.trim())
         const hit = result.get(col.trim())
         if (hit == null) {
           return {
