@@ -97,7 +97,7 @@
         <column-map
           title="市町村別感染状況"
           :title-id="'patients-per-cities'"
-          :date="Data.patients.date"
+          :date="Data.patients_summary.date"
           :city-data-map="cityDataMap"
           :data-weekly="patientsPerCitiesWeekly"
           :title-date="patientsPerCitiesDate"
@@ -179,7 +179,7 @@ export default {
       '日付'
     ]
     const patientsPerCitiesWeekly = formatPatientsPerCitiesWeekly(
-      Data.patients.data
+      Data.patients_summary.data
     )
 
     const data = {
