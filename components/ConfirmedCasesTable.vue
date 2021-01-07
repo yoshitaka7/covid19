@@ -2,10 +2,10 @@
   <ul :class="$style.container">
     <li :class="$style.box">
       <div :class="$style.inspections">
-        <span> {{ $t('検査実施人数') }} </span>
+        <span> 検査実施人数 </span>
         <span :class="$style.count">
           <strong>{{ formatNumber(検査実施人数) }}</strong>
-          <span :class="$style.unit">{{ $t('人') }}</span>
+          <span :class="$style.unit">人</span>
         </span>
       </div>
     </li>

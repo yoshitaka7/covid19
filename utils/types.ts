@@ -1,6 +1,14 @@
 export type PatientsSummaryDaily = {
   日付: string
   小計: number
+  住居地: {
+    [key: string]: number
+  }
+  年代: {
+    [key: string]: {
+      [key: string]: number
+    }
+  }
 }
 
 export type PatientsSummaryWeekly = {
