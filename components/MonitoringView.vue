@@ -123,7 +123,7 @@
           </tr>
           <tr style="border: 3px solid #a83945; border-top-style:none;">
             <th scope="row" class="row-header">
-              70歳以上新規数
+              70歳以上
             </th>
             <td class="col-caution">{{ indicator.seniors.caution }}人</td>
             <td class="col-warning">{{ indicator.seniors.warning }}人</td>
@@ -235,8 +235,8 @@ type ScoreType = {
   hospitals7DaysScore: number | undefined // 入院患者数の危険度(50=150人, 100=250人)
   criticals7DaysNum: number | undefined // 重症者数(7日間平均)
   criticals7DaysScore: number | undefined // 重症者数の危険度(50=150人, 100=250人)
-  seniors7DaysNum: number | undefined // 70歳以上新規数(7日間平均)
-  seniors7DaysScore: number | undefined // 70歳以上新規数の危険度
+  seniors7DaysNum: number | undefined // 70歳以上(7日間平均)
+  seniors7DaysScore: number | undefined // 70歳以上の危険度
 }
 
 type DataKind = 'latest' | 'history'
@@ -247,7 +247,7 @@ type DisplayInfo = {
   unit: string
 }
 
-// 指標群(新規感染者数、陽性率、入院患者数、重症者数、70歳以上新規数)
+// 指標群(新規感染者数、陽性率、入院患者数、重症者数、70歳以上)
 type IndicatorKind = 'patient' | 'rate' | 'hospital' | 'critical' | 'senior'
 
 type StatusKind = 'normal' | 'caution' | 'warning' | 'danger'
@@ -329,7 +329,8 @@ export default class MonitoringView extends Vue {
   private readonly remarks = [
     '<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/novel-coronavirus-taisakuhonbu.html>2020年12月24日 第17回新型コロナウイルス感染症対策本部員会議　資料3,参考資料</a>に基き、当サイトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
     '「新規感染者数」「入院患者数」「重症者数」は、過去7日間の平均です。定義詳細は「新規感染者数」「入院患者数」「重症者数」の各グラフを参照',
-    '「陽性率」は参考値の場合があります。定義詳細は「陽性率・検査実施人数」のグラフを参照'
+    '「陽性率」は参考値の場合があります。定義詳細は「陽性率・検査実施人数」のグラフを参照',
+    '「70歳以上」は70歳以上の新規陽性者数の過去7日間の平均です。'
   ]
 
   @Prop()
@@ -587,7 +588,7 @@ export default class MonitoringView extends Vue {
     const criticals = CriticallyChart.makeAverageCriticals(
       this.mainSummaryData ?? []
     )
-    // 70歳以上新規数
+    // 70歳以上
     const seniors = NewPatientsChart.makeAverageSeniorsNewPatients(
       this.parientsData ?? []
     )
@@ -663,7 +664,7 @@ export default class MonitoringView extends Vue {
             hospitals7DaysScore: calcScore(h.average, this.indicator.hospitals),
             criticals7DaysNum: c.average, // 重症者数(7日間平均)
             criticals7DaysScore: calcScore(c.average, this.indicator.criticals),
-            seniors7DaysNum: s.average7days, // 70歳以上新規数
+            seniors7DaysNum: s.average7days, // 70歳以上
             seniors7DaysScore: calcScore(s.average7days, this.indicator.seniors)
           } as ScoreType
         }
@@ -723,13 +724,11 @@ export default class MonitoringView extends Vue {
         },
         {
           type: 'line',
-          title: '70歳以上新規数',
+          title: '70歳以上',
           unit: '人',
-          values: rows.select(d => d.seniors7DaysNum).toArray(),
+          values: rows.select(d => d.seniors7DaysScore).toArray(),
           tooltipTexts: rows
-            .select(
-              d => `70歳以上新規数: ${formatNumber(d.seniors7DaysNum)} 人`
-            )
+            .select(d => `70歳以上: ${formatNumber(d.seniors7DaysNum)} 人`)
             .toArray(),
           order: 5,
           color: '#FF828C'
