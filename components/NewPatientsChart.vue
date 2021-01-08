@@ -46,6 +46,8 @@ export type NewPatientsAverageType = {
   count7days: number | undefined
 }
 
+export type NewSeniorPatientsAverageType = NewPatientsAverageType
+
 type DataKind = 'daily-transition' | 'weekly-transition' | 'daily-cumulative'
 
 type DisplayInfo = {
@@ -89,9 +91,7 @@ export default class NewPatientsChart extends Vue {
   private readonly chartDataSet = new Map<DataKind, GraphData>()
 
   private get displayTitle(): string {
-    return `${
-      this.dataKind === 'daily-cumulative' ? '累計' : '新規'
-    }感染者数${
+    return `${this.dataKind === 'daily-cumulative' ? '累計' : '新規'}感染者数${
       this.dataKind === 'weekly-transition' ? '(週別)' : ''
     }`
   }
@@ -190,6 +190,67 @@ export default class NewPatientsChart extends Vue {
         return {
           date: dayjs(dayjs(first['日付']).format('YYYY-MM-DD')), // 時刻を切り落とす
           count: Number(first['小計']),
+          average7days: ave,
+          count7days: cnt
+        }
+      })
+      .reverse()
+  }
+
+  public static makeAverageSeniorsNewPatients = (
+    data: PatientsSummaryDaily[]
+  ): Enumerable.IEnumerable<NewSeniorPatientsAverageType> => {
+    const source = Enumerable.from(data).reverse()
+
+    const sumSexesNum = (sexes: { [key: string]: number }): number => {
+      if (sexes == null) {
+        return 0
+      }
+
+      let num = 0
+      Object.keys(sexes).forEach(key => {
+        const x = sexes[key]
+        if (x == null || Number.isNaN(Number(x))) {
+          return
+        }
+        num = num + Number(x)
+      })
+
+      return num
+    }
+
+    const getOver70sNum = (d: PatientsSummaryDaily) => {
+      const y = d['年代']
+      return (
+        sumSexesNum(y['70代']) +
+        sumSexesNum(y['80代']) +
+        sumSexesNum(y['90代']) +
+        sumSexesNum(y['100代']) +
+        sumSexesNum(y['110代'])
+      )
+    }
+
+    return source
+      .select(d => d['日付'])
+      .select((_, index) => source.skip(index).take(7))
+      .select(d => {
+        const first = d.first()
+        const ave =
+          d.count() === 7
+            ? d
+                .where(d => getOver70sNum(d) !== undefined)
+                .average(d => Number(getOver70sNum(d)))
+            : undefined
+        const cnt =
+          d.count() === 7
+            ? d
+                .where(d => getOver70sNum(d) !== undefined)
+                .sum(d => Number(getOver70sNum(d)))
+            : undefined
+
+        return {
+          date: dayjs(dayjs(first['日付']).format('YYYY-MM-DD')), // 時刻を切り落とす
+          count: Number(getOver70sNum(first)),
           average7days: ave,
           count7days: cnt
         }

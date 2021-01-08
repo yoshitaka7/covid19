@@ -106,7 +106,7 @@
             </td>
           </tr>
           <tr style="height: 20px" />
-          <tr style="border: 3px solid #a83945">
+          <tr style="border: 3px solid #a83945; border-bottom-style:none;">
             <th scope="row" class="row-header">
               重症者数
             </th>
@@ -119,6 +119,21 @@
               :style="'color: ' + criticalCell.textColor"
             >
               {{ criticalCell.label }}人
+            </td>
+          </tr>
+          <tr style="border: 3px solid #a83945; border-top-style:none;">
+            <th scope="row" class="row-header">
+              70歳以上
+            </th>
+            <td class="col-caution">{{ indicator.seniors.caution }}人</td>
+            <td class="col-warning">{{ indicator.seniors.warning }}人</td>
+            <td class="col-danger">{{ indicator.seniors.danger }}人</td>
+            <td
+              class="col-actual"
+              :bgcolor="seniorCell.bgColor"
+              :style="'color: ' + seniorCell.textColor"
+            >
+              {{ seniorCell.label }}人
             </td>
           </tr>
         </tbody>
@@ -183,6 +198,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 import dayjs, { Dayjs } from 'dayjs'
 import * as Enumerable from 'linq'
 import NewPatientsChart, {
+  NewSeniorPatientsAverageType,
   NewPatientsAverageType
 } from './NewPatientsChart.vue'
 import InspectionPersonsChart, {
@@ -219,6 +235,8 @@ type ScoreType = {
   hospitals7DaysScore: number | undefined // 入院患者数の危険度(50=150人, 100=250人)
   criticals7DaysNum: number | undefined // 重症者数(7日間平均)
   criticals7DaysScore: number | undefined // 重症者数の危険度(50=150人, 100=250人)
+  seniors7DaysNum: number | undefined // 70歳以上(7日間平均)
+  seniors7DaysScore: number | undefined // 70歳以上の危険度
 }
 
 type DataKind = 'latest' | 'history'
@@ -229,8 +247,8 @@ type DisplayInfo = {
   unit: string
 }
 
-// 指標群(新規感染者数、陽性率、入院患者数、重症者数)
-type IndicatorKind = 'patient' | 'rate' | 'hospital' | 'critical'
+// 指標群(新規感染者数、陽性率、入院患者数、重症者数、70歳以上)
+type IndicatorKind = 'patient' | 'rate' | 'hospital' | 'critical' | 'senior'
 
 type StatusKind = 'normal' | 'caution' | 'warning' | 'danger'
 
@@ -300,13 +318,19 @@ export default class MonitoringView extends Vue {
       caution: 15,
       warning: 25,
       danger: 50
+    } as Values,
+    seniors: {
+      caution: 7,
+      warning: 22,
+      danger: 36
     } as Values
   }
 
   private readonly remarks = [
     '<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/novel-coronavirus-taisakuhonbu.html>2020年12月24日 第17回新型コロナウイルス感染症対策本部員会議　資料3,参考資料</a>に基き、当サイトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
     '「新規感染者数」「入院患者数」「重症者数」は、過去7日間の平均です。定義詳細は「新規感染者数」「入院患者数」「重症者数」の各グラフを参照',
-    '「陽性率」は参考値の場合があります。定義詳細は「陽性率・検査実施人数」のグラフを参照'
+    '「陽性率」は参考値の場合があります。定義詳細は「陽性率・検査実施人数」のグラフを参照',
+    '「70歳以上」は70歳以上の新規陽性者数の過去7日間の平均です。'
   ]
 
   @Prop()
@@ -334,6 +358,7 @@ export default class MonitoringView extends Vue {
   private hospitalCell: CellInfo
   private totalCell: CellInfo
   private criticalCell: CellInfo
+  private seniorCell: CellInfo
 
   private dataKind: DataKind = 'latest'
   private readonly dataKinds = [
@@ -403,6 +428,7 @@ export default class MonitoringView extends Vue {
     this.rateCell = Object.assign({}, { indicator: 'rate' }) as CellInfo
     this.hospitalCell = Object.assign({}, { indicator: 'hospital' }) as CellInfo
     this.criticalCell = Object.assign({}, { indicator: 'critical' }) as CellInfo
+    this.seniorCell = Object.assign({}, { indicator: 'senior ' }) as CellInfo
 
     const applyStyle = (
       average: number | undefined,
@@ -472,6 +498,11 @@ export default class MonitoringView extends Vue {
         value: latest.criticals7DaysNum,
         indicator: this.indicator.criticals,
         cell: this.criticalCell
+      },
+      {
+        value: latest.seniors7DaysNum,
+        indicator: this.indicator.seniors,
+        cell: this.seniorCell
       }
     ])
 
@@ -557,13 +588,18 @@ export default class MonitoringView extends Vue {
     const criticals = CriticallyChart.makeAverageCriticals(
       this.mainSummaryData ?? []
     )
+    // 70歳以上
+    const seniors = NewPatientsChart.makeAverageSeniorsNewPatients(
+      this.parientsData ?? []
+    )
 
     // 4つのデータそれぞれの最古日付の中で、最も新しい日をグラフの開始日とする
     const startDate = Enumerable.from([
       dayjs(newPatients.first().date),
       dayjs(positives.first().date),
       dayjs(hospitals.first().date),
-      dayjs(criticals.first().date)
+      dayjs(criticals.first().date),
+      dayjs(seniors.first().date)
     ]).maxBy(x => x)
 
     // 4つのデータそれぞれの最新日付の中で、最も古い日をグラフの終了日とする
@@ -571,7 +607,8 @@ export default class MonitoringView extends Vue {
       dayjs(newPatients.last().date),
       dayjs(positives.last().date),
       dayjs(hospitals.last().date),
-      dayjs(criticals.last().date)
+      dayjs(criticals.last().date),
+      dayjs(seniors.last().date)
     ]).minBy(x => x)
 
     const now = dayjs()
@@ -606,11 +643,13 @@ export default class MonitoringView extends Vue {
         positives.where(d => startDate <= d.date && d.date <= endDate),
         hospitals.where(d => startDate <= d.date && d.date <= endDate),
         criticals.where(d => startDate <= d.date && d.date <= endDate),
+        seniors.where(d => startDate <= d.date && d.date <= endDate),
         (
           n: NewPatientsAverageType,
           p: InspectionPersonAverageType,
           h: HospitalizedAverageType,
-          c: CriticallyAverageType
+          c: CriticallyAverageType,
+          s: NewSeniorPatientsAverageType
         ): any => {
           return {
             date: n.date,
@@ -624,7 +663,9 @@ export default class MonitoringView extends Vue {
             hospitals7DaysNum: h.average, // 入院患者数(7日間平均)
             hospitals7DaysScore: calcScore(h.average, this.indicator.hospitals),
             criticals7DaysNum: c.average, // 重症者数(7日間平均)
-            criticals7DaysScore: calcScore(c.average, this.indicator.criticals)
+            criticals7DaysScore: calcScore(c.average, this.indicator.criticals),
+            seniors7DaysNum: s.average7days, // 70歳以上
+            seniors7DaysScore: calcScore(s.average7days, this.indicator.seniors)
           } as ScoreType
         }
       )
@@ -680,6 +721,17 @@ export default class MonitoringView extends Vue {
             .toArray(),
           order: 4,
           color: '#7F7F7F'
+        },
+        {
+          type: 'line',
+          title: '70歳以上',
+          unit: '人',
+          values: rows.select(d => d.seniors7DaysScore).toArray(),
+          tooltipTexts: rows
+            .select(d => `70歳以上: ${formatNumber(d.seniors7DaysNum)} 人`)
+            .toArray(),
+          order: 5,
+          color: '#FF828C'
         },
         {
           type: 'line',
