@@ -7,6 +7,11 @@
     />
     <whats-new
       class="mb-1"
+      text="1月14日、緊急事態宣言が発出されました（対象期間：1/14～2/7）"
+      url="https://www.pref.aichi.jp/site/covid19-aichi/covid19-aichi.html"
+    />
+    <whats-new
+      class="mb-1"
       :text="newsItem.text"
       :date="newsItem.date"
       :url="newsItem.url"
