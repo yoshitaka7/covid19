@@ -6,7 +6,7 @@ on:
       - data
 
 jobs:
-  pr-development:
+  pr-master:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -15,19 +15,19 @@ jobs:
           path: data-branch
       - uses: actions/checkout@v2
         with:
-          ref: development
-          path: development
+          ref: master
+          path: master
       - run: |
-          cp -rf data-branch/* development/data/
+          cp -rf data-branch/* master/data/
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: development
+          path: master
           commit-message: UPDATE DATA
           title: UPDATE DATA
-          base: development
-          branch: data-bot/development
+          base: master
+          branch: data-bot/master
       - name: Check outputs
         run: |
           echo "Pull Request Number - ${{ env.PULL_REQUEST_NUMBER }}"
