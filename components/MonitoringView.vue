@@ -310,14 +310,14 @@ export default class MonitoringView extends Vue {
       danger: 15.0
     } as Values,
     hospitals: {
-      caution: 150,
-      warning: 250,
-      danger: 500
+      caution: 180,
+      warning: 300,
+      danger: 600
     } as Values,
     criticals: {
-      caution: 15,
-      warning: 25,
-      danger: 50
+      caution: 18,
+      warning: 30,
+      danger: 60
     } as Values,
     seniors: {
       caution: 7,
@@ -327,7 +327,7 @@ export default class MonitoringView extends Vue {
   }
 
   private readonly remarks = [
-    '<a class=RemarksLink target=_blank href=https://www.pref.aichi.jp/site/covid19-aichi/novel-coronavirus-taisakuhonbu.html>2020年12月24日 第17回新型コロナウイルス感染症対策本部員会議　資料3,参考資料</a>に基き、当サイトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
+    '<a class=RemarksLink target=_blank href=https://twitter.com/ohmura_hideaki/status/1359084053119422465>2021年2月9日の愛知県知事のツイート</a>に基き、当サイトが独自に状況を掲載するもので、愛知県の公式発表ではありません',
     '「新規感染者数」「入院患者数」「重症者数」は、過去7日間の平均です。定義詳細は「新規感染者数」「入院患者数」「重症者数」の各グラフを参照',
     '「陽性率」は参考値の場合があります。定義詳細は「陽性率・検査実施人数」のグラフを参照',
     '「70歳以上」は70歳以上の新規陽性者数の過去7日間の平均です。'
