@@ -221,6 +221,9 @@ export default class NewPatientsChart extends Vue {
 
     const getOver70sNum = (d: PatientsSummaryDaily) => {
       const y = d['年代']
+      if (y == null) {
+        return 0
+      }
       return (
         sumSexesNum(y['70代']) +
         sumSexesNum(y['80代']) +
