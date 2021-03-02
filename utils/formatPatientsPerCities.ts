@@ -64,6 +64,9 @@ export const formatPatientsPerCitiesWeekly = (
       const wr = containsWeek(row['日付'])
 
       const places = row['住居地']
+      if (places == null) {
+        return []
+      }
       const arr: WeekCityPatientDataType[] = []
       Object.keys(places).forEach(key => {
         const num = places[key]
