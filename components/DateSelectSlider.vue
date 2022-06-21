@@ -72,7 +72,6 @@ export default {
   methods: {
     showSliderLabels(order) {
       const isFrom =  this.sliderValue[0] === order
-      console.log(isFrom)
       if (order < this.chartData.length) {
         const certainPeriod = this.chartData
         const particularDate = certainPeriod[order]
